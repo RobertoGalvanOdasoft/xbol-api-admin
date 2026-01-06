@@ -1,3 +1,5 @@
+using Odasoft.XBOL.AdminAPI;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -10,6 +12,13 @@ builder.Services.AddHealthChecks();
 // Add OpenAPI services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddHttpClient<ITicketingClient, TicketingClient>(
+    (provider, client) =>
+    {
+        client.BaseAddress = new Uri(builder.Configuration.GetValue(
+            "TicketingClientBaseAddress", "https://localhost:7021/"));
+    });
 
 var app = builder.Build();
 

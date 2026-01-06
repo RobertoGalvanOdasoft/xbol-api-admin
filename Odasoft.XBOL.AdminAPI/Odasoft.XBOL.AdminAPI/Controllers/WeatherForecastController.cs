@@ -4,7 +4,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    public class WeatherForecastController(ITicketingClient ticketingClient) : ControllerBase
     {
         private static readonly string[] Summaries =
         [
@@ -12,8 +12,10 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         ];
 
         [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        public async Task<IEnumerable<WeatherForecast>> Get()
         {
+            var result = await ticketingClient.TestAsync();
+
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),

@@ -1,0 +1,18 @@
+services:
+  xbol-api-admin:
+    container_name: xbol-api-admin
+    build:
+      context: ./Odasoft.XBOL.AdminAPI
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ASPNETCORE_URLS: "http://+:8080"
+      ASPNETCORE_ENVIRONMENT: "Production"
+    networks:
+      - xbol-network
+
+networks:
+  xbol-network:
+    external: true

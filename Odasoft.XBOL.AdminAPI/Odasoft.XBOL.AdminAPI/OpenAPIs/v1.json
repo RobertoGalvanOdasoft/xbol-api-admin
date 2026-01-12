@@ -10,6 +10,64 @@
     }
   ],
   "paths": {
+    "/api/Booking": {
+      "post": {
+        "tags": [
+          "Booking"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Test": {
       "get": {
         "tags": [
@@ -82,6 +140,28 @@
   },
   "components": {
     "schemas": {
+      "BookingRequest": {
+        "required": [
+          "seats",
+          "holdToken",
+          "eventId"
+        ],
+        "type": "object",
+        "properties": {
+          "seats": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "holdToken": {
+            "type": "string"
+          },
+          "eventId": {
+            "type": "string"
+          }
+        }
+      },
       "Role": {
         "type": "object",
         "properties": {
@@ -105,6 +185,9 @@
     }
   },
   "tags": [
+    {
+      "name": "Booking"
+    },
     {
       "name": "Test"
     }

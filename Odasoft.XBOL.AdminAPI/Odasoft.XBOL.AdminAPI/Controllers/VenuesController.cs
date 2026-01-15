@@ -7,7 +7,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
     public class VenuesController(ITicketingClient ticketingClient) : ControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<ICollection<string>>> GetVenues()
+        public async Task<ActionResult<ICollection<VenueListItem>>> GetVenues()
         {
             var result = await ticketingClient.VenuesAsync();
 

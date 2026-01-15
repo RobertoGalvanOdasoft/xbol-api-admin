@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Odasoft.XBOL.Business.Services;
 using Odasoft.XBOL.Models;
 
@@ -9,10 +9,12 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
     public class EventsController : ControllerBase
     {
         private readonly EventService _eventService;
+        private readonly ITicketingClient _ticketingClient;
 
-        public EventsController(EventService eventService)
+        public EventsController(EventService eventService, ITicketingClient ticketingClient)
         {
             _eventService = eventService;
+            _ticketingClient = ticketingClient;
         }
 
         /// <summary>
@@ -28,6 +30,24 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
 
             // TODO: Set the proper Response DTO
             return Ok(eventDetails);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<PagedResponseOfEventListItem>> GetEvents(
+            [FromQuery] string? venues,
+            [FromQuery] string? categories,
+            [FromQuery] DateTimeOffset? startDate,
+            [FromQuery] DateTimeOffset? endDate,
+            [FromQuery] string? search,
+            [FromQuery] string? sortBy,
+            [FromQuery] bool? descending,
+            [FromQuery] int? page,
+            [FromQuery] int? pageSize)
+        {
+            var result = await _ticketingClient.EventsAsync(
+                venues, categories, startDate, endDate, search, sortBy, descending, page, pageSize);
+
+            return Ok(result);
         }
     }
 }

@@ -1,0 +1,35 @@
+﻿using Odasoft.XBOL.Commons.Enums;
+using System;
+using System.Collections.Generic;
+using System.Net.Sockets;
+using System.Text;
+
+namespace Odasoft.XBOL.Models
+{
+    public class EventSchedule : BaseModel
+    {
+        public long EventId { get; set; }
+
+        public DateTimeOffset StartDateTime { get; set; }
+        
+        public DateTimeOffset EndDateTime { get; set; }
+
+        public DateTimeOffset PublishedDate { get; set; }
+        
+        public DateTimeOffset OnSaleDate { get; set; }
+        
+        public DateTimeOffset PreSaleDate { get; set; }
+        
+        public DateTimeOffset OffSaleDate { get; set; }
+        
+        public DateTimeOffset GateOpenDate { get; set; }
+
+        public GameCategory GameCategory { get; set; }
+        
+        public ScheduleStatus Status { get; set; }
+
+        public string ExternalEventKey { get; set; } = null!;
+
+        public IList<EventSection> Sections { get; set; } = [];
+    }
+}

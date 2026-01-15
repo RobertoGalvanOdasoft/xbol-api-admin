@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Odasoft.XBOL.DTO.Results;
+using Wolverine;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
 {
     [Route("api/bookings")]
     [ApiController]
-    public class BookingsController(ITicketingClient ticketingClient) : ControllerBase
+    public class BookingsController(IMessageBus bus) : ControllerBase
     {
         /// <summary>
         /// Creates a new booking based on the specified booking request.
@@ -15,9 +16,8 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<BookingResult>> CreateBooking([FromBody] BookingRequest request)
         {
-            var result = await ticketingClient.BookingAsync(request);
-
-            return Ok(new BookingResult { Message = "Booking created successfully", Tickets = result });
+            var result = await bus.InvokeAsync<BookingResult>(new CreateBookingCommand(request));
+            return Ok(result);
         }
     }
 }

@@ -3,6 +3,7 @@ using Odasoft.XBOL.AdminAPI;
 using Odasoft.XBOL.Business.Extensions;
 using Odasoft.XBOL.Data;
 using Odasoft.XBOL.Data.Extensions;
+using Wolverine;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,8 @@ builder.Services.AddHealthChecks();
 // Add OpenAPI services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Host.UseWolverine();
 
 // Add Http Clients
 builder.Services.AddHttpClient<ITicketingClient, TicketingClient>(

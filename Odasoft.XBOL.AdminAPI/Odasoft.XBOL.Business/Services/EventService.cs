@@ -1,4 +1,4 @@
-﻿using Odasoft.XBOL.Data.Repositories;
+using Odasoft.XBOL.Data.Repositories;
 using Odasoft.XBOL.Models;
 
 namespace Odasoft.XBOL.Business.Services
@@ -12,7 +12,7 @@ namespace Odasoft.XBOL.Business.Services
             _eventRepository = eventRepository;
         }
 
-        public async Task<Event> GetEventByIdAsync(long eventId)
+        public async Task<Event?> GetEventByIdAsync(long eventId)
         {
             // TODO: Set the proper DTO to return only necessary fields
             var result = await _eventRepository.GetByIdAsync(eventId);

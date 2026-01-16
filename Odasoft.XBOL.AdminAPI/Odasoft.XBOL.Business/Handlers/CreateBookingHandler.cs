@@ -3,16 +3,16 @@ using Odasoft.XBOL.DTO.Results;
 
 public class CreateBookingHandler
 {
-    private readonly ITicketingApi _ticketingApi;
+    private readonly ITicketingClient _ticketingClient;
 
-    public CreateBookingHandler(ITicketingApi ticketingApi)
+    public CreateBookingHandler(ITicketingClient ticketingClient)
     {
-        _ticketingApi = ticketingApi;
+        _ticketingClient = ticketingClient;
     }
 
     public async Task<BookingResult> Handle(CreateBookingCommand command)
     {
-        var tickets = await _ticketingApi.BookingAsync(command.Request);
+        var tickets = await _ticketingClient.BookingAsync(command.Request);
         return new BookingResult { Message = "Booking created successfully", Tickets = tickets };
     }
 }

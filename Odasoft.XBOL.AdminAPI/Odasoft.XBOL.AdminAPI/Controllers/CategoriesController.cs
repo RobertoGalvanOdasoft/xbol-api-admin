@@ -7,11 +7,11 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        private readonly ITicketingApi _ticketingApi;
+        private readonly ITicketingClient _ticketingClient;
 
-        public CategoriesController(ITicketingApi ticketingApi)
+        public CategoriesController(ITicketingClient ticketingClient)
         {
-            _ticketingApi = ticketingApi;
+            _ticketingClient = ticketingClient;
         }
 
         [HttpGet]
@@ -19,7 +19,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         {
             // TODO: Move categories logic to this API from TicketingApi
 
-            var result = await _ticketingApi.CategoriesAsync();
+            var result = await _ticketingClient.CategoriesAsync();
 
             return Ok(result);
         }

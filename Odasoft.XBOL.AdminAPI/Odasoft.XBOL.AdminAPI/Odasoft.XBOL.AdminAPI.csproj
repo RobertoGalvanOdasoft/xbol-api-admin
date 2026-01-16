@@ -30,9 +30,4 @@
     <ProjectReference Include="..\Odasoft.XBOL.Data\Odasoft.XBOL.Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Handlers\" />
-    <Folder Include="Messages\" />
-  </ItemGroup>
-
 </Project>

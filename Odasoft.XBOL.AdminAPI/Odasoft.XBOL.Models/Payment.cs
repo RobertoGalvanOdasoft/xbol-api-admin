@@ -1,7 +1,4 @@
 using Odasoft.XBOL.Commons.Enums;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Odasoft.XBOL.Models
 {

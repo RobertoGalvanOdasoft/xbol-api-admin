@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Odasoft.XBOL.Business;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
 {
@@ -14,7 +15,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         [HttpGet]
         public async Task<IEnumerable<WeatherForecast>> Get()
         {
-            var result = await ticketingClient.TestAsync();
+            var result = await ticketingClient.TestsAsync();
 
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {

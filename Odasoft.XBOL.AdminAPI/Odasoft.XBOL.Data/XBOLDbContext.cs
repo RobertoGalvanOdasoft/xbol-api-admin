@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Odasoft.XBOL.Data.Configurations;
 using Odasoft.XBOL.Data.Extensions;
@@ -5,7 +6,7 @@ using Odasoft.XBOL.Models;
 
 namespace Odasoft.XBOL.Data
 {
-    public class XBOLDbContext : DbContext
+    public class XBOLDbContext : IdentityDbContext<User, Role, Guid>
     {
         public DbSet<Event> Events { get; set; }
         public DbSet<EventSeat> EventSeats { get; set; }

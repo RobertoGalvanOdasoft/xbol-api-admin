@@ -1,4 +1,4 @@
-﻿using Dapper;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Odasoft.XBOL.Models;
@@ -38,7 +38,7 @@ namespace Odasoft.XBOL.Data.Repositories
             GC.SuppressFinalize(this);
         }
 
-        public IEnumerable<M> Get(
+        public IQueryable<M> Get(
             Expression<Func<M, bool>>? filter = null,
             Func<IQueryable<M>, IOrderedQueryable<M>>? orderBy = null,
             int? pageSize = null,

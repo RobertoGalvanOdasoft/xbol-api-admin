@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Odasoft.XBOL.Data.Repositories;
 
 namespace Odasoft.XBOL.Data.Extensions
@@ -9,6 +9,9 @@ namespace Odasoft.XBOL.Data.Extensions
         {
             services.AddScoped<EventRepository>();
             services.AddScoped<EventSeatRepository>();
+            services.AddScoped<EventScheduleRepository>();
+            services.AddScoped<OrderRepository>();
+            services.AddScoped<UserRepository>();
 
             return services;
         }

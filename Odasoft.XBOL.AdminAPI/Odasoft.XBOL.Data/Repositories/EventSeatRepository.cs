@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Odasoft.XBOL.DTO;
 using Odasoft.XBOL.Models;
 
@@ -16,6 +16,13 @@ namespace Odasoft.XBOL.Data.Repositories
                     SeatKey = t1.ExternalSeatObjectKey,
                     Price = t1.PriceOverride.HasValue ? t1.PriceOverride.Value : 0m,
                 }).ToListAsync();
+        }
+
+        public async Task<EventSeat?> GetByExternalSeatObjectKeyAsync(string key)
+        {
+            return await dbContext.EventSeats
+                .AsNoTracking()
+                .FirstOrDefaultAsync(es => es.ExternalSeatObjectKey == key);
         }
     }
 }

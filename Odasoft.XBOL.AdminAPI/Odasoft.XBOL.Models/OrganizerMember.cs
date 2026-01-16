@@ -1,4 +1,4 @@
-﻿namespace Odasoft.XBOL.Models
+namespace Odasoft.XBOL.Models
 {
     public class OrganizerMember : BaseModel
     {
@@ -6,5 +6,7 @@
         public Organizer Organizer { get; set; } = null!;
 
         public Guid UserId { get; set; }
+
+        public User User { get; set; } = null!;
     }
 }

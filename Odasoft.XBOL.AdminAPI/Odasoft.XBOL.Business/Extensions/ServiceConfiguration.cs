@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Odasoft.XBOL.Business.Services;
 
 namespace Odasoft.XBOL.Business.Extensions

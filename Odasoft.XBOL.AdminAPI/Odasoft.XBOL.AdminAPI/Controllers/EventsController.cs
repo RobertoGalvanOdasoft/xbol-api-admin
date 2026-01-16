@@ -17,6 +17,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         }
 
         [HttpGet]
+        [EndpointName("GetEvents")]
         public async Task<ActionResult<PagedResponseOfEventListItem>> GetEvents(
             [FromQuery] string? venues,
             [FromQuery] string? categories,
@@ -28,9 +29,17 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
             [FromQuery] int? page,
             [FromQuery] int? pageSize)
         {
-            var result = await _ticketingClient.EventsAsync(
+            var result = await _ticketingClient.GetEventsAsync(
                 venues, categories, startDate, endDate, search, sortBy, descending, page, pageSize);
 
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        [EndpointName("GetEvent")]
+        public async Task<ActionResult<EventListItem>> GetEvent([FromRoute] long id)
+        {
+            var result = await _ticketingClient.GetEventAsync(id);
             return Ok(result);
         }
     }

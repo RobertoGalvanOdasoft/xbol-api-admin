@@ -10,11 +10,12 @@
     }
   ],
   "paths": {
-    "/api/Booking": {
+    "/api/booking": {
       "post": {
         "tags": [
           "Booking"
         ],
+        "operationId": "CreateBooking",
         "requestBody": {
           "content": {
             "application/json": {
@@ -68,11 +69,12 @@
         }
       }
     },
-    "/api/Categories": {
+    "/api/categories": {
       "get": {
         "tags": [
           "Categories"
         ],
+        "operationId": "GetCategories",
         "responses": {
           "200": {
             "description": "OK",
@@ -106,11 +108,12 @@
         }
       }
     },
-    "/api/Events": {
+    "/api/events": {
       "get": {
         "tags": [
           "Events"
         ],
+        "operationId": "GetEvents",
         "parameters": [
           {
             "name": "venues",
@@ -216,11 +219,54 @@
         }
       }
     },
-    "/api/Test": {
+    "/api/events/{id}": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "operationId": "GetEvent",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventListItem"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventListItem"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventListItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/test": {
       "get": {
         "tags": [
           "Test"
         ],
+        "operationId": "GetTest",
         "responses": {
           "200": {
             "description": "OK",
@@ -245,11 +291,12 @@
         }
       }
     },
-    "/api/Test/role/{id}": {
+    "/api/test/role/{id}": {
       "get": {
         "tags": [
           "Test"
         ],
+        "operationId": "GetRole",
         "parameters": [
           {
             "name": "id",
@@ -285,11 +332,12 @@
         }
       }
     },
-    "/api/Test/dynamic-pricing/{eventId}": {
+    "/api/test/dynamic-pricing/{eventId}": {
       "get": {
         "tags": [
           "Test"
         ],
+        "operationId": "GetDynamicPricing",
         "parameters": [
           {
             "name": "eventId",
@@ -312,11 +360,12 @@
         }
       }
     },
-    "/api/VenueMaps": {
+    "/api/venue-maps": {
       "get": {
         "tags": [
           "VenueMaps"
         ],
+        "operationId": "GetVenueMaps",
         "responses": {
           "200": {
             "description": "OK",
@@ -350,11 +399,54 @@
         }
       }
     },
-    "/api/Venues": {
+    "/api/venue-maps/{id}": {
+      "get": {
+        "tags": [
+          "VenueMaps"
+        ],
+        "operationId": "GetVenueMap",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/VenueMapListItem"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VenueMapListItem"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VenueMapListItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/venues": {
       "get": {
         "tags": [
           "Venues"
         ],
+        "operationId": "GetVenues",
         "responses": {
           "200": {
             "description": "OK",
@@ -425,7 +517,7 @@
             ],
             "format": "int64"
           },
-          "dateTime": {
+          "scheduledStartDate": {
             "type": "string",
             "format": "date-time"
           },
@@ -442,6 +534,12 @@
               "string"
             ],
             "format": "int64"
+          },
+          "venueName": {
+            "type": "string"
+          },
+          "externalEventKey": {
+            "type": "string"
           },
           "availableSeats": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",

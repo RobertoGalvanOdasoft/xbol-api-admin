@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/ticket")]
     [ApiController]
     public class TicketController : ControllerBase
     {

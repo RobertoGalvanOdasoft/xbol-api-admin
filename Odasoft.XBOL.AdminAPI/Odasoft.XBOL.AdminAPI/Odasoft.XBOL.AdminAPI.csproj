@@ -18,18 +18,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <OpenApiReference Include="OpenAPIs\v1.json" Options="/UseBaseUrl:false /GenerateClientInterfaces:true" ClassName="TicketingClient">
-      <SourceUri>https://localhost:7021/openapi/v1.json</SourceUri>
-    </OpenApiReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="NSwag.ApiDescription.Client" Version="14.6.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.0" />
     <PackageReference Include="WolverineFx" Version="5.10.0" />
     <!-- Container environment variables -->
@@ -40,6 +28,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Odasoft.XBOL.Business\Odasoft.XBOL.Business.csproj" />
     <ProjectReference Include="..\Odasoft.XBOL.Data\Odasoft.XBOL.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Handlers\" />
+    <Folder Include="Messages\" />
   </ItemGroup>
 
 </Project>

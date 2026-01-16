@@ -1,21 +1,18 @@
 {
-  "openapi": "3.1.1",
+  "openapi": "3.0.4",
   "info": {
-    "title": "XBOL.Ticketing.API | v1",
-    "version": "1.0.0"
+    "title": "XBOL Ticketing API",
+    "version": "v1"
   },
-  "servers": [
-    {
-      "url": "https://localhost:7021/"
-    }
-  ],
   "paths": {
-    "/api/Booking": {
+    "/api/booking": {
       "post": {
         "tags": [
           "Booking"
         ],
+        "summary": "Creates a new booking for the specified seat selection and returns the identifiers of the booked seats.",
         "requestBody": {
+          "description": "The booking request containing event and seat selection details. Cannot be null.",
           "content": {
             "application/json": {
               "schema": {
@@ -32,8 +29,7 @@
                 "$ref": "#/components/schemas/BookingRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -68,7 +64,7 @@
         }
       }
     },
-    "/api/Categories": {
+    "/api/categories": {
       "get": {
         "tags": [
           "Categories"
@@ -106,7 +102,7 @@
         }
       }
     },
-    "/api/Events": {
+    "/api/events": {
       "get": {
         "tags": [
           "Events"
@@ -169,11 +165,7 @@
             "name": "page",
             "in": "query",
             "schema": {
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": "integer",
               "format": "int32",
               "default": 1
             }
@@ -182,11 +174,7 @@
             "name": "pageSize",
             "in": "query",
             "schema": {
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": "integer",
               "format": "int32",
               "default": 10
             }
@@ -198,17 +186,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedResponseOfEventListItem"
+                  "$ref": "#/components/schemas/EventListItemPagedResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedResponseOfEventListItem"
+                  "$ref": "#/components/schemas/EventListItemPagedResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedResponseOfEventListItem"
+                  "$ref": "#/components/schemas/EventListItemPagedResponse"
                 }
               }
             }
@@ -216,7 +204,7 @@
         }
       }
     },
-    "/api/Test": {
+    "/api/tests": {
       "get": {
         "tags": [
           "Test"
@@ -245,7 +233,7 @@
         }
       }
     },
-    "/api/Test/role/{id}": {
+    "/api/tests/role/{id}": {
       "get": {
         "tags": [
           "Test"
@@ -285,22 +273,20 @@
         }
       }
     },
-    "/api/Test/dynamic-pricing/{eventId}": {
-      "get": {
+    "/api/tests/dynamic-pricing/{eventId}": {
+      "post": {
         "tags": [
           "Test"
         ],
+        "summary": "Calculates dynamic ticket prices for the specified event using the provided rules engine service.",
         "parameters": [
           {
             "name": "eventId",
             "in": "path",
+            "description": "The unique identifier of the event for which to calculate dynamic prices.",
             "required": true,
             "schema": {
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": "integer",
               "format": "int64"
             }
           }
@@ -312,7 +298,7 @@
         }
       }
     },
-    "/api/VenueMaps": {
+    "/api/venue-maps": {
       "get": {
         "tags": [
           "VenueMaps"
@@ -350,7 +336,7 @@
         }
       }
     },
-    "/api/Venues": {
+    "/api/venues": {
       "get": {
         "tags": [
           "Venues"
@@ -393,9 +379,9 @@
     "schemas": {
       "BookingRequest": {
         "required": [
-          "seats",
+          "eventId",
           "holdToken",
-          "eventId"
+          "seats"
         ],
         "type": "object",
         "properties": {
@@ -403,13 +389,16 @@
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "nullable": true
           },
           "holdToken": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "eventId": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -418,11 +407,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int64"
           },
           "dateTime": {
@@ -430,69 +415,48 @@
             "format": "date-time"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "category": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "venueMapId": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int64"
           },
           "availableSeats": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           },
           "totalSeats": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           }
         },
         "additionalProperties": false
       },
-      "PagedResponseOfEventListItem": {
+      "EventListItemPagedResponse": {
         "type": "object",
         "properties": {
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/EventListItem"
-            }
+            },
+            "nullable": true
           },
           "totalCount": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           },
           "page": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           },
           "pageSize": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           }
         },
@@ -506,7 +470,8 @@
             "format": "uuid"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -518,7 +483,8 @@
         "type": "object",
         "properties": {
           "result": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -527,15 +493,12 @@
         "type": "object",
         "properties": {
           "id": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int64"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -544,26 +507,20 @@
         "type": "object",
         "properties": {
           "id": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int64"
           },
           "venueId": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int64"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "externalMapKey": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

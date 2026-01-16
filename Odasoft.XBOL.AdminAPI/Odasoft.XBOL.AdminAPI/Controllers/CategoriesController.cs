@@ -7,10 +7,11 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
     [ApiController]
     public class CategoriesController(ITicketingClient ticketingClient) : ControllerBase
     {
-        [HttpGet]
-        public async Task<ActionResult<ICollection<string>>> GetCategoriesAsync()
+        [HttpGet("names")]
+        [EndpointName("GetCategoriesNamesAsync")]
+        public async Task<ActionResult<ICollection<string>>> GetCategoriesNamesAsync()
         {
-            var result = await ticketingClient.GetCategoriesAsync();
+            var result = await ticketingClient.GetCategoriesNamesAsync();
 
             return Ok(result);
         }

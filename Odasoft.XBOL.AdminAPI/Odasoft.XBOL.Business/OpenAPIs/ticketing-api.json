@@ -5,12 +5,13 @@
     "version": "v1"
   },
   "paths": {
-    "/api/booking": {
+    "/api/booking/book-seats": {
       "post": {
         "tags": [
           "Booking"
         ],
-        "summary": "Creates a new booking for the specified seat selection and returns the identifiers of the booked seats.",
+        "summary": "Books the specified seat selection for the event and returns the identifiers of the booked seats.",
+        "operationId": "BookSeatsAsync",
         "requestBody": {
           "description": "The booking request containing event and seat selection details. Cannot be null.",
           "content": {
@@ -64,12 +65,12 @@
         }
       }
     },
-    "/api/categories": {
+    "/api/categories/names": {
       "get": {
         "tags": [
           "Categories"
         ],
-        "operationId": "GetCategories",
+        "operationId": "GetCategoriesNames",
         "responses": {
           "200": {
             "description": "OK",
@@ -108,7 +109,7 @@
         "tags": [
           "Events"
         ],
-        "operationId": "GetEvents",
+        "operationId": "GetEventsAsync",
         "parameters": [
           {
             "name": "venues",
@@ -206,15 +207,15 @@
         }
       }
     },
-    "/api/events/{id}": {
+    "/api/events/{eventId}": {
       "get": {
         "tags": [
           "Events"
         ],
-        "operationId": "GetEvent",
+        "operationId": "GetEvenByIdAsync",
         "parameters": [
           {
-            "name": "id",
+            "name": "eventId",
             "in": "path",
             "required": true,
             "schema": {
@@ -252,6 +253,7 @@
         "tags": [
           "Test"
         ],
+        "operationId": "GetApiEnvironment",
         "responses": {
           "200": {
             "description": "OK",
@@ -282,6 +284,7 @@
           "Test"
         ],
         "summary": "Calculates dynamic ticket prices for the specified event using the provided rules engine service.",
+        "operationId": "CalculatePricesAsync",
         "parameters": [
           {
             "name": "eventId",
@@ -306,7 +309,7 @@
         "tags": [
           "VenueMaps"
         ],
-        "operationId": "GetVenueMaps",
+        "operationId": "GetVenueMapsAsync",
         "responses": {
           "200": {
             "description": "OK",
@@ -340,15 +343,15 @@
         }
       }
     },
-    "/api/venue-maps/{id}": {
+    "/api/venue-maps/{venueMapId}": {
       "get": {
         "tags": [
           "VenueMaps"
         ],
-        "operationId": "GetVenueMap",
+        "operationId": "GetVenueMapByIdAsync",
         "parameters": [
           {
-            "name": "id",
+            "name": "venueMapId",
             "in": "path",
             "required": true,
             "schema": {
@@ -386,7 +389,7 @@
         "tags": [
           "Venues"
         ],
-        "operationId": "GetVenues",
+        "operationId": "GetVenuesAsync",
         "responses": {
           "200": {
             "description": "OK",

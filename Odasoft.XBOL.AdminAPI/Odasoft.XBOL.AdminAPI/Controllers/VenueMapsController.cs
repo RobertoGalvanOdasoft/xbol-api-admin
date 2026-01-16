@@ -8,6 +8,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
     public class VenueMapsController(ITicketingClient ticketingClient) : ControllerBase
     {
         [HttpGet]
+        [EndpointName("GetVenueMapsAsync")]
         public async Task<ActionResult<ICollection<VenueMapListItem>>> GetVenueMapsAsync()
         {
             var result = await ticketingClient.GetVenueMapsAsync();
@@ -16,9 +17,10 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         }
 
         [HttpGet("{venueMapId}")]
-        public async Task<ActionResult<VenueMapListItem>> GetVenueMapsByIdAsync([FromRoute] long id)
+        [EndpointName("GetVenueMapsByIdAsync")]
+        public async Task<ActionResult<VenueMapListItem>> GetVenueMapsByIdAsync([FromRoute] long venueMapId)
         {
-            var result = await ticketingClient.GetVenueMapAsync(id);
+            var result = await ticketingClient.GetVenueMapByIdAsync(venueMapId);
             return Ok(result);
         }
     }

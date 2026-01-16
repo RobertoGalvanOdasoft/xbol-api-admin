@@ -27,7 +27,8 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// Cannot be null.</param>
         /// <returns>An ActionResult containing <see langword="true"/> if the user was registered successfully.</returns>
         [HttpPost]
-        public async Task<ActionResult<bool>> RegisterUserAsync(CreateUserRequest request)
+        [EndpointName("CreateUserAsync")]
+        public async Task<ActionResult<bool>> CreateUserAsync(CreateUserRequest request)
         {
             User newUser = new()
             {

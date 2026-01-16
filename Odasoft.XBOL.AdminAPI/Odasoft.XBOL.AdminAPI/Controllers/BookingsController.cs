@@ -10,12 +10,14 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
     public class BookingsController(IMessageBus bus) : ControllerBase
     {
         /// <summary>
-        /// Creates a new booking based on the specified booking request.
+        /// Books the specified seat selection for the event and returns the identifiers of the booked seats.
         /// </summary>
-        /// <param name="request">The booking details to use for creating the new booking. Cannot be null.</param>
-        /// <returns>An ActionResult containing a BookingResult that indicates the outcome of the booking operation.</returns>
-        [HttpPost]
-        public async Task<ActionResult<BookingResult>> CreateBookingAsync([FromBody] BookingRequest request)
+        /// <param name="request">The booking request containing event and seat selection details. Cannot be null.</param>
+        /// <returns>An action result containing a collection of strings that represent the keys of the successfully booked
+        /// seats.</returns>
+        [HttpPost("book-seats")]
+        [EndpointName("BookSeatsAsync")]
+        public async Task<ActionResult<BookingResult>> BookSeatsAsync([FromBody] BookingRequest request)
         {
             var result = await bus.InvokeAsync<BookingResult>(new CreateBookingCommand(request));
             return Ok(result);

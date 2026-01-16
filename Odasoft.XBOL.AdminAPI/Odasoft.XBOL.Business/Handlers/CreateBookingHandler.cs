@@ -12,7 +12,7 @@ public class CreateBookingHandler
 
     public async Task<BookingResult> Handle(CreateBookingCommand command)
     {
-        var tickets = await _ticketingClient.BookingAsync(command.Request);
+        var tickets = await _ticketingClient.BookSeatsAsync(command.Request);
         return new BookingResult { Message = "Booking created successfully", Tickets = tickets };
     }
 }

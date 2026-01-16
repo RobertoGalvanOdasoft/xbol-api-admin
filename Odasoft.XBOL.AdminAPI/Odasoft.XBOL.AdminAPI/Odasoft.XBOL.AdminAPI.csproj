@@ -1,33 +1,35 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>24d800dc-d3dd-470f-83a0-68bd52cd3a78</UserSecretsId>
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>24d800dc-d3dd-470f-83a0-68bd52cd3a78</UserSecretsId>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);1591</NoWarn>
 
-    <!-- Docker configuration for Visual Studio -->
-    <DockerfileContext>..\..</DockerfileContext>
-    <DockerfilePath>..\Dockerfile</DockerfilePath>
-  </PropertyGroup>
+        <!-- Docker configuration for Visual Studio -->
+        <DockerfileContext>..\..</DockerfileContext>
+        <DockerfilePath>..\Dockerfile</DockerfilePath>
+    </PropertyGroup>
 
-  <!-- Production optimizations -->
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <ContainerUser>app</ContainerUser>
-    <PublishReadyToRun>true</PublishReadyToRun>
-  </PropertyGroup>
+    <!-- Production optimizations -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <ContainerUser>app</ContainerUser>
+        <PublishReadyToRun>true</PublishReadyToRun>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.0" />
-    <PackageReference Include="WolverineFx" Version="5.10.0" />
-    <!-- Container environment variables -->
-    <ContainerEnvironmentVariable Include="ASPNETCORE_HTTP_PORTS" Value="8080" />
-    <ContainerEnvironmentVariable Include="ASPNETCORE_URLS" Value="http://+:8080" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.0" />
+        <PackageReference Include="WolverineFx" Version="5.10.0" />
+        <!-- Container environment variables -->
+        <ContainerEnvironmentVariable Include="ASPNETCORE_HTTP_PORTS" Value="8080" />
+        <ContainerEnvironmentVariable Include="ASPNETCORE_URLS" Value="http://+:8080" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Odasoft.XBOL.Business\Odasoft.XBOL.Business.csproj" />
-    <ProjectReference Include="..\Odasoft.XBOL.Data\Odasoft.XBOL.Data.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Odasoft.XBOL.Business\Odasoft.XBOL.Business.csproj" />
+        <ProjectReference Include="..\Odasoft.XBOL.Data\Odasoft.XBOL.Data.csproj" />
+    </ItemGroup>
 
 </Project>

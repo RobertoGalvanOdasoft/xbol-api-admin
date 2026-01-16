@@ -22,6 +22,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// <returns>An asynchronous operation that returns an <see cref="ActionResult{IList{SeatPriceDTO}}"/> containing the
         /// list of seat prices for the event.</returns>
         [HttpGet("{eventId}/seat-prices")]
+        [EndpointName("GetEventSeatPrices")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<SeatPriceDTO>))]
         public async Task<ActionResult<List<SeatPriceDTO>>> GetSeatPricesAsync([FromRoute] long eventId)
         {

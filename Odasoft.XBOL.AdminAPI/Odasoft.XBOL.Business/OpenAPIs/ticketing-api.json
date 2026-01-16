@@ -69,6 +69,7 @@
         "tags": [
           "Categories"
         ],
+        "operationId": "GetCategories",
         "responses": {
           "200": {
             "description": "OK",
@@ -107,6 +108,7 @@
         "tags": [
           "Events"
         ],
+        "operationId": "GetEvents",
         "parameters": [
           {
             "name": "venues",
@@ -204,6 +206,47 @@
         }
       }
     },
+    "/api/events/{id}": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "operationId": "GetEvent",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventListItem"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventListItem"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventListItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/tests": {
       "get": {
         "tags": [
@@ -263,6 +306,7 @@
         "tags": [
           "VenueMaps"
         ],
+        "operationId": "GetVenueMaps",
         "responses": {
           "200": {
             "description": "OK",
@@ -296,11 +340,53 @@
         }
       }
     },
+    "/api/venue-maps/{id}": {
+      "get": {
+        "tags": [
+          "VenueMaps"
+        ],
+        "operationId": "GetVenueMap",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/VenueMapListItem"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VenueMapListItem"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VenueMapListItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/venues": {
       "get": {
         "tags": [
           "Venues"
         ],
+        "operationId": "GetVenues",
         "responses": {
           "200": {
             "description": "OK",
@@ -370,7 +456,7 @@
             "type": "integer",
             "format": "int64"
           },
-          "dateTime": {
+          "scheduledStartDate": {
             "type": "string",
             "format": "date-time"
           },
@@ -385,6 +471,14 @@
           "venueMapId": {
             "type": "integer",
             "format": "int64"
+          },
+          "venueName": {
+            "type": "string",
+            "nullable": true
+          },
+          "externalEventKey": {
+            "type": "string",
+            "nullable": true
           },
           "availableSeats": {
             "type": "integer",

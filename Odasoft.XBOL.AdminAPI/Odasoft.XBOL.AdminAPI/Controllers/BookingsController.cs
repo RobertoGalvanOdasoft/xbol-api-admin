@@ -15,7 +15,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// <param name="request">The booking details to use for creating the new booking. Cannot be null.</param>
         /// <returns>An ActionResult containing a BookingResult that indicates the outcome of the booking operation.</returns>
         [HttpPost]
-        public async Task<ActionResult<BookingResult>> CreateBooking([FromBody] BookingRequest request)
+        public async Task<ActionResult<BookingResult>> CreateBookingAsync([FromBody] BookingRequest request)
         {
             var result = await bus.InvokeAsync<BookingResult>(new CreateBookingCommand(request));
             return Ok(result);

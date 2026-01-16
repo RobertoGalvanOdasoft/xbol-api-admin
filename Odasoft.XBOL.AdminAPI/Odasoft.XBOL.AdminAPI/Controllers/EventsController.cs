@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Odasoft.XBOL.Business;
+using Odasoft.XBOL.Business.Services;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
 {
@@ -7,15 +8,17 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
     [ApiController]
     public class EventsController : ControllerBase
     {
+        private readonly EventService _eventService;
         private readonly ITicketingClient _ticketingClient;
 
-        public EventsController(ITicketingClient ticketingClient)
+        public EventsController(EventService eventService, ITicketingClient ticketingClient)
         {
+            _eventService = eventService;
             _ticketingClient = ticketingClient;
         }
 
         [HttpGet]
-        public async Task<ActionResult<EventListItemPagedResponse>> GetEvents(
+        public async Task<ActionResult<EventListItemPagedResponse>> GetEventsAsync(
             [FromQuery] string? venues,
             [FromQuery] string? categories,
             [FromQuery] DateTimeOffset? startDate,
@@ -26,9 +29,16 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
             [FromQuery] int? page,
             [FromQuery] int? pageSize)
         {
-            var result = await _ticketingClient.EventsAsync(
+            var result = await _ticketingClient.GetEventsAsync(
                 venues, categories, startDate, endDate, search, sortBy, descending, page, pageSize);
 
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<EventListItem>> GetEventAsync([FromRoute] long id)
+        {
+            var result = await _ticketingClient.GetEventAsync(id);
             return Ok(result);
         }
     }

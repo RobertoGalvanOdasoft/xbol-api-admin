@@ -3,23 +3,14 @@ using Odasoft.XBOL.Business;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/categories")]
     [ApiController]
-    public class CategoriesController : ControllerBase
+    public class CategoriesController(ITicketingClient ticketingClient) : ControllerBase
     {
-        private readonly ITicketingClient _ticketingClient;
-
-        public CategoriesController(ITicketingClient ticketingClient)
-        {
-            _ticketingClient = ticketingClient;
-        }
-
         [HttpGet]
-        public async Task<ActionResult<ICollection<string>>> GetCategories()
+        public async Task<ActionResult<ICollection<string>>> GetCategoriesAsync()
         {
-            // TODO: Move categories logic to this API from TicketingApi
-
-            var result = await _ticketingClient.CategoriesAsync();
+            var result = await ticketingClient.GetCategoriesAsync();
 
             return Ok(result);
         }

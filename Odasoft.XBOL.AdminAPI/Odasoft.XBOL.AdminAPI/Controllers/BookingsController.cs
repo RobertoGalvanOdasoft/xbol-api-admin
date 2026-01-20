@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Odasoft.XBOL.Business;
+using Odasoft.XBOL.Business.Messages;
 using Odasoft.XBOL.DTO.Results;
 using Wolverine;
 

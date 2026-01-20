@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Odasoft.XBOL.Business;
 using Odasoft.XBOL.Business.Extensions;
+using Odasoft.XBOL.Business.Messages;
 using Odasoft.XBOL.Data;
 using Odasoft.XBOL.Data.Extensions;
 using Odasoft.XBOL.Models;
@@ -54,7 +55,10 @@ builder.Services.AddSwaggerGen(c =>
     }
 });
 
-builder.Host.UseWolverine();
+builder.Host.UseWolverine(opts =>
+{
+    opts.Discovery.IncludeAssembly(typeof(CreateBookingCommand).Assembly);
+});
 
 // Add Http Clients
 builder.Services.AddHttpClient<ITicketingClient, TicketingClient>(

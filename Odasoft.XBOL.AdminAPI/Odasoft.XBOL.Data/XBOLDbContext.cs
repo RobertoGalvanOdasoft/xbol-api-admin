@@ -1,13 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Odasoft.XBOL.Data.Configurations;
 using Odasoft.XBOL.Data.Extensions;
 using Odasoft.XBOL.Models;
 
 namespace Odasoft.XBOL.Data
 {
-    public class XBOLDbContext : DbContext
+    public class XBOLDbContext : IdentityDbContext<User, Role, Guid>
     {
         public DbSet<Event> Events { get; set; }
         public DbSet<EventSeat> EventSeats { get; set; }
+        public DbSet<Ticket> Tickets { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<EventSchedule> EventSchedules { get; set; }
 
         public XBOLDbContext() : base()
         {
@@ -22,7 +27,7 @@ namespace Odasoft.XBOL.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql(@"Host=localhost;Port=5432;Database=XBOL;Username=postgres;Password=OdaUser@123!");
+                optionsBuilder.UseNpgsql(@"Host=localhost;Port=5432;Database=XBOL;Username=postgres;Password=12345");
             }
         }
 
@@ -30,6 +35,9 @@ namespace Odasoft.XBOL.Data
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.RemovePluralizingTableNameConvention();
+
+            modelBuilder.ApplyConfiguration(new TicketConfiguration());
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
         }
     }
 }

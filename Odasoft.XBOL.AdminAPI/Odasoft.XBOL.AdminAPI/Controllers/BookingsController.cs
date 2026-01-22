@@ -1,24 +1,27 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Odasoft.XBOL.Business;
+using Odasoft.XBOL.Business.Messages;
 using Odasoft.XBOL.DTO.Results;
+using Wolverine;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
 {
     [Route("api/bookings")]
     [ApiController]
-    public class BookingsController(ITicketingClient ticketingClient) : ControllerBase
+    public class BookingsController(IMessageBus bus) : ControllerBase
     {
         /// <summary>
-        /// Creates a new booking based on the specified booking request.
+        /// Books the specified seat selection for the event and returns the identifiers of the booked seats.
         /// </summary>
-        /// <param name="request">The booking details to use for creating the new booking. Cannot be null.</param>
-        /// <returns>An ActionResult containing a BookingResult that indicates the outcome of the booking operation.</returns>
-        [HttpPost]
-        [EndpointName("CreateBooking")]
-        public async Task<ActionResult<BookingResult>> CreateBooking([FromBody] BookingRequest request)
+        /// <param name="request">The booking request containing event and seat selection details. Cannot be null.</param>
+        /// <returns>An action result containing a collection of strings that represent the keys of the successfully booked
+        /// seats.</returns>
+        [HttpPost("book-seats")]
+        [EndpointName("BookSeatsAsync")]
+        public async Task<ActionResult<BookingResult>> BookSeatsAsync([FromBody] BookingRequest request)
         {
-            var result = await ticketingClient.CreateBookingAsync(request);
-
-            return Ok(new BookingResult { Message = "Booking created successfully", Tickets = result });
+            var result = await bus.InvokeAsync<BookingResult>(new CreateBookingCommand(request));
+            return Ok(result);
         }
     }
 }

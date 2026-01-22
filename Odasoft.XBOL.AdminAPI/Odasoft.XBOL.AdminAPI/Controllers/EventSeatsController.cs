@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Odasoft.XBOL.Business.Services;
 using Odasoft.XBOL.DTO;
 
@@ -22,11 +22,11 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// <returns>An asynchronous operation that returns an <see cref="ActionResult{IList{SeatPriceDTO}}"/> containing the
         /// list of seat prices for the event.</returns>
         [HttpGet("{eventId}/seat-prices")]
-        [EndpointName("GetEventSeatPrices")]
+        [EndpointName("GetSeatPricesByEventIdAsync")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<SeatPriceDTO>))]
-        public async Task<ActionResult<List<SeatPriceDTO>>> GetSeatPricesAsync([FromRoute] long eventId)
+        public async Task<ActionResult<List<SeatPriceDTO>>> GetSeatPricesByEventIdAsync([FromRoute] long eventId)
         {
-            IList<SeatPriceDTO> result = await _eventSeatService.GetSeatPricesForEventAsync(eventId);
+            IList<SeatPriceDTO> result = await _eventSeatService.GetSeatPricesByEventIdAsync(eventId);
 
             return Ok(result);
         }

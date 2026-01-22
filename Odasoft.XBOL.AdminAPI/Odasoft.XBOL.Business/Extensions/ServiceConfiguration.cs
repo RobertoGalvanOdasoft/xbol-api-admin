@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Odasoft.XBOL.Business.Services;
 
 namespace Odasoft.XBOL.Business.Extensions
@@ -10,6 +10,7 @@ namespace Odasoft.XBOL.Business.Extensions
         {
             services.AddScoped<EventService>();
             services.AddScoped<EventSeatsService>();
+            services.AddScoped<OrderService>();
 
             return services;
         }

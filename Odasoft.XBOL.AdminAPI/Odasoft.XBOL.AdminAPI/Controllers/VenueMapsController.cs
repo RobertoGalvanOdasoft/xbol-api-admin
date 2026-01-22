@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Odasoft.XBOL.Business;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
 {
@@ -7,19 +8,19 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
     public class VenueMapsController(ITicketingClient ticketingClient) : ControllerBase
     {
         [HttpGet]
-        [EndpointName("GetVenueMaps")]
-        public async Task<ActionResult<ICollection<VenueMapListItem>>> GetVenueMaps()
+        [EndpointName("GetVenueMapsAsync")]
+        public async Task<ActionResult<ICollection<VenueMapListItem>>> GetVenueMapsAsync()
         {
             var result = await ticketingClient.GetVenueMapsAsync();
 
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
-        [EndpointName("GetVenueMap")]
-        public async Task<ActionResult<VenueMapListItem>> GetVenueMap([FromRoute] long id)
+        [HttpGet("{venueMapId}")]
+        [EndpointName("GetVenueMapsByIdAsync")]
+        public async Task<ActionResult<VenueMapListItem>> GetVenueMapsByIdAsync([FromRoute] long venueMapId)
         {
-            var result = await ticketingClient.GetVenueMapAsync(id);
+            var result = await ticketingClient.GetVenueMapByIdAsync(venueMapId);
             return Ok(result);
         }
     }

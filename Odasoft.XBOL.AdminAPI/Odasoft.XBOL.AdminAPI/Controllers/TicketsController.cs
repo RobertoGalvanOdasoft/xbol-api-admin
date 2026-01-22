@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
 {
-    [Route("api/ticket")]
+    [Route("api/tickets")]
     [ApiController]
-    public class TicketController : ControllerBase
+    public class TicketsController : ControllerBase
     {
     }
 }

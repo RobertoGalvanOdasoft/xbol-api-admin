@@ -1,22 +1,19 @@
 {
-  "openapi": "3.1.1",
+  "openapi": "3.0.4",
   "info": {
-    "title": "XBOL.Ticketing.API | v1",
-    "version": "1.0.0"
+    "title": "XBOL Ticketing API",
+    "version": "v1"
   },
-  "servers": [
-    {
-      "url": "https://localhost:7021/"
-    }
-  ],
   "paths": {
-    "/api/booking": {
+    "/api/booking/book-seats": {
       "post": {
         "tags": [
           "Booking"
         ],
-        "operationId": "CreateBooking",
+        "summary": "Books the specified seat selection for the event and returns the identifiers of the booked seats.",
+        "operationId": "BookSeatsAsync",
         "requestBody": {
+          "description": "The booking request containing event and seat selection details. Cannot be null.",
           "content": {
             "application/json": {
               "schema": {
@@ -33,8 +30,7 @@
                 "$ref": "#/components/schemas/BookingRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -69,12 +65,12 @@
         }
       }
     },
-    "/api/categories": {
+    "/api/categories/names": {
       "get": {
         "tags": [
           "Categories"
         ],
-        "operationId": "GetCategories",
+        "operationId": "GetCategoriesNames",
         "responses": {
           "200": {
             "description": "OK",
@@ -113,7 +109,7 @@
         "tags": [
           "Events"
         ],
-        "operationId": "GetEvents",
+        "operationId": "GetEventsAsync",
         "parameters": [
           {
             "name": "venues",
@@ -172,11 +168,7 @@
             "name": "page",
             "in": "query",
             "schema": {
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": "integer",
               "format": "int32",
               "default": 1
             }
@@ -185,11 +177,7 @@
             "name": "pageSize",
             "in": "query",
             "schema": {
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": "integer",
               "format": "int32",
               "default": 10
             }
@@ -201,17 +189,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedResponseOfEventListItem"
+                  "$ref": "#/components/schemas/EventListItemPagedResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedResponseOfEventListItem"
+                  "$ref": "#/components/schemas/EventListItemPagedResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedResponseOfEventListItem"
+                  "$ref": "#/components/schemas/EventListItemPagedResponse"
                 }
               }
             }
@@ -219,19 +207,18 @@
         }
       }
     },
-    "/api/events/{id}": {
+    "/api/events/{eventId}": {
       "get": {
         "tags": [
           "Events"
         ],
-        "operationId": "GetEvent",
+        "operationId": "GetEvenByIdAsync",
         "parameters": [
           {
-            "name": "id",
+            "name": "eventId",
             "in": "path",
             "required": true,
             "schema": {
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": "integer",
               "format": "int64"
             }
@@ -261,12 +248,12 @@
         }
       }
     },
-    "/api/test": {
+    "/api/tests": {
       "get": {
         "tags": [
           "Test"
         ],
-        "operationId": "GetTest",
+        "operationId": "GetApiEnvironment",
         "responses": {
           "200": {
             "description": "OK",
@@ -291,64 +278,21 @@
         }
       }
     },
-    "/api/test/role/{id}": {
-      "get": {
+    "/api/tests/dynamic-pricing/{eventId}": {
+      "post": {
         "tags": [
           "Test"
         ],
-        "operationId": "GetRole",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Role"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Role"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Role"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/test/dynamic-pricing/{eventId}": {
-      "get": {
-        "tags": [
-          "Test"
-        ],
-        "operationId": "GetDynamicPricing",
+        "summary": "Calculates dynamic ticket prices for the specified event using the provided rules engine service.",
+        "operationId": "CalculatePricesAsync",
         "parameters": [
           {
             "name": "eventId",
             "in": "path",
+            "description": "The unique identifier of the event for which to calculate dynamic prices.",
             "required": true,
             "schema": {
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": "integer",
               "format": "int64"
             }
           }
@@ -365,7 +309,7 @@
         "tags": [
           "VenueMaps"
         ],
-        "operationId": "GetVenueMaps",
+        "operationId": "GetVenueMapsAsync",
         "responses": {
           "200": {
             "description": "OK",
@@ -399,19 +343,18 @@
         }
       }
     },
-    "/api/venue-maps/{id}": {
+    "/api/venue-maps/{venueMapId}": {
       "get": {
         "tags": [
           "VenueMaps"
         ],
-        "operationId": "GetVenueMap",
+        "operationId": "GetVenueMapByIdAsync",
         "parameters": [
           {
-            "name": "id",
+            "name": "venueMapId",
             "in": "path",
             "required": true,
             "schema": {
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": "integer",
               "format": "int64"
             }
@@ -446,7 +389,7 @@
         "tags": [
           "Venues"
         ],
-        "operationId": "GetVenues",
+        "operationId": "GetVenuesAsync",
         "responses": {
           "200": {
             "description": "OK",
@@ -485,9 +428,9 @@
     "schemas": {
       "BookingRequest": {
         "required": [
-          "seats",
+          "eventId",
           "holdToken",
-          "eventId"
+          "seats"
         ],
         "type": "object",
         "properties": {
@@ -495,13 +438,16 @@
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "nullable": true
           },
           "holdToken": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "eventId": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -510,11 +456,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int64"
           },
           "scheduledStartDate": {
@@ -522,89 +464,57 @@
             "format": "date-time"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "category": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "venueMapId": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int64"
           },
           "venueName": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "externalEventKey": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "availableSeats": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           },
           "totalSeats": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           }
         },
         "additionalProperties": false
       },
-      "PagedResponseOfEventListItem": {
+      "EventListItemPagedResponse": {
         "type": "object",
         "properties": {
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/EventListItem"
-            }
+            },
+            "nullable": true
           },
           "totalCount": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           },
           "page": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           },
           "pageSize": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
-      "Role": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
           }
         },
         "additionalProperties": false
@@ -616,7 +526,8 @@
         "type": "object",
         "properties": {
           "result": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -625,15 +536,12 @@
         "type": "object",
         "properties": {
           "id": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int64"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -642,26 +550,20 @@
         "type": "object",
         "properties": {
           "id": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int64"
           },
           "venueId": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int64"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "externalMapKey": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

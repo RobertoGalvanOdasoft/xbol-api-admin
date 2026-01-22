@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Odasoft.XBOL.Business;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
 {
@@ -6,11 +7,11 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
     [ApiController]
     public class CategoriesController(ITicketingClient ticketingClient) : ControllerBase
     {
-        [HttpGet]
-        [EndpointName("GetCategories")]
-        public async Task<ActionResult<ICollection<string>>> GetCategories()
+        [HttpGet("names")]
+        [EndpointName("GetCategoriesNamesAsync")]
+        public async Task<ActionResult<ICollection<string>>> GetCategoriesNamesAsync()
         {
-            var result = await ticketingClient.GetCategoriesAsync();
+            var result = await ticketingClient.GetCategoriesNamesAsync();
 
             return Ok(result);
         }

@@ -10,6 +10,7 @@ namespace Odasoft.XBOL.Models
 
         public DateTimeOffset EndDateTime { get; set; }
 
+        public Event Event { get; set; } = null!;
         public DateTimeOffset PublishedDate { get; set; }
 
         public DateTimeOffset OnSaleDate { get; set; }
@@ -27,5 +28,7 @@ namespace Odasoft.XBOL.Models
         public string ExternalEventKey { get; set; } = null!;
 
         public IList<EventSection> Sections { get; set; } = [];
+        public IList<Ticket> Tickets { get; set; } = [];
+        public IList<PriceRule> PriceRules { get; set; } = [];
     }
 }

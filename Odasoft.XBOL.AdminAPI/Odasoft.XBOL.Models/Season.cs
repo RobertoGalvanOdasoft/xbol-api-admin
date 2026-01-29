@@ -1,4 +1,4 @@
-﻿using Odasoft.XBOL.Commons.Enums;
+using Odasoft.XBOL.Commons.Enums;
 
 namespace Odasoft.XBOL.Models
 {
@@ -19,12 +19,21 @@ namespace Odasoft.XBOL.Models
 
         public SeasonStatus Status { get; set; }
 
+        public long? PreviousSeasonId { get; set; }
+        public Season? PreviousSeason { get; set; }
+
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }
 
+        public IList<SeasonPass> SeasonPasses { get; set; } = [];
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
         public Guid CreatedBy { get; set; }
         public Guid UpdatedBy { get; set; }
+
+        public string ExternalSeasonKey { get; set; } = null!;
+
+        public long? PerformerId { get; set; }
+        public Performer? Performer { get; set; }
     }
 }

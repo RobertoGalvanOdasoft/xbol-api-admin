@@ -14,7 +14,15 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Odasoft.XBOL.DTO\Odasoft.XBOL.DTO.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Odasoft.XBOL.Models\Odasoft.XBOL.Models.csproj" />
+    <ProjectReference Include="..\XBOL.Admin.Core.DTO\XBOL.Admin.Core.DTO.csproj" />
   </ItemGroup>
 
 </Project>

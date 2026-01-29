@@ -1,7 +1,12 @@
 using Microsoft.AspNetCore.Identity;
 using Odasoft.XBOL.Commons.Enums;
+using Odasoft.XBOL.Commons.Requests.Filters;
+using Odasoft.XBOL.Commons.Responses;
 using Odasoft.XBOL.Data.Repositories;
+using Odasoft.XBOL.Data.Repositories.Order;
+using Odasoft.XBOL.DTO.Requests;
 using Odasoft.XBOL.Models;
+using XBOL.Admin.Core.DTO;
 
 namespace Odasoft.XBOL.Business.Services
 {
@@ -69,6 +74,33 @@ namespace Odasoft.XBOL.Business.Services
             await _orderRepository.CommitAsync();
 
             // Process Payment
+        }
+
+        public async Task<PagedResponse<OrderListItem>> GetOrderListAsync(OrderListFilters filters)
+        {
+            filters.Page = Math.Max(filters.Page, 1);
+            filters.PageSize = Math.Clamp(filters.PageSize, 1, 50);
+
+            (List<OrderListItem> result, int totalCount) = await _orderRepository.GetOrderListAsync(filters);
+
+            return new PagedResponse<OrderListItem>
+            {
+                Items = result,
+                CurrentPage = filters.Page,
+                PageSize = filters.PageSize,
+                TotalItems = totalCount,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)filters.PageSize)
+            };
+        }
+
+        public async Task<ClientSeasonEvent> GetClientSeasonEventByOrderReferenceAsync(string orderReference)
+        {
+            return await _orderRepository.GetClientSeasonEventByOrderReferenceAsync(orderReference);
+        }
+
+        public async Task BookSeasonAsync(BookSeasonRequest request)
+        {
+            await _orderRepository.BookSeasonAsync(request);
         }
     }
 }

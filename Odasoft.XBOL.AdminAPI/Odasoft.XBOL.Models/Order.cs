@@ -26,6 +26,9 @@ namespace Odasoft.XBOL.Models
         public Guid CreatedBy { get; set; }
         public Guid UpdatedBy { get; set; }
 
+        public long? RelatedOrderId { get; set; }
+        public Order? RelatedOrder { get; set; }
+
         public IList<OrderItem> Items { get; set; } = [];
         public IList<OrderFee> Fees { get; set; } = [];
         public IList<OrderTax> Taxes { get; set; } = [];

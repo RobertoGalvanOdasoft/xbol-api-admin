@@ -8,14 +8,28 @@ namespace Odasoft.XBOL.Data
 {
     public class XBOLDbContext : IdentityDbContext<User, Role, Guid>
     {
+        public DbSet<Season> Seasons => Set<Season>();
+        public DbSet<Order> Orders => Set<Order>();
+        public DbSet<Client> Clients => Set<Client>();
+        public DbSet<Ticket> Tickets => Set<Ticket>();
+        public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+        public DbSet<SeasonPass> SeasonPasses => Set<SeasonPass>();
+        public DbSet<SeasonPassEventTicket> SeasonPassEventTickets => Set<SeasonPassEventTicket>();
+        public DbSet<BaseSeat> BaseSeats => Set<BaseSeat>();
+        public DbSet<BaseRow> BaseRows => Set<BaseRow>();
+        public DbSet<BaseSection> BaseSections => Set<BaseSection>();
+        public DbSet<BaseZone> BaseZones => Set<BaseZone>();
+        public DbSet<VenueMap> VenueMaps => Set<VenueMap>();
+        public DbSet<Venue> Venues => Set<Venue>();
         public DbSet<Event> Events { get; set; }
         public DbSet<EventSeat> EventSeats { get; set; }
-        public DbSet<Ticket> Tickets { get; set; }
-        public DbSet<Order> Orders { get; set; }
         public DbSet<EventSchedule> EventSchedules { get; set; }
+        public DbSet<InventoryBatch> InventoryBatches { get; set; }
+        public DbSet<Performer> Performers { get; set; }
 
         public XBOLDbContext() : base()
         {
+
         }
 
         public XBOLDbContext(DbContextOptions<XBOLDbContext> options)
@@ -33,7 +47,28 @@ namespace Odasoft.XBOL.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                if (typeof(BaseModel).IsAssignableFrom(entityType.ClrType))
+                {
+                    modelBuilder.Entity(entityType.ClrType)
+                        .Property(nameof(BaseModel.Id))
+                        .ValueGeneratedOnAdd();
+                }
+            }
+
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Client>()
+                .HasOne(c => c.User)
+                .WithOne(u => u.Client)
+                .HasForeignKey<User>(u => u.ClientId)
+                .IsRequired();
+
+            modelBuilder.Entity<SeasonPassEventTicket>()
+                .Property(spet => spet.Id)
+                .ValueGeneratedOnAdd();
+
             modelBuilder.RemovePluralizingTableNameConvention();
 
             modelBuilder.ApplyConfiguration(new TicketConfiguration());

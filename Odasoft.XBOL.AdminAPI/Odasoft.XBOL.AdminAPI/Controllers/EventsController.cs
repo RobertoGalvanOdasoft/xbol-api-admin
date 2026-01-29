@@ -9,9 +9,9 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
     public class EventsController : ControllerBase
     {
         private readonly EventService _eventService;
-        private readonly ITicketingClient _ticketingClient;
+        private readonly Business.ITicketingClient _ticketingClient;
 
-        public EventsController(EventService eventService, ITicketingClient ticketingClient)
+        public EventsController(EventService eventService, Business.ITicketingClient ticketingClient)
         {
             _eventService = eventService;
             _ticketingClient = ticketingClient;

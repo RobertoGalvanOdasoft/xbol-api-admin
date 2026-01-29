@@ -24,6 +24,7 @@ namespace Odasoft.XBOL.Models
         public Guid UpdatedBy { get; set; }
 
         public IList<Order> Orders { get; set; } = [];
+        public IList<ClientCreditAccount> ClientCreditAccounts { get; set; } = [];
         public IList<Ticket> Tickets { get; set; } = [];
     }
 }

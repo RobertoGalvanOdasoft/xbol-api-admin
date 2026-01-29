@@ -5,4 +5,5 @@
   <Project Path="Odasoft.XBOL.Data/Odasoft.XBOL.Data.csproj" />
   <Project Path="Odasoft.XBOL.DTO/Odasoft.XBOL.DTO.csproj" />
   <Project Path="Odasoft.XBOL.Models/Odasoft.XBOL.Models.csproj" />
+  <Project Path="XBOL.Admin.Core.DTO/XBOL.Admin.Core.DTO.csproj" Id="92ae17fd-c62b-4f86-b9fe-3e8d3a53752f" />
 </Solution>

@@ -1,14 +1,16 @@
-﻿using Odasoft.XBOL.Commons.Enums;
+using Odasoft.XBOL.Commons.Enums;
 
 namespace Odasoft.XBOL.Models
 {
     public class Event : BaseModel
     {
         public long VenueMapId { get; set; }
+        public VenueMap VenueMap { get; set; } = null!;
 
         public long OrganizerId { get; set; }
 
         public long? SeasonId { get; set; }
+        public Season? Season { get; set; }
 
         public string Name { get; set; } = null!;
         public string Subtitle { get; set; } = null!;
@@ -23,9 +25,13 @@ namespace Odasoft.XBOL.Models
 
         public EventStatus Status { get; set; }
 
+        public IList<EventSchedule> Schedules { get; set; } = [];
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
         public Guid CreatedBy { get; set; }
         public Guid UpdatedBy { get; set; }
+
+        public long? PerformerId { get; set; }
+        public Performer? Performer { get; set; }
     }
 }

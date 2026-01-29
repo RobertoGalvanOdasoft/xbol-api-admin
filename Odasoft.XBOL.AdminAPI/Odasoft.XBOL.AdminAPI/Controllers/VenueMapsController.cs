@@ -5,7 +5,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
 {
     [Route("api/venue-maps")]
     [ApiController]
-    public class VenueMapsController(ITicketingClient ticketingClient) : ControllerBase
+    public class VenueMapsController(Business.ITicketingClient ticketingClient) : ControllerBase
     {
         [HttpGet]
         [EndpointName("GetVenueMapsAsync")]

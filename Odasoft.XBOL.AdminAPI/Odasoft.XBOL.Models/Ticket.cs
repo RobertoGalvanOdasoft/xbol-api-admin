@@ -16,7 +16,8 @@ namespace Odasoft.XBOL.Models
         public long EventSeatId { get; set; }
         public EventSeat EventSeat { get; set; } = null!;
 
-        public long InventoryBatchId { get; set; }
+        public long? InventoryBatchId { get; set; }
+        public InventoryBatch? InventoryBatch { get; set; }
 
         public long? OriginalClientId { get; set; }
         public Client? OriginalClient { get; set; }

@@ -1,4 +1,4 @@
-namespace Odasoft.XBOL.Models
+﻿namespace Odasoft.XBOL.Models
 {
     public class EventSection : BaseModel
     {
@@ -7,6 +7,7 @@ namespace Odasoft.XBOL.Models
         public EventSchedule EventSchedule { get; set; } = null!;
 
         public long BaseSectionId { get; set; }
+        public BaseSection BaseSection { get; set; } = null!;
 
         public string DisplayName { get; set; } = null!;
 
@@ -16,6 +17,8 @@ namespace Odasoft.XBOL.Models
 
         public int AvailableSeats { get; set; }
 
+        public IList<Ticket> Tickets { get; set; } = [];
         public IList<EventSeat> EventSeats { get; set; } = [];
+        public IList<PriceRule> PriceRules { get; set; } = [];
     }
 }

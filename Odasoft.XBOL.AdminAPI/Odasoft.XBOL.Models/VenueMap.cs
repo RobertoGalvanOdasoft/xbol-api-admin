@@ -1,4 +1,4 @@
-﻿using Odasoft.XBOL.Commons.Enums;
+using Odasoft.XBOL.Commons.Enums;
 
 namespace Odasoft.XBOL.Models
 {
@@ -18,5 +18,6 @@ namespace Odasoft.XBOL.Models
         public Guid UpdatedBy { get; set; }
 
         public IList<Event> Events { get; set; } = [];
+        public IList<BaseZone> BaseZones { get; set; } = [];
     }
 }

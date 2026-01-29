@@ -13,15 +13,11 @@ namespace Odasoft.XBOL.Business.Services
     public class OrderService(
         OrderRepository _orderRepository,
         UserManager<User> _userManager,
-        EventScheduleRepository _eventScheduleRepository
-        )
+        EventScheduleRepository _eventScheduleRepository)
     {
         public async Task CreateOrderAsync(BookingRequest request)
         {
             // TODO: Get seller from Identity, and buyer email from request, create custom NotFoundException
-            User? buyer = await _userManager.FindByEmailAsync("admin@xbol.com") ?? throw new KeyNotFoundException();
-
-            User? seller = buyer;
 
             EventSchedule schedule = _eventScheduleRepository.Get(x => x.ExternalEventKey == request.EventId).First();
 
@@ -30,7 +26,7 @@ namespace Odasoft.XBOL.Business.Services
             // Create Order
             var newOrder = new Order
             {
-                UserId = buyer.Id,
+                UserId = null,
                 //TODO: Check the correct value of reference
                 Reference = request.HoldToken,
                 Status = OrderStatus.Pending,
@@ -43,9 +39,9 @@ namespace Odasoft.XBOL.Business.Services
                 PayformType = PayformType.BoxOffice,
 
                 CreatedAt = DateTime.UtcNow,
-                CreatedBy = seller.Id,
+                CreatedBy = Guid.Empty,
                 UpdatedAt = DateTime.UtcNow,
-                UpdatedBy = seller.Id,
+                UpdatedBy = Guid.Empty,
                 Items = [.. request.Seats.Select(x => new OrderItem
                     {
                         ItemType = ItemType.Ticket,
@@ -56,19 +52,6 @@ namespace Odasoft.XBOL.Business.Services
             };
 
             // TODO: Confirm if Ticket creation should be done after payment confirmation
-            //foreach (var item in result.Objects)
-            //{
-            //    // TODO: Get all seats info and handle in memory to avoid multiple calls to database
-            //    EventSeat seat = await _eventSeatRepository.GetByExternalSeatObjectKeyAsync(item.Key) ?? throw new KeyNotFoundException();
-
-            //    newOrder.Tickets.Add(new Ticket
-            //    {
-            //        EventSeatId = seat.Id,
-            //        Status = TicketStatus.Issued,
-            //        EventScheduleId = schedule.Id,
-            //        EventSectionId = seat.EventSectionId,
-            //    });
-            //}
 
             await _orderRepository.InsertAsync(newOrder);
             await _orderRepository.CommitAsync();

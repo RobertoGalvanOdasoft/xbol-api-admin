@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Odasoft.XBOL.Business;
+using Odasoft.XBOL.Business.Services;
+using Odasoft.XBOL.DTO;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
 {
@@ -8,10 +10,12 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
     public class EventsController : ControllerBase
     {
         private readonly ITicketingClient _ticketingClient;
+        private readonly EventService _eventService;
 
-        public EventsController(ITicketingClient ticketingClient)
+        public EventsController(ITicketingClient ticketingClient, EventService eventService)
         {
             _ticketingClient = ticketingClient;
+            _eventService = eventService;
         }
 
         [HttpGet]
@@ -35,9 +39,13 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
 
         [HttpGet("{eventId}")]
         [EndpointName("GetEventByIdAsync")]
-        public async Task<ActionResult<EventListItem>> GetEventByIdAsync([FromRoute] long eventId)
+        public async Task<ActionResult<EventInfoDTO>> GetEventByIdAsync([FromRoute] long eventId)
         {
-            var result = await _ticketingClient.GetEvenByIdAsync(eventId);
+            var result = await _eventService.GetEventByIdAsync(eventId);
+            if (result == null)
+            {
+                return NotFound();
+            }
             return Ok(result);
         }
     }

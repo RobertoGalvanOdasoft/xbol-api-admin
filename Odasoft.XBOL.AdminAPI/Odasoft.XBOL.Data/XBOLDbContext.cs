@@ -23,6 +23,7 @@ namespace Odasoft.XBOL.Data
         public DbSet<Venue> Venues => Set<Venue>();
         public DbSet<Event> Events => Set<Event>();
         public DbSet<EventSeat> EventSeats => Set<EventSeat>();
+        public DbSet<EventSection> EventSections => Set<EventSection>();
         public DbSet<EventSchedule> EventSchedules => Set<EventSchedule>();
         public DbSet<SuiteLevel> SuiteLevels => Set<SuiteLevel>();
         public DbSet<Suite> Suites => Set<Suite>();

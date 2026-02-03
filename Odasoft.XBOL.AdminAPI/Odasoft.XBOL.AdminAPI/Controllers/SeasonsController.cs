@@ -5,9 +5,9 @@ using XBOL.Admin.Core.DTO;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
 {
-    [Route("api/season")]
+    [Route("api/seasons")]
     [ApiController]
-    public class SeasonController(SeasonService seasonService) : Controller
+    public class SeasonsController(SeasonService seasonService) : Controller
     {
         [HttpGet]
         [EndpointName("GetSeasonSelectorItemsAsync")]

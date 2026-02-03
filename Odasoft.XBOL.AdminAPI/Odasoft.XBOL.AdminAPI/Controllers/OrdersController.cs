@@ -8,9 +8,9 @@ using XBOL.Admin.Core.DTO;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/orders")]
     [ApiController]
-    public class OrderController(Business.ITicketingClient ticketingClient) : ControllerBase
+    public class OrdersController(ITicketingClient ticketingClient) : ControllerBase
     {
         [HttpPost]
         [EndpointName("GetOrderListAsync")]

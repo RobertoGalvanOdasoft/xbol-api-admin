@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Odasoft.XBOL.Business;
-using Odasoft.XBOL.Business.Services;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
 {
@@ -8,12 +7,10 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
     [ApiController]
     public class EventsController : ControllerBase
     {
-        private readonly EventService _eventService;
-        private readonly Business.ITicketingClient _ticketingClient;
+        private readonly ITicketingClient _ticketingClient;
 
-        public EventsController(EventService eventService, Business.ITicketingClient ticketingClient)
+        public EventsController(ITicketingClient ticketingClient)
         {
-            _eventService = eventService;
             _ticketingClient = ticketingClient;
         }
 

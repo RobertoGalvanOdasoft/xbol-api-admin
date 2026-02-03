@@ -5,7 +5,7 @@ namespace XBOL.Admin.Core.DTO
     public class SeatInfoRequest
     {
         public string SeatId { get; set; } = null!;
-        public decimal Price { get; set; }
+        public required decimal Price { get; set; }
         public SeatType CategoryEnum { get; set; }
         public string? Category { get; set; }
     }

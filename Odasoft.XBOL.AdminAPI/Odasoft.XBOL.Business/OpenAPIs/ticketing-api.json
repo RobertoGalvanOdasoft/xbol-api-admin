@@ -15,6 +15,11 @@
         "requestBody": {
           "description": "The booking request containing event and seat selection details. Cannot be null.",
           "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingRequest"
+              }
+            },
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/BookingRequest"
@@ -453,6 +458,14 @@
         "additionalProperties": false
       },
       "EventListItem": {
+        "required": [
+          "availableSeats",
+          "id",
+          "name",
+          "scheduledStartDate",
+          "totalSeats",
+          "venueMapId"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -495,6 +508,11 @@
         "additionalProperties": false
       },
       "EventListItemPagedResponse": {
+        "required": [
+          "page",
+          "pageSize",
+          "totalCount"
+        ],
         "type": "object",
         "properties": {
           "items": {
@@ -533,6 +551,9 @@
         "additionalProperties": false
       },
       "VenueListItem": {
+        "required": [
+          "id"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -547,6 +568,10 @@
         "additionalProperties": false
       },
       "VenueMapListItem": {
+        "required": [
+          "id",
+          "venueId"
+        ],
         "type": "object",
         "properties": {
           "id": {

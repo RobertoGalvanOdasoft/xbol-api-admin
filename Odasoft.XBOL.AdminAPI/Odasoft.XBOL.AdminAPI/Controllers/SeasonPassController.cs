@@ -8,7 +8,7 @@ using XBOL.Admin.Core.DTO;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/season-pass")]
     [ApiController]
     public class SeasonPassController : Controller
     {
@@ -100,7 +100,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// <summary>
         /// Updated season pass status
         /// </summary>
-        [HttpPut("seasonpass/{id:long}")]
+        [HttpPut("{id:long}")]
         [EndpointName("UpdateSeasonPassStatusAsync")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

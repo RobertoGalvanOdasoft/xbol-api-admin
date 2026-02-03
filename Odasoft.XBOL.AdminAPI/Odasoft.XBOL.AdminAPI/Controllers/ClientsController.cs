@@ -5,9 +5,9 @@ using XBOL.Admin.Core.DTO;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/clients")]
     [ApiController]
-    public class ClientController : Controller
+    public class ClientsController : Controller
     {
         [HttpPost]
         [EndpointName("GetClientSeasonEventInfoAsync")]

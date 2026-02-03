@@ -20,7 +20,9 @@ namespace Odasoft.XBOL.Data.Repositories.Order
                                         .FirstOrDefaultAsync();
 
             if (!latestSeason.PreviousSeasonId.HasValue && filters.RenovationMode)
+            {
                 return (new List<OrderListItem>(), 0);
+            }
 
             List<long> seasonIds =
              filters.RenovationMode && latestSeason.PreviousSeasonId is long previousId

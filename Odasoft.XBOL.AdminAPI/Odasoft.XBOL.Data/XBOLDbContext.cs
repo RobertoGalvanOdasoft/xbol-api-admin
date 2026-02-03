@@ -21,15 +21,16 @@ namespace Odasoft.XBOL.Data
         public DbSet<BaseZone> BaseZones => Set<BaseZone>();
         public DbSet<VenueMap> VenueMaps => Set<VenueMap>();
         public DbSet<Venue> Venues => Set<Venue>();
-        public DbSet<Event> Events { get; set; }
-        public DbSet<EventSeat> EventSeats { get; set; }
-        public DbSet<EventSchedule> EventSchedules { get; set; }
-        public DbSet<InventoryBatch> InventoryBatches { get; set; }
-        public DbSet<Performer> Performers { get; set; }
+        public DbSet<Event> Events => Set<Event>();
+        public DbSet<EventSeat> EventSeats => Set<EventSeat>();
+        public DbSet<EventSchedule> EventSchedules => Set<EventSchedule>();
+        public DbSet<SuiteLevel> SuiteLevels => Set<SuiteLevel>();
+        public DbSet<Suite> Suites => Set<Suite>();
+        public DbSet<InventoryBatch> InventoryBatches => Set<InventoryBatch>();
+        public DbSet<Performer> Performers => Set<Performer>();
 
         public XBOLDbContext() : base()
         {
-
         }
 
         public XBOLDbContext(DbContextOptions<XBOLDbContext> options)

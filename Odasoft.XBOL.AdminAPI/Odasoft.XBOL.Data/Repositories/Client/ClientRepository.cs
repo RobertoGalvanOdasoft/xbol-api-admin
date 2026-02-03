@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Odasoft.XBOL.Commons.Requests.Filters;
-using Odasoft.XBOL.Models;
 using XBOL.Admin.Core.DTO;
 
 namespace Odasoft.XBOL.Data.Repositories.Client
@@ -32,7 +31,9 @@ namespace Odasoft.XBOL.Data.Repositories.Client
             var season = await _context.Seasons.FirstOrDefaultAsync(s => s.Id == filter.SeasonId);
 
             if (season is null)
+            {
                 return result;
+            }
 
             result.SeasonKey = season.ExternalSeasonKey;
 
@@ -76,7 +77,9 @@ namespace Odasoft.XBOL.Data.Repositories.Client
             var ids = new List<long>(capacity: 2) { currentSeason.Id };
 
             if (currentSeason.PreviousSeasonId is long prevId)
+            {
                 ids.Add(prevId);
+            }
 
             return ids;
         }

@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Odasoft.XBOL.Models\Odasoft.XBOL.Models.csproj" />
-    <ProjectReference Include="..\XBOL.Admin.Core.DTO\XBOL.Admin.Core.DTO.csproj" />
   </ItemGroup>
 
 </Project>

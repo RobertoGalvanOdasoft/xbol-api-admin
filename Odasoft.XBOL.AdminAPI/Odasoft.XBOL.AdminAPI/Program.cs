@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Odasoft.XBOL.Business;
 using Odasoft.XBOL.Business.Extensions;
 using Odasoft.XBOL.Business.Messages;
 using Odasoft.XBOL.Data;
@@ -24,7 +25,7 @@ builder.Services
         options.Password.RequiredLength = 8;
         options.User.RequireUniqueEmail = true;
     })
-    .AddRoles<Odasoft.XBOL.Models.Role>()
+    .AddRoles<Role>()
     .AddEntityFrameworkStores<XBOLDbContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
@@ -33,30 +34,19 @@ builder.Services
 builder.Services.ConfigureServices();
 builder.Services.ConfigureRepositories();
 
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddControllers(options =>
+{
+    options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+}).AddNewtonsoftJson();
 
 // Add health check services
 builder.Services.AddHealthChecks();
-
-#region Localization
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
-builder.Services.Configure<RequestLocalizationOptions>(options =>
-{
-    var supportedCultures = new[] { "es" };
-
-    options.SetDefaultCulture("es");
-    options.AddSupportedCultures(supportedCultures);
-    options.AddSupportedUICultures(supportedCultures);
-});
-#endregion
 
 // Add OpenAPI services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.UseInlineDefinitionsForEnums();
     c.SwaggerDoc("v1", new() { Title = "XBOL Admin API", Version = "v1" });
 
     // Include XML comments if available
@@ -67,7 +57,7 @@ builder.Services.AddSwaggerGen(c =>
     {
         c.IncludeXmlComments(xmlPath);
     }
-});
+}).AddSwaggerGenNewtonsoftSupport();
 
 builder.Host.UseWolverine(opts =>
 {
@@ -75,7 +65,7 @@ builder.Host.UseWolverine(opts =>
 });
 
 // Add Http Clients
-builder.Services.AddHttpClient<Odasoft.XBOL.Business.ITicketingClient, Odasoft.XBOL.Business.TicketingClient>(
+builder.Services.AddHttpClient<ITicketingClient, TicketingClient>(
     (provider, client) =>
     {
         client.BaseAddress = new Uri(builder.Configuration.GetValue("TicketingClientBaseAddress", "https://localhost:7021/"));
@@ -116,7 +106,6 @@ if (!app.Environment.IsProduction()
     app.UseHttpsRedirection();
 }
 
-app.UseRequestLocalization();
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -21,7 +21,7 @@ namespace Odasoft.XBOL.Models
 
         public SeasonPassType SeasonPassType { get; set; }
         public SeasonPassStatus Status { get; set; }
-        
+
         public SeasonPassSuspendedReason? SuspendedReason { get; set; }
         public string? SuspendedOtherReason { get; set; }
         public decimal Price { get; set; }

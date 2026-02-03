@@ -1,0 +1,6 @@
+@Odasoft.XBOL.AdminAPI_HostAddress = http://localhost:5269
+
+GET {{Odasoft.XBOL.AdminAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

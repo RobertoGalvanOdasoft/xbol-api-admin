@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Odasoft.XBOL.Business.Services;
+using Odasoft.XBOL.DTO;
 using Odasoft.XBOL.DTO.QueryParams;
 using Odasoft.XBOL.DTO.Requests;
 using Odasoft.XBOL.DTO.Response;
@@ -108,7 +109,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// Deletes the suite with the specified identifier.
         /// </summary>
         /// <param name="suiteId">The unique identifier of the suite to delete.</param>
-        /// <returns>An <see cref="ActionResult{T}"/> containing <see langword="true"/> if the suite was successfully deleted;
+        /// <returns>An object containing <see langword="true"/> if the suite was successfully deleted;
         /// otherwise, <see langword="false"/>.</returns>
         [HttpDelete("{suiteId:long}")]
         [EndpointName("DeleteSuiteAsync")]
@@ -122,6 +123,21 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
             }
 
             return UnprocessableEntity("Unable to delete Suite");
+        }
+
+        /// <summary>
+        /// Retrieves the catalog of suite items associated with the specified suite level.
+        /// </summary>
+        /// <param name="suiteLevelId">The unique identifier of the suite level for which to retrieve the catalog.</param>
+        /// <returns>An asynchronous operation that returns a list containing the
+        /// collection of suite catalog items. Returns an empty collection if no items are found for the specified suite
+        /// level.</returns>
+        [HttpGet("{suiteLevelId:long}/catalog")]
+        [EndpointName("GetSuiteCatalogBySuiteLevelIdAsync")]
+        public async Task<ActionResult<ICollection<ListItem>>> GetSuiteCatalogBySuiteLevelIdAsync([FromRoute] long suiteLevelId)
+        {
+            var result = await _suiteService.GetSuiteCatalogBySuiteLevelIdAsync(suiteLevelId);
+            return Ok(result);
         }
     }
 }

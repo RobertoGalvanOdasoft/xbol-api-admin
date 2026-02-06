@@ -32,6 +32,10 @@ builder.Services
     .AddDefaultTokenProviders();
 
 // Add services to the container.
+builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 104857600; // 100 MB
+});
 builder.Services.ConfigureServices();
 builder.Services.ConfigureRepositories();
 

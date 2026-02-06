@@ -20,9 +20,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="10.1.0" />
-        <PackageReference Include="WolverineFx" Version="5.12.1" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.1" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="10.1.1" />
+        <PackageReference Include="WolverineFx" Version="5.13.0" />
         <!-- Container environment variables -->
         <ContainerEnvironmentVariable Include="ASPNETCORE_HTTP_PORTS" Value="8080" />
         <ContainerEnvironmentVariable Include="ASPNETCORE_URLS" Value="http://+:8080" />

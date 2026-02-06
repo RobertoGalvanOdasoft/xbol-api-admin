@@ -27,6 +27,8 @@ namespace Odasoft.XBOL.Data
         public DbSet<EventSchedule> EventSchedules => Set<EventSchedule>();
         public DbSet<SuiteLevel> SuiteLevels => Set<SuiteLevel>();
         public DbSet<Suite> Suites => Set<Suite>();
+        public DbSet<SuiteAgreement> SuiteAgreements => Set<SuiteAgreement>();
+        public DbSet<SuiteAgreementFile> SuiteAgreementFiles => Set<SuiteAgreementFile>();
         public DbSet<InventoryBatch> InventoryBatches => Set<InventoryBatch>();
         public DbSet<Performer> Performers => Set<Performer>();
 
@@ -75,6 +77,9 @@ namespace Odasoft.XBOL.Data
 
             modelBuilder.ApplyConfiguration(new TicketConfiguration());
             modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new SuiteConfiguration());
+            modelBuilder.ApplyConfiguration(new SuiteAgreementConfiguration());
+            modelBuilder.ApplyConfiguration(new SuiteAgreementFileConfiguration());
         }
     }
 }

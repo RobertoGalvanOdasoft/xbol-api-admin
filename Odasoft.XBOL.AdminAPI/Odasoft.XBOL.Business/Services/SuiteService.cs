@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Odasoft.XBOL.Commons.Constants;
 using Odasoft.XBOL.Data.Repositories;
+using Odasoft.XBOL.DTO;
 using Odasoft.XBOL.DTO.QueryParams;
 using Odasoft.XBOL.DTO.Requests;
 using Odasoft.XBOL.DTO.Response;
@@ -75,8 +76,8 @@ namespace Odasoft.XBOL.Business.Services
                 SuiteLevelId = request.SuiteLevelId,
                 Name = request.Name,
                 Seats = request.Seats,
-                CreatedAt = DateTimeOffset.UtcNow,
-                UpdatedAt = DateTimeOffset.UtcNow,
+                CreatedAt = DateTimeOffset.UtcNow.ToUniversalTime(),
+                UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime(),
                 CreatedBy = Guid.Empty,
                 UpdatedBy = Guid.Empty
             };
@@ -110,7 +111,7 @@ namespace Odasoft.XBOL.Business.Services
             existingSuite.Name = request.Name;
             existingSuite.SuiteLevelId = request.SuiteLevelId;
             existingSuite.Seats = request.Seats;
-            existingSuite.UpdatedAt = DateTimeOffset.UtcNow;
+            existingSuite.UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime();
             existingSuite.UpdatedBy = Guid.Empty;
 
             try
@@ -152,6 +153,18 @@ namespace Odasoft.XBOL.Business.Services
             }
 
             return true;
+        }
+
+        public async Task<IList<ListItem>> GetSuiteCatalogBySuiteLevelIdAsync(long suiteLevelId)
+        {
+            return await _suiteRepository.Get()
+                            .AsNoTracking()
+                            .Where(s => s.SuiteLevelId == suiteLevelId)
+                            .Select(x => new ListItem
+                            {
+                                Id = x.Id,
+                                Name = x.Name
+                            }).ToListAsync();
         }
 
         private void SetSuiteLevelsFilter(ref IQueryable<SuiteResult> query, string levels)

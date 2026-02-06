@@ -10,5 +10,7 @@ namespace Odasoft.XBOL.Models
         public DateTimeOffset UpdatedAt { get; set; }
         public Guid CreatedBy { get; set; }
         public Guid UpdatedBy { get; set; }
+
+        public IList<SuiteAgreement> SuiteAgreements { get; set; } = [];
     }
 }

@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Odasoft.XBOL.Business;
 using Odasoft.XBOL.Business.Services;
 using Odasoft.XBOL.DTO;
 
@@ -7,24 +6,13 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
 {
     [Route("api/venues")]
     [ApiController]
-    public class VenuesController : ControllerBase
+    public class VenuesController(VenueService venueService) : ControllerBase
     {
-        private readonly ITicketingClient _ticketingClient;
-        private readonly VenueService _venueService;
-
-        public VenuesController(ITicketingClient ticketingClient, VenueService venueService)
-        {
-            _ticketingClient = ticketingClient;
-            _venueService = venueService;
-        }
-
         [HttpGet]
         [EndpointName("GetVenuesAsync")]
-        public async Task<ActionResult<ICollection<VenueListItem>>> GetVenuesAsync()
+        public async Task<ActionResult<ICollection<VenueListItemDTO>>> GetVenuesAsync()
         {
-            // TODO: Move this to Admin API client
-            var result = await _ticketingClient.GetVenuesAsync();
-
+            var result = await venueService.GetVenueListAsync();
             return Ok(result);
         }
 
@@ -39,7 +27,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         [EndpointName("GetVenueCatalogAsync")]
         public async Task<ActionResult<ICollection<ListItem>>> GetVenueCatalogAsync()
         {
-            var result = await _venueService.GetVenueCatalogAsync();
+            var result = await venueService.GetVenueCatalogAsync();
             return Ok(result);
         }
     }

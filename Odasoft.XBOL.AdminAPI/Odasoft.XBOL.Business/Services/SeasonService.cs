@@ -1,32 +1,20 @@
 using Odasoft.XBOL.Data.Repositories.Season;
-using XBOL.Admin.Core.DTO;
+using Odasoft.XBOL.DTO.QueryParams;
+using Odasoft.XBOL.DTO.Response;
+using Odasoft.XBOL.DTO.Results;
 
 namespace Odasoft.XBOL.Business.Services
 {
     public class SeasonService(SeasonRepository repository)
     {
-        public async Task<List<SeasonSelectorItem>> GetSeasonSelectorItemsAsync()
+        public async Task<PagedResponse<SeasonListItem>> GetSeasonsAsync(SeasonsQueryParams queryParams)
         {
-            List<SeasonSelectorItem> items = await repository.GetSeasonSelectorItemsAsync();
-            return items;
+            return await repository.GetSeasonsAsync(queryParams);
         }
 
-        public async Task<long?> GetLatestEventIdBySeasonAsync(long seasonId)
+        public async Task<SeasonResult?> GetSeasonByIdAsync(long id)
         {
-            long? eventId = await repository.GetLatestEventIdBySeasonAsync(seasonId);
-            return eventId;
-        }
-
-        public async Task<SeasonBanner?> GetSeasonBannerByEventAsync(long seasonId)
-        {
-            SeasonBanner? seasonBanner = await repository.GetSeasonBannerByEventAsync(seasonId);
-            return seasonBanner;
-        }
-
-        public async Task<string?> GetSeasonKeyAsync(long seasonId)
-        {
-            string? seasonKey = await repository.GetSeasonKeyAsync(seasonId);
-            return seasonKey;
+            return await repository.GetSeasonByIdAsync(id);
         }
     }
 }

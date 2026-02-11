@@ -1,62 +1,40 @@
 using Microsoft.AspNetCore.Mvc;
 using Odasoft.XBOL.Business.Services;
+using Odasoft.XBOL.DTO.QueryParams;
+using Odasoft.XBOL.DTO.Response;
 using Odasoft.XBOL.DTO.Results;
-using XBOL.Admin.Core.DTO;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
 {
     [Route("api/seasons")]
     [ApiController]
-    public class SeasonsController(SeasonService seasonService) : Controller
+    public class SeasonsController(SeasonService seasonService) : ControllerBase
     {
+        /// <summary>
+        /// Get paginated list of seasons with filters.
+        /// </summary>
         [HttpGet]
-        [EndpointName("GetSeasonSelectorItemsAsync")]
-        public async Task<ActionResult<List<SeasonSelectorItem>>> GetSeasonSelectorItemsAsync()
+        [EndpointName("GetSeasonsAsync")]
+        [ProducesResponseType(typeof(PagedResponse<SeasonListItem>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PagedResponse<SeasonListItem>>> GetSeasonsAsync(
+            [FromQuery] SeasonsQueryParams queryParams)
         {
-            List<SeasonSelectorItem> result = await seasonService.GetSeasonSelectorItemsAsync();
+            var result = await seasonService.GetSeasonsAsync(queryParams);
             return Ok(result);
         }
 
-        [HttpGet("banner/{seasonId}")]
-        [EndpointName("GetSeasonBannerAsync")]
-        public async Task<ActionResult<SeasonBanner>> GetSeasonBannerAsync([FromRoute] long seasonId)
+        /// <summary>
+        /// Get season by ID.
+        /// </summary>
+        [HttpGet("{id:long}")]
+        [EndpointName("GetSeasonByIdAsync")]
+        [ProducesResponseType(typeof(SeasonResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<SeasonResult>> GetSeasonByIdAsync([FromRoute] long id)
         {
-            SeasonBanner? result = await seasonService.GetSeasonBannerByEventAsync(seasonId);
-
-            if (result == null)
-            {
-                return NotFound();
-            }
-
+            var result = await seasonService.GetSeasonByIdAsync(id);
+            if (result == null) return NotFound();
             return Ok(result);
-        }
-
-        [HttpGet("event/{seasonId}")]
-        [EndpointName("GetLatestEventIdBySeasonAsync")]
-        public async Task<ActionResult<long>> GetLatestEventIdBySeasonAsync([FromRoute] long seasonId)
-        {
-            long? eventId = await seasonService.GetLatestEventIdBySeasonAsync(seasonId);
-
-            if (eventId == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(eventId);
-        }
-
-        [HttpGet("season-key/{seasonId}")]
-        [EndpointName("GetSeasonKeyAsync")]
-        public async Task<ActionResult<SeasonKeyResult>> GetSeasonKeyAsync([FromRoute] long seasonId)
-        {
-            string? seasonKey = await seasonService.GetSeasonKeyAsync(seasonId);
-
-            if (string.IsNullOrEmpty(seasonKey))
-            {
-                return NotFound();
-            }
-
-            return Ok(new SeasonKeyResult { Value = seasonKey });
         }
     }
 }

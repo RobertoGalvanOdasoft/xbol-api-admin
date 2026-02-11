@@ -1,26 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
-using Odasoft.XBOL.Business;
 using Odasoft.XBOL.Business.Services;
+using Odasoft.XBOL.Commons.Enums;
 using Odasoft.XBOL.DTO;
+using Odasoft.XBOL.DTO.Response;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
 {
     [Route("api/events")]
     [ApiController]
-    public class EventsController : ControllerBase
+    public class EventsController(EventService eventService) : ControllerBase
     {
-        private readonly ITicketingClient _ticketingClient;
-        private readonly EventService _eventService;
-
-        public EventsController(ITicketingClient ticketingClient, EventService eventService)
-        {
-            _ticketingClient = ticketingClient;
-            _eventService = eventService;
-        }
-
         [HttpGet]
         [EndpointName("GetEventsAsync")]
-        public async Task<ActionResult<EventListItemPagedResponse>> GetEventsAsync(
+        public async Task<ActionResult<PagedResponse<EventListItemDTO>>> GetEventsAsync(
             [FromQuery] string? venues,
             [FromQuery] string? categories,
             [FromQuery] DateTimeOffset? startDate,
@@ -29,10 +21,13 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
             [FromQuery] string? sortBy,
             [FromQuery] bool? descending,
             [FromQuery] int? page,
-            [FromQuery] int? pageSize)
+            [FromQuery] int? pageSize,
+            [FromQuery] long? seasonId,
+            [FromQuery] EventStatus? status)
         {
-            var result = await _ticketingClient.GetEventsAsync(
-                venues, categories, startDate, endDate, search, sortBy, descending, page, pageSize);
+            var result = await eventService.GetEventListAsync(
+                venues, categories, startDate, endDate, search, sortBy, descending, page, pageSize,
+                seasonId, status);
 
             return Ok(result);
         }
@@ -41,7 +36,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         [EndpointName("GetEventByIdAsync")]
         public async Task<ActionResult<EventInfoDTO>> GetEventByIdAsync([FromRoute] long eventId)
         {
-            var result = await _eventService.GetEventByIdAsync(eventId);
+            var result = await eventService.GetEventByIdAsync(eventId);
             if (result == null)
             {
                 return NotFound();

@@ -31,6 +31,8 @@ namespace Odasoft.XBOL.Data
         public DbSet<SuiteAgreementFile> SuiteAgreementFiles => Set<SuiteAgreementFile>();
         public DbSet<InventoryBatch> InventoryBatches => Set<InventoryBatch>();
         public DbSet<Performer> Performers => Set<Performer>();
+        public DbSet<SeasonSection> SeasonSections => Set<SeasonSection>();
+        public DbSet<SeasonSeat> SeasonSeats => Set<SeasonSeat>();
 
         public XBOLDbContext() : base()
         {

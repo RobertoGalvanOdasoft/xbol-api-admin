@@ -1,5 +1,7 @@
+using Odasoft.XBOL.Commons.Enums;
 using Odasoft.XBOL.Data.Repositories;
 using Odasoft.XBOL.DTO;
+using Odasoft.XBOL.DTO.Response;
 
 namespace Odasoft.XBOL.Business.Services
 {
@@ -10,6 +12,33 @@ namespace Odasoft.XBOL.Business.Services
         public EventService(EventRepository eventRepository)
         {
             _eventRepository = eventRepository;
+        }
+
+        public async Task<PagedResponse<EventListItemDTO>> GetEventListAsync(
+            string? venues,
+            string? categories,
+            DateTimeOffset? startDate,
+            DateTimeOffset? endDate,
+            string? search,
+            string? sortBy,
+            bool? descending,
+            int? page,
+            int? pageSize,
+            long? seasonId = null,
+            EventStatus? status = null)
+        {
+            return await _eventRepository.GetEventListAsync(
+                venues,
+                categories,
+                startDate,
+                endDate,
+                search,
+                sortBy,
+                descending ?? false,
+                page ?? 1,
+                pageSize ?? 10,
+                seasonId,
+                status);
         }
 
         public async Task<EventInfoDTO?> GetEventByIdAsync(long eventId)

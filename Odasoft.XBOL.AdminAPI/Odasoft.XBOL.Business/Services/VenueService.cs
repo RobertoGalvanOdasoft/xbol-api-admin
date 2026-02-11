@@ -13,6 +13,11 @@ namespace Odasoft.XBOL.Business.Services
             _venueRepository = venueRepository;
         }
 
+        public async Task<IList<VenueListItemDTO>> GetVenueListAsync()
+        {
+            return await _venueRepository.GetVenueListAsync();
+        }
+
         public async Task<IList<ListItem>> GetVenueCatalogAsync()
         {
             return await _venueRepository.Get()

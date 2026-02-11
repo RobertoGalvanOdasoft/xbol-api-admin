@@ -253,6 +253,134 @@
         }
       }
     },
+    "/api/hold-seats": {
+      "post": {
+        "tags": [
+          "Hold"
+        ],
+        "operationId": "HoldSeatsAsync",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/HoldSeatsRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HoldSeatsRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HoldSeatsRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/HoldSeatsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoldToken"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoldToken"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoldToken"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Hold"
+        ],
+        "operationId": "GetHoldTokenAsync",
+        "parameters": [
+          {
+            "name": "holdToken",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoldToken"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoldToken"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoldToken"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Hold"
+        ],
+        "operationId": "ReleaseHoldSeatsAsync",
+        "parameters": [
+          {
+            "name": "holdToken",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoldToken"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoldToken"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoldToken"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/tests": {
       "get": {
         "tags": [
@@ -433,9 +561,12 @@
     "schemas": {
       "BookingRequest": {
         "required": [
+          "clientContact",
           "eventId",
           "holdToken",
-          "seats"
+          "paymentInfoRequest",
+          "seats",
+          "ticketType"
         ],
         "type": "object",
         "properties": {
@@ -451,6 +582,43 @@
             "nullable": true
           },
           "eventId": {
+            "type": "string",
+            "nullable": true
+          },
+          "ticketType": {
+            "type": "string",
+            "nullable": true
+          },
+          "clientContact": {
+            "$ref": "#/components/schemas/EventClientContactRequest"
+          },
+          "paymentInfoRequest": {
+            "$ref": "#/components/schemas/PaymentInfoRequest"
+          }
+        },
+        "additionalProperties": false
+      },
+      "EventClientContactRequest": {
+        "required": [
+          "countryPhoneISO",
+          "email",
+          "phoneNumber"
+        ],
+        "type": "object",
+        "properties": {
+          "countryPhoneISO": {
+            "type": "string",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "fullName": {
             "type": "string",
             "nullable": true
           }
@@ -537,6 +705,80 @@
         },
         "additionalProperties": false
       },
+      "HoldSeatsRequest": {
+        "required": [
+          "eventId",
+          "seats"
+        ],
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "seats": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "HoldToken": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "nullable": true
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresInSeconds": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "workspaceKey": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PaymentInfoRequest": {
+        "type": "object",
+        "properties": {
+          "cardAmount": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "cashAmount": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "dolarAmount": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "creditAmount": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "otherAmount": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "TestResultObject": {
         "required": [
           "result"
@@ -604,6 +846,9 @@
     },
     {
       "name": "Events"
+    },
+    {
+      "name": "Hold"
     },
     {
       "name": "Test"

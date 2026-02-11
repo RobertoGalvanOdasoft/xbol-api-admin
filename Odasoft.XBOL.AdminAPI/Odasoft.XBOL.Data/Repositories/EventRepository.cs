@@ -171,8 +171,11 @@ namespace Odasoft.XBOL.Data.Repositories
                 {
                     Id = temp.Event.Id,
                     ScheduledStartDate = temp.Schedule != null ? temp.Schedule.StartDateTime : DateTimeOffset.MinValue,
+                    ScheduledEndDate = temp.Schedule != null ? temp.Schedule.EndDateTime : null,
                     Name = temp.Event.Name,
+                    Subtitle = temp.Event.Subtitle,
                     Category = temp.Event.Category.ToString(),
+                    BannerImageUrl = temp.Event.BannerImageUrl,
                     VenueMapId = temp.Event.VenueMapId,
                     VenueName = temp.Event.VenueMap.Venue.Name,
                     ExternalEventKey = temp.Schedule != null ? temp.Schedule.ExternalEventKey : string.Empty,

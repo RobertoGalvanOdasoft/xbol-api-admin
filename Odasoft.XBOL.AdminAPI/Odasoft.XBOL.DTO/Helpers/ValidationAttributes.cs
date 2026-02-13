@@ -1,44 +1,69 @@
 using System.ComponentModel.DataAnnotations;
+using System.Reflection;
+using Microsoft.Extensions.Localization;
 
 namespace Odasoft.XBOL.DTO.Helpers
 {
-    public sealed class DateGreaterThanAttribute : ValidationAttribute
+    public sealed class DateGreaterThanAttribute(string comparisonProperty) : ValidationAttribute
     {
-        private readonly string _comparisonProperty;
+        public string ComparisonProperty { get; } = comparisonProperty;
 
         /// <summary>
         /// Validates that a DateTimeOffset property is greater than another DateTimeOffset property.
         /// </summary>
-        /// <param name="comparisonProperty"></param>
-        public DateGreaterThanAttribute(string comparisonProperty)
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
-            _comparisonProperty = comparisonProperty;
-        }
+            var currentValue = ToNullableDateTimeOffset(value);
 
-        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
-        {
-            if (value == null)
-            {
-                return ValidationResult.Success; // Let [Required] handle nullability
-            }
+            if (currentValue is null)
+                return ValidationResult.Success;
 
-            var currentValue = (DateTimeOffset)value;
-            var comparisonPropertyInfo = validationContext.ObjectType.GetProperty(_comparisonProperty);
+            var comparisonPropertyInfo = validationContext.ObjectType.GetProperty(ComparisonProperty)
+                ?? throw new ArgumentException($"Property '{ComparisonProperty}' not found on '{validationContext.ObjectType.Name}'.");
 
-            if (comparisonPropertyInfo == null)
-            {
-                throw new ArgumentException("Comparison property not found.");
-            }
+            var rawComparisonValue = comparisonPropertyInfo.GetValue(validationContext.ObjectInstance);
+            var comparisonValue = ToNullableDateTimeOffset(rawComparisonValue);
 
-            var comparisonValue = (DateTimeOffset)comparisonPropertyInfo.GetValue(validationContext.ObjectInstance, null);
+            if (comparisonValue is null)
+                return ValidationResult.Success;
 
             if (currentValue <= comparisonValue)
-            {
-                return new ValidationResult(ErrorMessage ??
-                    $"{validationContext.DisplayName} must be after {_comparisonProperty}.");
-            }
+                return new ValidationResult(GetLocalizedErrorMessage(validationContext, comparisonPropertyInfo));
 
             return ValidationResult.Success;
+        }
+
+        private static DateTimeOffset? ToNullableDateTimeOffset(object? value)
+        {
+            if (value is DateTimeOffset dateValue && dateValue != DateTimeOffset.MinValue)
+            {
+                return dateValue;
+            }
+
+            return null;
+        }
+
+        private string GetLocalizedErrorMessage(ValidationContext validationContext, PropertyInfo comparisonPropertyInfo)
+        {
+            var resourceKey = ErrorMessage ?? nameof(DateGreaterThanAttribute).Replace("Attribute", "");
+            var displayName = validationContext.DisplayName;
+
+            if (validationContext.GetService(typeof(IStringLocalizerFactory)) is not IStringLocalizerFactory factory)
+                return string.Format(resourceKey, displayName, ComparisonProperty);
+
+            var entryAssembly = Assembly.GetEntryAssembly()!;
+            var localizer = factory.Create("SharedResource", entryAssembly.GetName().Name!);
+
+            var template = localizer[resourceKey];
+            var comparisonFieldName = localizer[GetDisplayName(comparisonPropertyInfo)];
+
+            return string.Format(template, displayName, comparisonFieldName);
+        }
+
+        private static string GetDisplayName(PropertyInfo property)
+        {
+            var display = property.GetCustomAttribute<DisplayAttribute>();
+            return display?.GetName() ?? property.Name;
         }
     }
 }

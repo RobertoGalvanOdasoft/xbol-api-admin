@@ -1,4 +1,7 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
+using Odasoft.XBOL.AdminAPI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using Odasoft.XBOL.Business;
@@ -46,7 +49,31 @@ builder.Services.AddControllers(options =>
 
 // Add health check services
 builder.Services.AddHealthChecks();
+// Add localization services
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+builder.Services.AddMvc()
+    .AddDataAnnotationsLocalization(options => {
+        options.DataAnnotationLocalizerProvider = (type, factory) =>
+            factory.Create(typeof(SharedResource));
+    });
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var localizer = context.HttpContext.RequestServices
+            .GetRequiredService<IStringLocalizerFactory>()
+            .Create(typeof(SharedResource));
+
+        var details = new ValidationProblemDetails(context.ModelState)
+        {
+            Title = localizer["ValidationTitle"]
+        };
+
+        return new BadRequestObjectResult(details);
+    };
+});
 
 // Add OpenAPI services
 builder.Services.AddEndpointsApiExplorer();
@@ -115,6 +142,14 @@ if (!app.Environment.IsProduction()
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+var supportedCultures = new[] { "en", "es" };
+var localizationOptions = new RequestLocalizationOptions()
+    .SetDefaultCulture("en")
+    .AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures);
+
+app.UseRequestLocalization(localizationOptions);
 
 app.MapControllers();
 

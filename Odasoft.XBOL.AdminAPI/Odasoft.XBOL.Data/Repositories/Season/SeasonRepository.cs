@@ -11,7 +11,7 @@ namespace Odasoft.XBOL.Data.Repositories.Season
     {
         public async Task<PagedResponse<SeasonListItem>> GetSeasonsAsync(SeasonsQueryParams queryParams)
         {
-            var query = DbSet.AsNoTracking().AsQueryable();
+            var query = DbSet.AsNoTracking().Where(s => s.DeletedAt == null).AsQueryable();
 
             if (queryParams.Status.HasValue)
             {
@@ -126,15 +126,23 @@ namespace Odasoft.XBOL.Data.Repositories.Season
 
             return await DbSet
                 .AsNoTracking()
-                .Where(s => s.Id == id)
+                .Where(s => s.Id == id && s.DeletedAt == null)
                 .Select(s => new SeasonResult
                 {
                     Id = s.Id,
                     Name = s.Name,
+                    Code = s.Code,
                     Description = s.Description,
                     BannerImageUrl = s.BannerImageUrl,
+                    PosterImageUrl = s.PosterImageUrl,
+                    LandingUrl = s.LandingUrl,
                     StartDate = s.StartDate,
                     EndDate = s.EndDate,
+                    PublishedDate = s.PublishedDate,
+                    OnSaleDate = s.OnSaleDate,
+                    PreSaleDate = s.PreSaleDate,
+                    OffSaleDate = s.OffSaleDate,
+                    Status = s.Status,
                     ExternalSeasonKey = s.ExternalSeasonKey,
                     Venue = DbContext.Set<Models.Event>()
                         .Where(e => e.SeasonId == s.Id)

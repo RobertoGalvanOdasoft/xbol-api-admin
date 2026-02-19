@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
 using Odasoft.XBOL.DTO.Helpers;
+using System.ComponentModel.DataAnnotations;
 
 namespace Odasoft.XBOL.DTO.Requests
 {

@@ -8,15 +8,15 @@ namespace Odasoft.XBOL.Data.Repositories.Client
     {
         private readonly XBOLDbContext _context = dbContext;
 
-        public async Task<ClientSeasonEvent> GetClientSeasonEventInfoAsync(ClientFilter filter)
+        public async Task<ClientSeasonEvent?> GetClientSeasonEventInfoAsync(ClientFilter filter)
         {
             ClientSeasonEvent result = new() { AlreadyRenewed = false, CanRenovate = false };
 
             var client = await FindClientAsync(filter);
+
             if (client is null)
             {
-                result.ClientContact = new ClientContactRequest();
-                return result;
+                return null;
             }
 
             result.ClientContact = new()
@@ -24,8 +24,8 @@ namespace Odasoft.XBOL.Data.Repositories.Client
                 CountryPhoneISO = client.User!.CountryPhoneISO!,
                 PhoneNumber = client.PhoneNumber,
                 Email = client.Email,
-                Name = string.IsNullOrEmpty(client.BusinessName) ? client.FirstName : client.BusinessName,
-                LastName = client.LastName ?? ""
+                Name = string.IsNullOrEmpty(client.BusinessName) ? client.FullName : client.BusinessName,
+                LastName = string.Empty
             };
 
             var season = await _context.Seasons.FirstOrDefaultAsync(s => s.Id == filter.SeasonId);

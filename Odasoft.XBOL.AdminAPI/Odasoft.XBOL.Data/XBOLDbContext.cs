@@ -33,6 +33,9 @@ namespace Odasoft.XBOL.Data
         public DbSet<Performer> Performers => Set<Performer>();
         public DbSet<SeasonSection> SeasonSections => Set<SeasonSection>();
         public DbSet<SeasonSeat> SeasonSeats => Set<SeasonSeat>();
+        public DbSet<ClientCreditAccount> ClientCreditAccounts => Set<ClientCreditAccount>();
+        public DbSet<ClientCreditTransaction> ClientCreditTransactions => Set<ClientCreditTransaction>();
+        public DbSet<LegalRepresentative> LegalRepresentatives => Set<LegalRepresentative>();
 
         public XBOLDbContext() : base()
         {
@@ -82,6 +85,9 @@ namespace Odasoft.XBOL.Data
             modelBuilder.ApplyConfiguration(new SuiteConfiguration());
             modelBuilder.ApplyConfiguration(new SuiteAgreementConfiguration());
             modelBuilder.ApplyConfiguration(new SuiteAgreementFileConfiguration());
+            modelBuilder.ApplyConfiguration(new ClientCreditAccountConfiguration());
+            modelBuilder.ApplyConfiguration(new ClientCreditTransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new LegalRepresentativeConfiguration());
         }
     }
 }

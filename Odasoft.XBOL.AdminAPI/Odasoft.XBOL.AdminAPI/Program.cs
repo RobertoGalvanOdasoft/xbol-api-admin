@@ -1,15 +1,16 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
-using Odasoft.XBOL.AdminAPI;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.OpenApi;
+using Odasoft.XBOL.AdminAPI;
 using Odasoft.XBOL.Business;
 using Odasoft.XBOL.Business.Extensions;
 using Odasoft.XBOL.Business.Messages;
 using Odasoft.XBOL.Data;
 using Odasoft.XBOL.Data.Extensions;
 using Odasoft.XBOL.Models;
+using System.Globalization;
 using System.Reflection;
 using Wolverine;
 
@@ -45,15 +46,27 @@ builder.Services.ConfigureRepositories();
 builder.Services.AddControllers(options =>
 {
     options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
-}).AddNewtonsoftJson();
+}).AddNewtonsoftJson(options =>
+{
+    options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+});
 
 // Add health check services
 builder.Services.AddHealthChecks();
 // Add localization services
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    string[] supportedCultures = ["es-MX"];
+    options.SetDefaultCulture("es-MX");
+    options.AddSupportedCultures(supportedCultures);
+    options.AddSupportedUICultures(supportedCultures);
+});
+
 builder.Services.AddMvc()
-    .AddDataAnnotationsLocalization(options => {
+    .AddDataAnnotationsLocalization(options =>
+    {
         options.DataAnnotationLocalizerProvider = (type, factory) =>
             factory.Create(typeof(SharedResource));
     });
@@ -91,6 +104,9 @@ builder.Services.AddSwaggerGen(c =>
     }
 
     c.MapType<decimal>(() => new OpenApiSchema { Type = JsonSchemaType.Number, Format = "decimal" });
+
+    c.UseAllOfToExtendReferenceSchemas();
+    c.SupportNonNullableReferenceTypes();
 }).AddSwaggerGenNewtonsoftSupport();
 
 builder.Host.UseWolverine(opts =>
@@ -143,13 +159,9 @@ if (!app.Environment.IsProduction()
 app.UseAuthentication();
 app.UseAuthorization();
 
-var supportedCultures = new[] { "en", "es" };
-var localizationOptions = new RequestLocalizationOptions()
-    .SetDefaultCulture("en")
-    .AddSupportedCultures(supportedCultures)
-    .AddSupportedUICultures(supportedCultures);
-
-app.UseRequestLocalization(localizationOptions);
+var mexicoCulture = new CultureInfo("es-MX");
+CultureInfo.DefaultThreadCurrentCulture = mexicoCulture;
+CultureInfo.DefaultThreadCurrentUICulture = mexicoCulture;
 
 app.MapControllers();
 

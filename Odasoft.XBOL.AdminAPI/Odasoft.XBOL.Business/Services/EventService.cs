@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Odasoft.XBOL.Commons.Enums;
 using Odasoft.XBOL.Data.Repositories;
 using Odasoft.XBOL.DTO;
@@ -47,6 +48,18 @@ namespace Odasoft.XBOL.Business.Services
 
             // TODO: Handle null result (e.g., throw exception or return a default value)
             return result;
+        }
+
+        public async Task<IList<ListItem>> GetEventCatalogAsync()
+        {
+            return await _eventRepository
+                            .Get()
+                            .AsNoTracking()
+                            .Select(x => new ListItem
+                            {
+                                Id = x.Id,
+                                Name = x.Name
+                            }).ToListAsync();
         }
     }
 }

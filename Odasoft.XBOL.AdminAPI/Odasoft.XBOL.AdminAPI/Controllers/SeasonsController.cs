@@ -34,7 +34,11 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         public async Task<ActionResult<SeasonResult>> GetSeasonByIdAsync([FromRoute] long id)
         {
             var result = await seasonService.GetSeasonByIdAsync(id);
-            if (result == null) return NotFound();
+            if (result == null)
+            {
+                return NotFound();
+            }
+
             return Ok(result);
         }
 

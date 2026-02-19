@@ -11,6 +11,8 @@ namespace Odasoft.XBOL.Data.Repositories.Order
 {
     public class OrderRepository(XBOLDbContext dbContext) : BaseRepository<Models.Order>(dbContext)
     {
+        // TODO: Fix this logic
+
         public async Task<(List<OrderListItem> Items, int TotalCount)> GetOrderListAsync(
             OrderListFilters filters)
         {
@@ -116,8 +118,8 @@ namespace Odasoft.XBOL.Data.Repositories.Order
                         Email = o.Client.Email ?? string.Empty,
                         Name = !string.IsNullOrWhiteSpace(o.Client.BusinessName)
                                     ? o.Client.BusinessName
-                                    : o.Client.FirstName,
-                        LastName = o.Client.LastName
+                                    : o.Client.FullName,
+                        LastName = string.Empty
                     },
                     Seats = o.Tickets
                         .GroupBy(t => t.EventSeat.ExternalSeatObjectKey)
@@ -242,8 +244,8 @@ namespace Odasoft.XBOL.Data.Repositories.Order
                     Client = new Models.Client
                     {
                         ClientType = ClientType.Individual,
-                        FirstName = request.ClientContact.Name,
-                        LastName = request.ClientContact.LastName,
+                        FullName = request.ClientContact.Name,
+                        //LastName = request.ClientContact.LastName,
                         Email = request.ClientContact.Email,
                         PhoneNumber = request.ClientContact.PhoneNumber,
                         IsActive = true,

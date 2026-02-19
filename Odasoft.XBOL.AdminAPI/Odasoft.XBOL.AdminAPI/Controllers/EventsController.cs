@@ -37,10 +37,26 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         public async Task<ActionResult<EventInfoDTO>> GetEventByIdAsync([FromRoute] long eventId)
         {
             var result = await eventService.GetEventByIdAsync(eventId);
+
             if (result == null)
             {
                 return NotFound();
             }
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Retrieves the event catalog as a collection of list items.
+        /// </summary>
+        /// <returns>An object containing the event catalog. The collection will
+        /// be empty if no items are available.</returns>
+        [HttpGet("catalog")]
+        [EndpointName("GetEventCatalogAsync")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ICollection<ListItem>))]
+        public async Task<ActionResult<ICollection<ListItem>>> GetEventCatalogAsync()
+        {
+            var result = await eventService.GetEventCatalogAsync();
             return Ok(result);
         }
     }

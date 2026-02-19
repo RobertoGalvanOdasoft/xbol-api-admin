@@ -17,22 +17,38 @@
           "content": {
             "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/BookingRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/BookingRequest"
+                  }
+                ]
               }
             },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/BookingRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/BookingRequest"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/BookingRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/BookingRequest"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/BookingRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/BookingRequest"
+                  }
+                ]
               }
             }
           }
@@ -263,22 +279,38 @@
           "content": {
             "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/HoldSeatsRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/HoldSeatsRequest"
+                  }
+                ]
               }
             },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/HoldSeatsRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/HoldSeatsRequest"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/HoldSeatsRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/HoldSeatsRequest"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/HoldSeatsRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/HoldSeatsRequest"
+                  }
+                ]
               }
             }
           }
@@ -565,8 +597,7 @@
           "eventId",
           "holdToken",
           "paymentInfoRequest",
-          "seats",
-          "ticketType"
+          "seats"
         ],
         "type": "object",
         "properties": {
@@ -574,36 +605,36 @@
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           },
           "holdToken": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "eventId": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "ticketType": {
             "type": "string",
             "nullable": true
           },
           "clientContact": {
-            "$ref": "#/components/schemas/EventClientContactRequest"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EventClientContactRequest"
+              }
+            ]
           },
           "paymentInfoRequest": {
-            "$ref": "#/components/schemas/PaymentInfoRequest"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PaymentInfoRequest"
+              }
+            ]
           }
         },
         "additionalProperties": false
       },
       "EventClientContactRequest": {
-        "required": [
-          "countryPhoneISO",
-          "email",
-          "phoneNumber"
-        ],
         "type": "object",
         "properties": {
           "countryPhoneISO": {
@@ -645,24 +676,20 @@
             "format": "date-time"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "category": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "venueMapId": {
             "type": "integer",
             "format": "int64"
           },
           "venueName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "externalEventKey": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "availableSeats": {
             "type": "integer",
@@ -687,8 +714,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/EventListItem"
-            },
-            "nullable": true
+            }
           },
           "totalCount": {
             "type": "integer",
@@ -720,8 +746,7 @@
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -786,8 +811,7 @@
         "type": "object",
         "properties": {
           "result": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -803,8 +827,7 @@
             "format": "int64"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -825,12 +848,10 @@
             "format": "int64"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "externalMapKey": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false

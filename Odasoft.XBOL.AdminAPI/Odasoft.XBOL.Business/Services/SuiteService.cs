@@ -43,8 +43,9 @@ namespace Odasoft.XBOL.Business.Services
             return new PagedResponse<SuiteResult>
             {
                 Items = suites
-                        .Skip((queryParams.Page) * queryParams.PageSize)
-                        .Take(queryParams.PageSize).ToList(),
+                        .Skip(queryParams.Page * queryParams.PageSize)
+                        .Take(queryParams.PageSize)
+                        .ToList(),
                 TotalCount = totalCount,
                 Page = queryParams.Page,
                 PageSize = queryParams.PageSize
@@ -148,7 +149,7 @@ namespace Odasoft.XBOL.Business.Services
             catch (Exception ex)
             {
                 // TODO: Implement proper logging
-                Console.WriteLine($"Error updating Suite active status: {ex.Message}");
+                Console.WriteLine($"Error deleting Suite. Error: {ex.Message}");
                 return false;
             }
 

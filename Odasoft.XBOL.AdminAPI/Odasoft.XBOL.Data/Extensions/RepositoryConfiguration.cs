@@ -27,6 +27,10 @@ namespace Odasoft.XBOL.Data.Extensions
             services.AddScoped<SeasonSeatRepository>();
             services.AddScoped<SeasonSectionRepository>();
             services.AddScoped<ClientRepository>();
+            services.AddScoped<ClientCreditAccountRepository>();
+            services.AddScoped<ClientCreditTransactionRepository>();
+            services.AddScoped<LegalRepresentativeRepository>();
+            services.AddScoped<TicketRepository>();
 
             return services;
         }

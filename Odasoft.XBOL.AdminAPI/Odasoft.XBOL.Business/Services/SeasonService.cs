@@ -92,21 +92,45 @@ namespace Odasoft.XBOL.Business.Services
             existingSeason.EndDate = request.EndDate!.Value;
 
             if (request.Description is not null)
+            {
                 existingSeason.Description = request.Description;
+            }
+
             if (request.BannerImageUrl is not null)
+            {
                 existingSeason.BannerImageUrl = request.BannerImageUrl;
+            }
+
             if (request.PosterImageUrl is not null)
+            {
                 existingSeason.PosterImageUrl = request.PosterImageUrl;
+            }
+
             if (request.LandingUrl is not null)
+            {
                 existingSeason.LandingUrl = request.LandingUrl;
+            }
+
             if (request.PublishedDate is not null)
+            {
                 existingSeason.PublishedDate = request.PublishedDate;
+            }
+
             if (request.OnSaleDate is not null)
+            {
                 existingSeason.OnSaleDate = request.OnSaleDate;
+            }
+
             if (request.PreSaleDate is not null)
+            {
                 existingSeason.PreSaleDate = request.PreSaleDate;
+            }
+
             if (request.OffSaleDate is not null)
+            {
                 existingSeason.OffSaleDate = request.OffSaleDate;
+            }
+
             existingSeason.UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime();
             existingSeason.UpdatedBy = Guid.Empty;
 

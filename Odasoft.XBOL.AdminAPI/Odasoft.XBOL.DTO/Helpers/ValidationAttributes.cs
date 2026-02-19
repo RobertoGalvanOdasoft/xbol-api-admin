@@ -1,6 +1,6 @@
+using Microsoft.Extensions.Localization;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using Microsoft.Extensions.Localization;
 
 namespace Odasoft.XBOL.DTO.Helpers
 {
@@ -16,7 +16,9 @@ namespace Odasoft.XBOL.DTO.Helpers
             var currentValue = ToNullableDateTimeOffset(value);
 
             if (currentValue is null)
+            {
                 return ValidationResult.Success;
+            }
 
             var comparisonPropertyInfo = validationContext.ObjectType.GetProperty(ComparisonProperty)
                 ?? throw new ArgumentException($"Property '{ComparisonProperty}' not found on '{validationContext.ObjectType.Name}'.");
@@ -25,10 +27,14 @@ namespace Odasoft.XBOL.DTO.Helpers
             var comparisonValue = ToNullableDateTimeOffset(rawComparisonValue);
 
             if (comparisonValue is null)
+            {
                 return ValidationResult.Success;
+            }
 
             if (currentValue <= comparisonValue)
+            {
                 return new ValidationResult(GetLocalizedErrorMessage(validationContext, comparisonPropertyInfo));
+            }
 
             return ValidationResult.Success;
         }
@@ -49,7 +55,9 @@ namespace Odasoft.XBOL.DTO.Helpers
             var displayName = validationContext.DisplayName;
 
             if (validationContext.GetService(typeof(IStringLocalizerFactory)) is not IStringLocalizerFactory factory)
+            {
                 return string.Format(resourceKey, displayName, ComparisonProperty);
+            }
 
             var entryAssembly = Assembly.GetEntryAssembly()!;
             var localizer = factory.Create("SharedResource", entryAssembly.GetName().Name!);

@@ -23,6 +23,9 @@ namespace Odasoft.XBOL.Business.Extensions
             services.AddScoped<SeasonSectionService>();
             services.AddScoped<ClientService>();
             services.AddScoped<SeasonPassService>();
+            services.AddScoped<ClientCreditAccountService>();
+            services.AddScoped<ClientCreditTransactionService>();
+            services.AddScoped<LegalRepresentativeService>();
 
             return services;
         }

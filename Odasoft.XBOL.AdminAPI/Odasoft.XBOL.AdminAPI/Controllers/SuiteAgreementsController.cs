@@ -59,13 +59,14 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// result with an error message.</returns>
         [HttpPost]
         [EndpointName("CreateSuiteAgreementAsync")]
-        public async Task<ActionResult> CreateSuiteAgreementAsync([FromForm] CreateSuiteAgreementRequest request)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(long))]
+        public async Task<ActionResult> CreateSuiteAgreementAsync([FromBody] CreateSuiteAgreementRequest request)
         {
-            var success = await _suiteAgreementService.CreateSuiteAgreementAsync(request);
+            var agreementId = await _suiteAgreementService.CreateSuiteAgreementAsync(request);
 
-            if (success)
+            if (agreementId > 0)
             {
-                return Ok(success);
+                return Ok(agreementId);
             }
 
             // TODO: Return a server error
@@ -128,6 +129,37 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
                 // TODO: Return a server error
                 return UnprocessableEntity("Unable to delete the Suite Agreement");
             }
+        }
+
+        /// <summary>
+        /// Uploads the file associated with the specified suite agreement.
+        /// </summary>
+        /// <param name="suiteAgreementId">The unique identifier of the suite agreement whose file is to be downloaded.</param>
+        /// <param name="agreementFile">The file content</param>
+        /// <returns>An <see cref="FileContentResult"/> containing the file content if found; otherwise, a <see
+        /// cref="NotFoundResult"/> if the suite agreement file does not exist.</returns>
+        [HttpPost("upload")]
+        [EndpointName("UploadSuiteAgreementFileAsync")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(bool))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(string))]
+        public async Task<ActionResult> UploadSuiteAgreementFileAsync([FromForm] long suiteAgreementId, IFormFile agreementFile)
+        {
+            var agreement = await _suiteAgreementService.GetSuiteAgreementByIdAsync(suiteAgreementId);
+
+            if (agreementFile == null)
+            {
+                return NotFound($"Suite Agreement with Id {suiteAgreementId} not found.");
+            }
+
+            var success = await _suiteAgreementService.SaveSuiteAgreementFileBySuiteAgreementIdAsync(suiteAgreementId, agreementFile);
+
+            if (success)
+            {
+                return Ok(success);
+            }
+
+            return UnprocessableEntity("Unable to upload file.");
         }
 
         /// <summary>

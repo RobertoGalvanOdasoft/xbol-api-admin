@@ -20,16 +20,21 @@ namespace Odasoft.XBOL.Business.Services
         private readonly EventScheduleRepository _eventScheduleRepository;
         private readonly TicketRepository _ticketRepository;
         private readonly SeasonPassRepository _seasonPassRepository;
+        private readonly SequenceTrackerService _sequenceTrackerService;
+
+        private const string ORDER_LOCALIZER_PREFIX = "ORD"; // TODO: Get this value from a configuration file or database in the future
 
         public OrderService(OrderRepository orderRepository,
             EventScheduleRepository eventScheduleRepository,
             TicketRepository ticketRepository,
-            SeasonPassRepository seasonPassRepository)
+            SeasonPassRepository seasonPassRepository,
+            SequenceTrackerService sequenceTrackerService)
         {
             _orderRepository = orderRepository;
             _eventScheduleRepository = eventScheduleRepository;
             _ticketRepository = ticketRepository;
             _seasonPassRepository = seasonPassRepository;
+            _sequenceTrackerService = sequenceTrackerService;
         }
 
         public async Task CreateOrderAsync(BookingRequest request)
@@ -38,14 +43,15 @@ namespace Odasoft.XBOL.Business.Services
 
             EventSchedule schedule = _eventScheduleRepository.Get(x => x.ExternalEventKey == request.EventId).First();
 
+            var localizer = await _sequenceTrackerService.GenerateLocalizerAsync(ORDER_LOCALIZER_PREFIX, schedule.EventId);
+
             // TODO: Calculate total, taxes, and fees
 
             // Create Order
             var newOrder = new Order
             {
                 UserId = null,
-                //TODO: Check the correct value of reference
-                Reference = request.HoldToken,
+                Reference = localizer,
                 Status = OrderStatus.Pending,
                 SubTotal = 0,
                 TotalFees = 0,
@@ -72,6 +78,9 @@ namespace Odasoft.XBOL.Business.Services
 
             await _orderRepository.InsertAsync(newOrder);
             await _orderRepository.CommitAsync();
+
+            // TODO: Create Client Credit Transaction is the order was paid with client credit
+            // Use the localizer as description for the transaction to find the relationship between them
 
             // Process Payment
         }

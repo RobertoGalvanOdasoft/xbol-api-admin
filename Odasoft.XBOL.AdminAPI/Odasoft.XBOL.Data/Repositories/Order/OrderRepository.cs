@@ -11,17 +11,15 @@ namespace Odasoft.XBOL.Data.Repositories.Order
 {
     public class OrderRepository(XBOLDbContext dbContext) : BaseRepository<Models.Order>(dbContext)
     {
-        // TODO: Fix this logic
-
-        public async Task<(List<OrderListItem> Items, int TotalCount)> GetOrderListAsync(
-            OrderListFilters filters)
+        // TODO: This method is getting too complex, consider splitting the responsibilities in multiple methods or even repositories in the future
+        public async Task<(List<OrderListItem> Items, int TotalCount)> GetOrderListAsync(OrderListFilters filters)
         {
             var latestSeason = await DbContext.Set<Models.Season>()
                                         .OrderByDescending(x => x.StartDate)
                                         .Select(x => new { x.Id, x.PreviousSeasonId })
                                         .FirstOrDefaultAsync();
 
-            if (!latestSeason.PreviousSeasonId.HasValue && filters.RenovationMode)
+            if (latestSeason == default || !latestSeason.PreviousSeasonId.HasValue && filters.RenovationMode)
             {
                 return (new List<OrderListItem>(), 0);
             }
@@ -33,25 +31,59 @@ namespace Odasoft.XBOL.Data.Repositories.Order
 
             filters.TextFilter = string.IsNullOrWhiteSpace(filters.TextFilter) ? null : filters.TextFilter;
 
-            List<long> previousOrdersIds = await DbContext.Set<Models.Order>().Where(o => o.Tickets.Any(t => t.SeasonPassEventTicket.SeasonPass.SeasonId == latestSeason.Id) && o.RelatedOrderId.HasValue).Select(x => x.RelatedOrderId.Value).ToListAsync();
+            List<long> previousOrdersIds = await DbContext
+                .Set<Models.Order>()
+                .Where(o => o.RelatedOrderId.HasValue
+                && o.Tickets.Any(t =>
+                    t.SeasonPassEventTicket != null
+                    && t.SeasonPassEventTicket.SeasonPass != null
+                    && t.SeasonPassEventTicket.SeasonPass.SeasonId == latestSeason.Id))
+                .Select(x => x.RelatedOrderId!.Value)
+                .ToListAsync();
 
-            var query = DbContext.Set<Models.Order>().Where(o =>
-                o.Tickets.Any(t => seasonIds.Any(s => s == t.SeasonPassEventTicket.SeasonPass.SeasonId)) &&
-                !previousOrdersIds.Any(s => s == o.Id) &&
-                (filters.RenewalTypes == null || filters.RenewalTypes.Count == 0 ||
-                    (filters.RenewalTypes.Any(x =>
-                        (x == SeasonPassRenewalType.New && !o.RelatedOrderId.HasValue) ||
-                        (x == SeasonPassRenewalType.Renewal && o.RelatedOrderId.HasValue)))) &&
-                (filters.TextFilter == null ||
-                    (
-                        (o.RelatedOrder != null && o.RelatedOrder.Reference.Contains(filters.TextFilter)) ||
-                        o.Client.Email.Contains(filters.TextFilter) ||
-                        o.Client.PhoneNumber.Contains(filters.TextFilter) ||
-                        o.Reference.Contains(filters.TextFilter) ||
-                        o.Tickets.Any(t => t.EventSeat.ExternalSeatObjectKey.Contains(filters.TextFilter))
-                    )
-                )
+            var query = DbContext.Set<Models.Order>().AsQueryable();
+
+            // Base Ticket & Previous Order Filters
+            query = query.Where(o =>
+                o.Tickets.Any(t =>
+                    t.SeasonPassEventTicket != null
+                    && t.SeasonPassEventTicket.SeasonPass != null
+                    && seasonIds.Contains(t.SeasonPassEventTicket.SeasonPass.SeasonId))
+                && !previousOrdersIds.Contains(o.Id)
             );
+
+            // Renewal Types
+            if (filters.RenewalTypes != null && filters.RenewalTypes.Any())
+            {
+                bool wantsNew = filters.RenewalTypes.Contains(SeasonPassRenewalType.New);
+                bool wantsRenewal = filters.RenewalTypes.Contains(SeasonPassRenewalType.Renewal);
+
+                if (wantsNew && !wantsRenewal)
+                {
+                    query = query.Where(o => !o.RelatedOrderId.HasValue);
+                }
+                else if (wantsRenewal && !wantsNew)
+                {
+                    query = query.Where(o => o.RelatedOrderId.HasValue);
+                }
+            }
+
+            // Text Filter
+            if (!string.IsNullOrWhiteSpace(filters.TextFilter))
+            {
+                string search = filters.TextFilter; // Store in local variable to prevent closure warnings
+
+                query = query.Where(o =>
+                    (o.RelatedOrder != null && o.RelatedOrder.Reference != null && o.RelatedOrder.Reference.Contains(search))
+                    || (o.Client != null && o.Client.Email != null && o.Client.Email.Contains(search))
+                    || (o.Client != null && o.Client.PhoneNumber != null && o.Client.PhoneNumber.Contains(search))
+                    || (o.Reference != null && o.Reference.Contains(search))
+                    || o.Tickets.Any(t =>
+                        t.EventSeat != null
+                        && t.EventSeat.ExternalSeatObjectKey != null
+                        && t.EventSeat.ExternalSeatObjectKey.Contains(search))
+                );
+            }
 
             //sort
             query = filters.SortDesc == null
@@ -65,11 +97,16 @@ namespace Odasoft.XBOL.Data.Repositories.Order
             List<OrderListItem> orders = await query.Select(o => new OrderListItem
             {
                 Order = o.Reference,
-                Email = o.Client.Email,
-                CountryPhoneISO = o.Client.User.CountryPhoneISO,
-                PhoneNumber = o.Client.PhoneNumber,
+                Email = o.Client == null ? "" : o.Client.Email ?? "",
+                CountryPhoneISO = o.Client == null
+                                    ? ""
+                                    : (o.Client.User == null ? "" : o.Client.User.CountryPhoneISO ?? ""),
+                PhoneNumber = o.Client == null ? "" : o.Client.PhoneNumber ?? "",
                 Total = o.Total,
-                SeatCount = o.Tickets.GroupBy(x => x.SeasonPassEventTicket.SeasonPassId).Count(),
+                SeatCount = o.Tickets.GroupBy(x =>
+                    x.SeasonPassEventTicket == null
+                    ? 0
+                    : x.SeasonPassEventTicket.SeasonPassId).Count(),
                 RelatedOrderReference = o.RelatedOrder != null ? o.RelatedOrder.Reference : null,
 
                 SeasonPeriod = o.Tickets.All(t =>
@@ -107,19 +144,20 @@ namespace Odasoft.XBOL.Data.Repositories.Order
             ClientSeasonEvent? result = new();
 
             result = await DbContext.Set<Models.Order>()
-                 .AsNoTracking()
+                .AsNoTracking()
                 .Where(o => o.Reference == orderReference)
                 .Select(o => new ClientSeasonEvent
                 {
                     ClientContact = new ClientContactRequest
                     {
-                        CountryPhoneISO = o.Client.User!.CountryPhoneISO ?? string.Empty,
-                        PhoneNumber = o.Client.PhoneNumber ?? string.Empty,
-                        Email = o.Client.Email ?? string.Empty,
-                        Name = !string.IsNullOrWhiteSpace(o.Client.BusinessName)
-                                    ? o.Client.BusinessName
-                                    : o.Client.FullName,
-                        LastName = string.Empty
+                        CountryPhoneISO = o.Client == null ? "" : o.Client.User!.CountryPhoneISO ?? "",
+                        PhoneNumber = o.Client == null ? "" : o.Client.PhoneNumber ?? "",
+                        Email = o.Client == null ? "" : o.Client.Email ?? "",
+                        Name = o.Client == null ? ""
+                            : (string.IsNullOrWhiteSpace(o.Client.BusinessName)
+                                    ? (o.Client.FullName ?? "")
+                                    : o.Client.BusinessName),
+                        LastName = ""
                     },
                     Seats = o.Tickets
                         .GroupBy(t => t.EventSeat.ExternalSeatObjectKey)
@@ -156,23 +194,35 @@ namespace Odasoft.XBOL.Data.Repositories.Order
                 .AsNoTracking()
                 .Where(es => es.Event.SeasonId == seasonIdToUseId)// && es.StartDateTime >= now)
                 .OrderBy(es => es.StartDateTime)
-                .Select(es => new { es.ExternalEventKey, es.EventId, SeasonId = es.Event.Season.Id, SeasonKey = es.Event.Season.ExternalSeasonKey })
-                .FirstOrDefaultAsync();
+                .Select(es => new
+                {
+                    es.ExternalEventKey,
+                    es.EventId,
+                    SeasonId = es.Event.Season == null
+                                ? 0
+                                : es.Event.Season.Id,
+                    SeasonKey = es.Event.Season == null
+                                ? ""
+                                : es.Event.Season.ExternalSeasonKey
+                }).FirstOrDefaultAsync();
 
-            result.EventKey = upcoming?.ExternalEventKey ?? string.Empty;
-            result.EventId = upcoming?.EventId ?? 0;
-
-            bool alreadyRenewed = await DbContext.Set<Models.SeasonPass>()
-                .AnyAsync(sp => sp.ClientId == result.ClientId && sp.SeasonId == seasonIdToUseId);
-
-            result.AlreadyRenewed = alreadyRenewed;
-            result.CanRenovate = seasonIdToUseId != null && !alreadyRenewed;
-            result.SeasonId = upcoming?.SeasonId ?? 0;
-            result.SeasonKey = upcoming?.SeasonKey ?? string.Empty;
-
-            foreach (var seat in result.Seats)
+            if (result is not null)
             {
-                seat.Category = seat.CategoryEnum.GetDescription();
+                result.EventKey = upcoming?.ExternalEventKey ?? "";
+                result.EventId = upcoming?.EventId ?? 0;
+
+                bool alreadyRenewed = await DbContext.Set<Models.SeasonPass>()
+                    .AnyAsync(sp => sp.ClientId == result.ClientId && sp.SeasonId == seasonIdToUseId);
+
+                result.AlreadyRenewed = alreadyRenewed;
+                result.CanRenovate = seasonIdToUseId > 0 && !alreadyRenewed;
+                result.SeasonId = upcoming?.SeasonId ?? 0;
+                result.SeasonKey = upcoming?.SeasonKey ?? "";
+
+                foreach (var seat in result.Seats)
+                {
+                    seat.Category = seat.CategoryEnum.GetDescription();
+                }
             }
 
             return result;
@@ -272,7 +322,7 @@ namespace Odasoft.XBOL.Data.Repositories.Order
                 SeasonPass seasonPass = new()
                 {
                     ClientId = client.Id,
-                    SeasonId = season.Id,
+                    SeasonId = season == null ? 0 : season.Id,
                     Status = SeasonPassStatus.Active,
                     CreatedAt = now,
                     UpdatedAt = now,

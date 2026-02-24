@@ -31,6 +31,7 @@ namespace Odasoft.XBOL.Data.Extensions
             services.AddScoped<ClientCreditTransactionRepository>();
             services.AddScoped<LegalRepresentativeRepository>();
             services.AddScoped<TicketRepository>();
+            services.AddScoped<SequenceTrackerRepository>();
 
             return services;
         }

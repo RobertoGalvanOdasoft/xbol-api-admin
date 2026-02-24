@@ -178,7 +178,7 @@ namespace Odasoft.XBOL.Data.Repositories
                     BannerImageUrl = temp.Event.BannerImageUrl,
                     VenueMapId = temp.Event.VenueMapId,
                     VenueName = temp.Event.VenueMap.Venue.Name,
-                    ExternalEventKey = temp.Schedule != null ? temp.Schedule.ExternalEventKey : string.Empty,
+                    ExternalEventKey = temp.Schedule != null ? temp.Schedule.ExternalEventKey : "",
                     TotalSeats = temp.Schedule != null ? temp.Schedule.Sections.Sum(s => s.TotalSeats) : 0,
                     AvailableSeats = temp.Schedule != null ? temp.Schedule.Sections.Sum(s => s.AvailableSeats) : 0,
                     Prices = prices

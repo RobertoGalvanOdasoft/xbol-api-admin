@@ -26,7 +26,7 @@ namespace Odasoft.XBOL.AdminAPI.Customs
             response.ContentType = ContentType;
 
             // This triggers the download dialog in the browser
-            if (!string.IsNullOrEmpty(FileDownloadName))
+            if (!string.IsNullOrWhiteSpace(FileDownloadName))
             {
                 var headerValue = new Microsoft.Net.Http.Headers.ContentDispositionHeaderValue("attachment");
                 headerValue.SetHttpFileName(FileDownloadName);

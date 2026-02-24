@@ -21,11 +21,11 @@ namespace Odasoft.XBOL.Data.Repositories.Client
 
             result.ClientContact = new()
             {
-                CountryPhoneISO = client.User!.CountryPhoneISO!,
-                PhoneNumber = client.PhoneNumber,
-                Email = client.Email,
-                Name = string.IsNullOrEmpty(client.BusinessName) ? client.FullName : client.BusinessName,
-                LastName = string.Empty
+                CountryPhoneISO = client.User?.CountryPhoneISO ?? "",
+                PhoneNumber = client.PhoneNumber ?? "",
+                Email = client.Email ?? "",
+                Name = string.IsNullOrWhiteSpace(client.BusinessName) ? (client.FullName ?? "") : client.BusinessName,
+                LastName = ""
             };
 
             var season = await _context.Seasons.FirstOrDefaultAsync(s => s.Id == filter.SeasonId);
@@ -51,12 +51,10 @@ namespace Odasoft.XBOL.Data.Repositories.Client
             return await _context.Clients
                 .Include(c => c.User)
                 .FirstOrDefaultAsync(c =>
-                    (!string.IsNullOrEmpty(email) &&
-                     c.Email.ToLower().Trim() == email)
-                    ||
-                    (!string.IsNullOrEmpty(filter.PhoneNumber) &&
-                     c.PhoneNumber == filter.PhoneNumber &&
-                     c.User!.CountryPhoneISO == filter.CountryPhoneISO)
+                    (!string.IsNullOrWhiteSpace(email) && (c.Email == null ? "" : c.Email.ToLower().Trim()) == email)
+                    || (!string.IsNullOrEmpty(filter.PhoneNumber)
+                        && c.PhoneNumber == filter.PhoneNumber
+                        && c.User!.CountryPhoneISO == filter.CountryPhoneISO)
                 );
         }
 

@@ -151,7 +151,7 @@ if (app.Environment.IsDevelopment())
 // Only use HTTPS redirection when running directly (Visual Studio, dotnet run)
 // Containers handle TLS at load balancer/reverse proxy level
 if (!app.Environment.IsProduction()
-    || string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER")))
+    || string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER")))
 {
     app.UseHttpsRedirection();
 }

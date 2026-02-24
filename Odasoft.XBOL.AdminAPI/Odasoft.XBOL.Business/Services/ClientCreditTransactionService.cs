@@ -13,10 +13,14 @@ namespace Odasoft.XBOL.Business.Services
     public class ClientCreditTransactionService
     {
         private readonly ClientCreditTransactionRepository _clientCreditTransactionRepository;
+        private readonly SequenceTrackerService _sequenceTrackerService;
 
-        public ClientCreditTransactionService(ClientCreditTransactionRepository clientCreditTransactionRepository)
+        private const string CLIENT_CREDIT_TRANSACTION_LOCALIZER_PREFIX = "CCT"; // TODO: Get this value from a configuration file or database in the future
+
+        public ClientCreditTransactionService(ClientCreditTransactionRepository clientCreditTransactionRepository, SequenceTrackerService sequenceTrackerService)
         {
             _clientCreditTransactionRepository = clientCreditTransactionRepository;
+            _sequenceTrackerService = sequenceTrackerService;
         }
 
         public async Task<PagedResponse<CreditTransactionResult>> GetCreditTransactionsAsync(CreditTransactionsQueryParams queryParams)
@@ -64,6 +68,8 @@ namespace Odasoft.XBOL.Business.Services
 
         public async Task<bool> CreateCreditTransactionByCreditAccountIdAsync(long clientCreditAccountId, ClientCreditTransactionRequest request)
         {
+            string localizer = await _sequenceTrackerService.GenerateLocalizerAsync(CLIENT_CREDIT_TRANSACTION_LOCALIZER_PREFIX, clientCreditAccountId);
+
             var newCreditTransaction = new ClientCreditTransaction
             {
                 ClientCreditAccountId = clientCreditAccountId,
@@ -71,7 +77,7 @@ namespace Odasoft.XBOL.Business.Services
                 PaymentType = request.PaymentType,
                 TransactionDate = request.TransactionDate.ToUniversalTime(),
                 TransactionType = request.TransactionType,
-                ReferenceId = Guid.CreateVersion7(DateTimeOffset.UtcNow).ToString(), // TODO: Implement reference Id generation
+                ReferenceId = localizer,
                 CreatedAt = DateTimeOffset.UtcNow.ToUniversalTime(),
                 CreatedBy = Guid.Empty,
                 UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime(),

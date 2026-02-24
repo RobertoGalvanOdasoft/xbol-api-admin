@@ -16,6 +16,6 @@ namespace Odasoft.XBOL.Models
         public Guid CreatedBy { get; set; }
         public Guid UpdatedBy { get; set; }
 
-        public SuiteAgreementFile SuiteAgreementFile { get; set; } = null!;
+        public SuiteAgreementFile? SuiteAgreementFile { get; set; } = null!;
     }
 }

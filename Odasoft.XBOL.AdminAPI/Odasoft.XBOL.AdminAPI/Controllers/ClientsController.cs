@@ -27,7 +27,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ClientSeasonEvent>> GetClientSeasonEventInfoAsync([FromBody] ClientFilter filter, [FromServices] ClientService clientService)
         {
-            ClientSeasonEvent clientSeasonEvent = await clientService.GetClientSeasonEventInfoAsync(filter);
+            ClientSeasonEvent? clientSeasonEvent = await clientService.GetClientSeasonEventInfoAsync(filter);
 
             if (clientSeasonEvent is null)
             {

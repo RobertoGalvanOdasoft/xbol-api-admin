@@ -14,7 +14,7 @@ namespace Odasoft.XBOL.Data.Repositories
                 .GroupBy(es => es.BaseSection.BaseZone.ExternalZoneKey)
                 .Select(g => new ZonePriceDTO
                 {
-                    Category = g.Key.Value,
+                    Category = g.Key.HasValue ? g.Key.Value : 0,
                     Price = g.Min(es => es.Price)
                 })
                 .ToListAsync();

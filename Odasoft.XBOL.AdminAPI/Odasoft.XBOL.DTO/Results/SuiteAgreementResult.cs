@@ -5,6 +5,7 @@ namespace Odasoft.XBOL.DTO.Results
         public required long Id { get; set; }
         public required long SuiteId { get; set; }
         public string SuiteName { get; set; } = "";
+        public required long SuiteLevelId { get; set; }
         public string SuiteLevel { get; set; } = "";
         public string OwnerName { get; set; } = "";
         public string OwnerEmail { get; set; } = "";

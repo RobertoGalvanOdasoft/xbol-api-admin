@@ -15,7 +15,7 @@ namespace Odasoft.XBOL.Business.Services
 {
     public class ClientService(ClientRepository repository, ClientCreditAccountRepository clientCreditRepository, LegalRepresentativeRepository legalRepRepository)
     {
-        public async Task<ClientSeasonEvent> GetClientSeasonEventInfoAsync(ClientFilter filter)
+        public async Task<ClientSeasonEvent?> GetClientSeasonEventInfoAsync(ClientFilter filter)
         {
             return await repository.GetClientSeasonEventInfoAsync(filter);
         }
@@ -73,10 +73,10 @@ namespace Odasoft.XBOL.Business.Services
             {
                 newClient.LegalRepresentative = new LegalRepresentative
                 {
-                    FullName = request.LegalRep.Name ?? string.Empty,
+                    FullName = request.LegalRep.Name ?? "",
                     DOB = (request.LegalRep.Birthday ?? DateTimeOffset.UnixEpoch).ToUniversalTime(),
-                    TaxId = request.LegalRep.RFC ?? string.Empty,
-                    CURP = request.LegalRep.CURP ?? string.Empty
+                    TaxId = request.LegalRep.RFC ?? "",
+                    CURP = request.LegalRep.CURP ?? ""
                 };
             }
 
@@ -87,7 +87,7 @@ namespace Odasoft.XBOL.Business.Services
             return new ClientResult
             {
                 Id = newClient.Id,
-                ClientName = newClient.BusinessName ?? newClient.FullName ?? string.Empty,
+                ClientName = newClient.BusinessName ?? newClient.FullName ?? "",
                 LegalRepName = newClient.LegalRepresentative?.FullName,
                 HasCredit = newClient.ClientCreditAccount is not null,
                 CreditStatus = newClient.ClientCreditAccount?.CreditStatus,
@@ -158,7 +158,6 @@ namespace Odasoft.XBOL.Business.Services
                 {
                     if (request.HasCredit)
                     {
-
                         clientCreditAccount.CreditLimit = request.Credit.AuthorizedAmount ?? 0;
                         clientCreditAccount.StartDate = (request.Credit.StartDate ?? DateTimeOffset.UnixEpoch).ToUniversalTime();
                         clientCreditAccount.PaymentFrequency = request.Credit.PaymentCycleTypeId ?? PaymentFrequency.Monthly;
@@ -176,26 +175,25 @@ namespace Odasoft.XBOL.Business.Services
 
                 LegalRepresentative? legalRep = await legalRepRepository.GetByIdAsync(request.LegalRep.Id ?? 0);
 
-
                 if (legalRep is null)
                 {
                     legalRep = new()
                     {
                         ClientId = existingClient.Id,
-                        FullName = request.LegalRep.Name ?? string.Empty,
+                        FullName = request.LegalRep.Name ?? "",
                         DOB = (request.LegalRep.Birthday ?? DateTimeOffset.UnixEpoch).ToUniversalTime(),
-                        TaxId = request.LegalRep.RFC ?? string.Empty,
-                        CURP = request.LegalRep.CURP ?? string.Empty
+                        TaxId = request.LegalRep.RFC ?? "",
+                        CURP = request.LegalRep.CURP ?? ""
                     };
 
                     await legalRepRepository.InsertAsync(legalRep);
                 }
                 else
                 {
-                    legalRep.FullName = request.LegalRep.Name ?? string.Empty;
+                    legalRep.FullName = request.LegalRep.Name ?? "";
                     legalRep.DOB = (request.LegalRep.Birthday ?? DateTimeOffset.UnixEpoch).ToUniversalTime();
-                    legalRep.TaxId = request.LegalRep.RFC ?? string.Empty;
-                    legalRep.CURP = request.LegalRep.CURP ?? string.Empty;
+                    legalRep.TaxId = request.LegalRep.RFC ?? "";
+                    legalRep.CURP = request.LegalRep.CURP ?? "";
 
                     await legalRepRepository.UpdateAsync(legalRep);
                 }
@@ -278,7 +276,7 @@ namespace Odasoft.XBOL.Business.Services
                             .Select(c => new ClientResult
                             {
                                 Id = c.Id,
-                                ClientName = string.IsNullOrEmpty(c.BusinessName) ? c.FullName : c.BusinessName,
+                                ClientName = string.IsNullOrWhiteSpace(c.BusinessName) ? (c.FullName ?? "") : c.BusinessName,
                                 LegalRepName = c.LegalRepresentative != null ? c.LegalRepresentative.FullName : null,
                                 HasCredit = c.ClientCreditAccount != null,
                                 CreditAmount = c.ClientCreditAccount != null ? c.ClientCreditAccount.CreditLimit : null,

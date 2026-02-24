@@ -36,6 +36,7 @@ namespace Odasoft.XBOL.Data
         public DbSet<ClientCreditAccount> ClientCreditAccounts => Set<ClientCreditAccount>();
         public DbSet<ClientCreditTransaction> ClientCreditTransactions => Set<ClientCreditTransaction>();
         public DbSet<LegalRepresentative> LegalRepresentatives => Set<LegalRepresentative>();
+        public DbSet<SequenceTracker> SequenceTrackers => Set<SequenceTracker>();
 
         public XBOLDbContext() : base()
         {

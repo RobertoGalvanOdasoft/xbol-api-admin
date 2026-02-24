@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Odasoft.XBOL.Commons.Extensions;
 using Odasoft.XBOL.Data.Repositories;
@@ -28,20 +29,28 @@ namespace Odasoft.XBOL.Business.Services
                                 Id = sa.Id,
                                 SuiteId = sa.Suite.Id,
                                 SuiteName = sa.Suite.Name,
+                                SuiteLevelId = sa.Suite.SuiteLevel.Id,
                                 SuiteLevel = sa.Suite.SuiteLevel.Name,
                                 OwnerName = sa.OwnerName,
                                 OwnerEmail = sa.OwnerEmail,
                                 OwnerPhone = sa.OwnerPhone,
                                 StartDate = sa.StartDate,
                                 EndDate = sa.EndDate,
-                                FileName = sa.SuiteAgreementFile != null ? sa.SuiteAgreementFile.FileName : string.Empty
+                                FileName = sa.SuiteAgreementFile != null ? sa.SuiteAgreementFile.FileName : ""
                             })
                             .ToListAsync();
         }
 
         public async Task<SuiteAgreementResult?> GetSuiteAgreementByIdAsync(long suiteAgreementId)
         {
-            SuiteAgreement? suiteAgreement = await _suiteAgreementRepository.GetByIdAsync(suiteAgreementId);
+            SuiteAgreement? suiteAgreement = await _suiteAgreementRepository
+                                                    .Get()
+                                                    .Include(x => x.Suite)
+                                                        .ThenInclude(x => x.SuiteLevel)
+                                                    .Include(x => x.SuiteAgreementFile)
+                                                    .AsNoTracking()
+                                                    .Where(x => x.Id == suiteAgreementId)
+                                                    .FirstOrDefaultAsync();
 
             if (suiteAgreement == null)
             {
@@ -53,17 +62,18 @@ namespace Odasoft.XBOL.Business.Services
                 Id = suiteAgreement.Id,
                 SuiteId = suiteAgreement.Suite.Id,
                 SuiteName = suiteAgreement.Suite.Name,
+                SuiteLevelId = suiteAgreement.Suite.SuiteLevel.Id,
                 SuiteLevel = suiteAgreement.Suite.SuiteLevel.Name,
                 OwnerName = suiteAgreement.OwnerName,
                 OwnerEmail = suiteAgreement.OwnerEmail,
                 OwnerPhone = suiteAgreement.OwnerPhone,
                 StartDate = suiteAgreement.StartDate,
                 EndDate = suiteAgreement.EndDate,
-                FileName = suiteAgreement.SuiteAgreementFile != null ? suiteAgreement.SuiteAgreementFile.FileName : string.Empty
+                FileName = suiteAgreement.SuiteAgreementFile != null ? suiteAgreement.SuiteAgreementFile.FileName : ""
             };
         }
 
-        public async Task<bool> CreateSuiteAgreementAsync(CreateSuiteAgreementRequest request)
+        public async Task<long> CreateSuiteAgreementAsync(CreateSuiteAgreementRequest request)
         {
             try
             {
@@ -84,36 +94,12 @@ namespace Odasoft.XBOL.Business.Services
                 await _suiteAgreementRepository.InsertAsync(suiteAgreement);
                 await _suiteAgreementRepository.CommitAsync();
 
-                var fileContent = FileExtensions.ConvertIFormFileToByteArray(request.AgreementFile);
-
-                if (fileContent != null)
-                {
-                    var suiteAgreementFile = new SuiteAgreementFile
-                    {
-                        SuiteAgreementId = suiteAgreement.Id,
-                        FileName = request.AgreementFile.FileName,
-                        ContentType = request.AgreementFile.ContentType,
-                        Content = fileContent,
-                        CreatedBy = Guid.Empty,
-                        UpdatedBy = Guid.Empty,
-                        CreatedAt = DateTimeOffset.Now.ToUniversalTime(),
-                        UpdatedAt = DateTimeOffset.Now.ToUniversalTime()
-                    };
-
-                    await _suiteAgreementFileRepository.InsertAsync(suiteAgreementFile);
-                    await _suiteAgreementFileRepository.CommitAsync();
-                }
-                else
-                {
-                    Console.WriteLine("Failed to convert agreement file to byte array.");
-                }
-
-                return true;
+                return suiteAgreement.Id;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error creating suite agreement: {ex.Message}");
-                return false;
+                return 0;
             }
         }
 
@@ -198,6 +184,42 @@ namespace Odasoft.XBOL.Business.Services
                                     .AsNoTracking()
                                     .Where(a => suiteAgreementIds.Contains(a.SuiteAgreementId))
                                     .ToListAsync();
+        }
+
+        public async Task<bool> SaveSuiteAgreementFileBySuiteAgreementIdAsync(long suiteAgreementId, IFormFile file)
+        {
+            try
+            {
+                var fileContent = FileExtensions.ConvertIFormFileToByteArray(file);
+
+                if (fileContent != null)
+                {
+                    var suiteAgreementFile = new SuiteAgreementFile
+                    {
+                        SuiteAgreementId = suiteAgreementId,
+                        FileName = file.FileName,
+                        ContentType = file.ContentType,
+                        Content = fileContent,
+                        CreatedBy = Guid.Empty,
+                        UpdatedBy = Guid.Empty,
+                        CreatedAt = DateTimeOffset.Now.ToUniversalTime(),
+                        UpdatedAt = DateTimeOffset.Now.ToUniversalTime()
+                    };
+
+                    await _suiteAgreementFileRepository.InsertAsync(suiteAgreementFile);
+                    await _suiteAgreementFileRepository.CommitAsync();
+                }
+                else
+                {
+                    Console.WriteLine("Failed to convert agreement file to byte array.");
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error while trying to save agreement file: {ex.ToString()}");
+                return false;
+            }
         }
     }
 }

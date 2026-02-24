@@ -26,6 +26,7 @@ namespace Odasoft.XBOL.Business.Extensions
             services.AddScoped<ClientCreditAccountService>();
             services.AddScoped<ClientCreditTransactionService>();
             services.AddScoped<LegalRepresentativeService>();
+            services.AddScoped<SequenceTrackerService>();
 
             return services;
         }

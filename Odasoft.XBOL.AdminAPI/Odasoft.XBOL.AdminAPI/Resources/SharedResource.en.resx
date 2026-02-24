@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="The {0} field is required." xml:space="preserve">
+    <value>The {0} field is required.</value>
+  </data>
+  <data name="DateGreaterThan" xml:space="preserve">
+    <value>{0} must be after {1}.</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Code" xml:space="preserve">
+    <value>Code</value>
+  </data>
+  <data name="StartDate" xml:space="preserve">
+    <value>Start Date</value>
+  </data>
+  <data name="EndDate" xml:space="preserve">
+    <value>End Date</value>
+  </data>
+  <data name="PublishedDate" xml:space="preserve">
+    <value>Published Date</value>
+  </data>
+  <data name="PreSaleDate" xml:space="preserve">
+    <value>Pre-Sale Date</value>
+  </data>
+  <data name="OnSaleDate" xml:space="preserve">
+    <value>On Sale Date</value>
+  </data>
+  <data name="OffSaleDate" xml:space="preserve">
+    <value>End Date</value>
+  </data>
+  <data name="ValidationTitle" xml:space="preserve">
+    <value>One or more validation errors occurred.</value>
+  </data>
+</root>

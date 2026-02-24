@@ -10,10 +10,23 @@ namespace Odasoft.XBOL.Business.Extensions
         {
             services.AddScoped<EventService>();
             services.AddScoped<EventSeatsService>();
+            services.AddScoped<EventSectionService>();
             services.AddScoped<OrderService>();
+            services.AddScoped<SuiteLevelService>();
+            services.AddScoped<SuiteService>();
+            services.AddScoped<SuiteAgreementService>();
+            services.AddScoped<VenueService>();
+            services.AddScoped<VenueMapService>();
+            services.AddScoped<CategoryService>();
             services.AddScoped<SeasonService>();
+            services.AddScoped<SeasonSeatsService>();
+            services.AddScoped<SeasonSectionService>();
             services.AddScoped<ClientService>();
             services.AddScoped<SeasonPassService>();
+            services.AddScoped<ClientCreditAccountService>();
+            services.AddScoped<ClientCreditTransactionService>();
+            services.AddScoped<LegalRepresentativeService>();
+            services.AddScoped<SequenceTrackerService>();
 
             return services;
         }

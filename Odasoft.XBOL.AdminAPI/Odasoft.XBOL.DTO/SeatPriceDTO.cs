@@ -1,8 +1,8 @@
-﻿namespace Odasoft.XBOL.DTO
+namespace Odasoft.XBOL.DTO
 {
     public class SeatPriceDTO
     {
-        public decimal Price { get; set; }
+        public required decimal Price { get; set; }
         public string SeatKey { get; set; } = "";
     }
 }

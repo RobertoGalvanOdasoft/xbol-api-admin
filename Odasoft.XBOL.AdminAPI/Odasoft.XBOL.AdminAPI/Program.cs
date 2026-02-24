@@ -1,10 +1,16 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
+using Microsoft.OpenApi;
+using Odasoft.XBOL.AdminAPI;
+using Odasoft.XBOL.Business;
 using Odasoft.XBOL.Business.Extensions;
 using Odasoft.XBOL.Business.Messages;
 using Odasoft.XBOL.Data;
 using Odasoft.XBOL.Data.Extensions;
 using Odasoft.XBOL.Models;
+using System.Globalization;
 using System.Reflection;
 using Wolverine;
 
@@ -24,39 +30,68 @@ builder.Services
         options.Password.RequiredLength = 8;
         options.User.RequireUniqueEmail = true;
     })
-    .AddRoles<Odasoft.XBOL.Models.Role>()
+    .AddRoles<Role>()
     .AddEntityFrameworkStores<XBOLDbContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
 // Add services to the container.
+builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 104857600; // 100 MB
+});
 builder.Services.ConfigureServices();
 builder.Services.ConfigureRepositories();
 
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddControllers(options =>
+{
+    options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+}).AddNewtonsoftJson(options =>
+{
+    options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+});
 
 // Add health check services
 builder.Services.AddHealthChecks();
-
-#region Localization
+// Add localization services
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
-    var supportedCultures = new[] { "es" };
-
-    options.SetDefaultCulture("es");
+    string[] supportedCultures = ["es-MX"];
+    options.SetDefaultCulture("es-MX");
     options.AddSupportedCultures(supportedCultures);
     options.AddSupportedUICultures(supportedCultures);
 });
-#endregion
+
+builder.Services.AddMvc()
+    .AddDataAnnotationsLocalization(options =>
+    {
+        options.DataAnnotationLocalizerProvider = (type, factory) =>
+            factory.Create(typeof(SharedResource));
+    });
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var localizer = context.HttpContext.RequestServices
+            .GetRequiredService<IStringLocalizerFactory>()
+            .Create(typeof(SharedResource));
+
+        var details = new ValidationProblemDetails(context.ModelState)
+        {
+            Title = localizer["ValidationTitle"]
+        };
+
+        return new BadRequestObjectResult(details);
+    };
+});
 
 // Add OpenAPI services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.UseInlineDefinitionsForEnums();
     c.SwaggerDoc("v1", new() { Title = "XBOL Admin API", Version = "v1" });
 
     // Include XML comments if available
@@ -67,7 +102,12 @@ builder.Services.AddSwaggerGen(c =>
     {
         c.IncludeXmlComments(xmlPath);
     }
-});
+
+    c.MapType<decimal>(() => new OpenApiSchema { Type = JsonSchemaType.Number, Format = "decimal" });
+
+    c.UseAllOfToExtendReferenceSchemas();
+    c.SupportNonNullableReferenceTypes();
+}).AddSwaggerGenNewtonsoftSupport();
 
 builder.Host.UseWolverine(opts =>
 {
@@ -75,7 +115,7 @@ builder.Host.UseWolverine(opts =>
 });
 
 // Add Http Clients
-builder.Services.AddHttpClient<Odasoft.XBOL.Business.ITicketingClient, Odasoft.XBOL.Business.TicketingClient>(
+builder.Services.AddHttpClient<ITicketingClient, TicketingClient>(
     (provider, client) =>
     {
         client.BaseAddress = new Uri(builder.Configuration.GetValue("TicketingClientBaseAddress", "https://localhost:7021/"));
@@ -111,14 +151,17 @@ if (app.Environment.IsDevelopment())
 // Only use HTTPS redirection when running directly (Visual Studio, dotnet run)
 // Containers handle TLS at load balancer/reverse proxy level
 if (!app.Environment.IsProduction()
-    || string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER")))
+    || string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER")))
 {
     app.UseHttpsRedirection();
 }
 
-app.UseRequestLocalization();
 app.UseAuthentication();
 app.UseAuthorization();
+
+var mexicoCulture = new CultureInfo("es-MX");
+CultureInfo.DefaultThreadCurrentCulture = mexicoCulture;
+CultureInfo.DefaultThreadCurrentUICulture = mexicoCulture;
 
 app.MapControllers();
 

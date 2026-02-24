@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Odasoft.XBOL.Commons.Requests.Filters;
-using Odasoft.XBOL.Models;
 using XBOL.Admin.Core.DTO;
 
 namespace Odasoft.XBOL.Data.Repositories.Client
@@ -9,30 +8,32 @@ namespace Odasoft.XBOL.Data.Repositories.Client
     {
         private readonly XBOLDbContext _context = dbContext;
 
-        public async Task<ClientSeasonEvent> GetClientSeasonEventInfoAsync(ClientFilter filter)
+        public async Task<ClientSeasonEvent?> GetClientSeasonEventInfoAsync(ClientFilter filter)
         {
             ClientSeasonEvent result = new() { AlreadyRenewed = false, CanRenovate = false };
 
             var client = await FindClientAsync(filter);
+
             if (client is null)
             {
-                result.ClientContact = new ClientContactRequest();
-                return result;
+                return null;
             }
 
             result.ClientContact = new()
             {
-                CountryPhoneISO = client.User!.CountryPhoneISO!,
-                PhoneNumber = client.PhoneNumber,
-                Email = client.Email,
-                Name = string.IsNullOrEmpty(client.BusinessName) ? client.FirstName : client.BusinessName,
-                LastName = client.LastName ?? ""
+                CountryPhoneISO = client.User?.CountryPhoneISO ?? "",
+                PhoneNumber = client.PhoneNumber ?? "",
+                Email = client.Email ?? "",
+                Name = string.IsNullOrWhiteSpace(client.BusinessName) ? (client.FullName ?? "") : client.BusinessName,
+                LastName = ""
             };
 
             var season = await _context.Seasons.FirstOrDefaultAsync(s => s.Id == filter.SeasonId);
 
             if (season is null)
+            {
                 return result;
+            }
 
             result.SeasonKey = season.ExternalSeasonKey;
 
@@ -50,12 +51,10 @@ namespace Odasoft.XBOL.Data.Repositories.Client
             return await _context.Clients
                 .Include(c => c.User)
                 .FirstOrDefaultAsync(c =>
-                    (!string.IsNullOrEmpty(email) &&
-                     c.Email.ToLower().Trim() == email)
-                    ||
-                    (!string.IsNullOrEmpty(filter.PhoneNumber) &&
-                     c.PhoneNumber == filter.PhoneNumber &&
-                     c.User!.CountryPhoneISO == filter.CountryPhoneISO)
+                    (!string.IsNullOrWhiteSpace(email) && (c.Email == null ? "" : c.Email.ToLower().Trim()) == email)
+                    || (!string.IsNullOrEmpty(filter.PhoneNumber)
+                        && c.PhoneNumber == filter.PhoneNumber
+                        && c.User!.CountryPhoneISO == filter.CountryPhoneISO)
                 );
         }
 
@@ -76,7 +75,9 @@ namespace Odasoft.XBOL.Data.Repositories.Client
             var ids = new List<long>(capacity: 2) { currentSeason.Id };
 
             if (currentSeason.PreviousSeasonId is long prevId)
+            {
                 ids.Add(prevId);
+            }
 
             return ids;
         }

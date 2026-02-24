@@ -9,7 +9,8 @@ using System.Reflection;
 namespace Odasoft.XBOL.Data.Repositories
 {
     // TODO: Fix warnings for all repos
-    public class BaseRepository<M> where M : BaseModel
+    public class BaseRepository<M>
+        where M : BaseModel
     {
         protected DbContext DbContext { get; set; }
         protected readonly DbSet<M> DbSet;
@@ -43,7 +44,8 @@ namespace Odasoft.XBOL.Data.Repositories
             Func<IQueryable<M>, IOrderedQueryable<M>>? orderBy = null,
             int? pageSize = null,
             int? currentPage = null,
-            params string[] includedProperties)
+            params string[] includedProperties
+        )
         {
             return GetQuery(filter, orderBy, pageSize, currentPage, includedProperties)
                 .AsNoTracking();
@@ -119,12 +121,10 @@ namespace Odasoft.XBOL.Data.Repositories
         public async Task UpdateAsync(M entity)
         {
             var entry = DbContext.Entry(entity);
-
             if (entry.State == EntityState.Detached)
             {
                 var key = GetPrimaryKeys(entity);
                 var currentEntry = await GetByIds(key);
-
                 if (currentEntry != null)
                 {
                     var attachedEntry = DbContext.Entry(currentEntry);
@@ -137,13 +137,11 @@ namespace Odasoft.XBOL.Data.Repositories
                     DbContext.Entry(entity).State = EntityState.Modified;
                 }
             }
-
             if (entry.State == EntityState.Unchanged)
             {
                 DbContext.Entry(entity).State = EntityState.Modified;
                 return;
             }
-
             if (entry.State == EntityState.Modified)
             {
                 await DbContext.SaveChangesAsync();
@@ -156,7 +154,6 @@ namespace Odasoft.XBOL.Data.Repositories
             {
                 DbSet.Attach(entity);
             }
-
             DbSet.Remove(entity);
         }
 
@@ -166,7 +163,6 @@ namespace Odasoft.XBOL.Data.Repositories
             {
                 DbSet.Attach(entity);
             }
-
             DbSet.Remove(entity);
             await DbContext.SaveChangesAsync();
         }
@@ -191,7 +187,8 @@ namespace Odasoft.XBOL.Data.Repositories
             Func<IQueryable<M>, IOrderedQueryable<M>>? orderBy = null,
             int? skip = null,
             int? take = null,
-            params string[] includedProperties)
+            params string[] includedProperties
+        )
         {
             IQueryable<M> query = DbSet.AsNoTracking();
 
@@ -221,18 +218,17 @@ namespace Odasoft.XBOL.Data.Repositories
         public async Task<IEnumerable<N>> ExecuteStoredProcedureValues<N>(
             string query,
             Dictionary<string, object> parameters,
-            string? connectionString = null)
+            string? connectionString = null
+        )
         {
             using IDbConnection connection = GetConnection(connectionString);
             connection.Open();
-
             var items = await connection.QueryAsync<N>(
                 $"{query}",
                 GetDynamicParameters(parameters),
                 commandType: CommandType.StoredProcedure,
                 commandTimeout: 0
             );
-
             connection.Close();
             return items;
         }
@@ -240,7 +236,8 @@ namespace Odasoft.XBOL.Data.Repositories
         public IEnumerable<N> ExecuteStoredProcedureValues<N>(
             string query,
             CommandType commandType,
-            string? connectionString = null)
+            string? connectionString = null
+        )
         {
             return ExecuteStoredProcedureValuesSync<N>(
                 query,
@@ -254,18 +251,17 @@ namespace Odasoft.XBOL.Data.Repositories
             string query,
             CommandType commandType,
             Dictionary<string, object> parameters,
-            string? connectionString = null)
+            string? connectionString = null
+        )
         {
             using IDbConnection connection = GetConnection(connectionString);
             connection.Open();
-
             var items = connection.Query<N>(
                 $"{query}",
                 GetDynamicParameters(parameters),
                 commandType: commandType,
                 commandTimeout: 0
             );
-
             connection.Close();
             return items;
         }
@@ -273,7 +269,8 @@ namespace Odasoft.XBOL.Data.Repositories
         public void ExecuteQuerySync(
             string query,
             string? connectionString = null,
-            int? commandTimeout = null)
+            int? commandTimeout = null
+        )
         {
             using IDbConnection connection = GetConnection(connectionString);
             connection.Open();
@@ -284,7 +281,8 @@ namespace Odasoft.XBOL.Data.Repositories
         public async Task<IEnumerable<N>> ExecuteStoredProcedureValues<N>(
             string query,
             object parameters,
-            string? connectionString = null)
+            string? connectionString = null
+        )
         {
             return await ExecuteStoredProcedureValues<N>(
                 query,
@@ -296,32 +294,31 @@ namespace Odasoft.XBOL.Data.Repositories
         protected Dictionary<string, object> GetDictionaryParameters(object parameters)
         {
             var sqlParameters = new Dictionary<string, object>();
-
             foreach (PropertyInfo prop in parameters.GetType().GetProperties())
             {
                 var value = prop.GetValue(parameters, null);
-                sqlParameters.Add(prop.Name, value ?? DBNull.Value);
+                if (value is not null)
+                {
+                    sqlParameters.Add(prop.Name, value);
+                }
             }
-
             return sqlParameters;
         }
 
         protected DynamicParameters GetDynamicParameters(Dictionary<string, object> parameters)
         {
             var sqlParameters = new DynamicParameters();
-
             foreach (var pair in parameters)
             {
-                if (pair.Value is DataTable)
+                if (pair.Value is DataTable dataTable)
                 {
-                    sqlParameters.Add(pair.Key, ((DataTable)pair.Value).AsTableValuedParameter());
+                    sqlParameters.Add(pair.Key, dataTable.AsTableValuedParameter());
                 }
                 else
                 {
                     sqlParameters.Add(pair.Key, pair.Value);
                 }
             }
-
             return sqlParameters;
         }
 
@@ -342,19 +339,33 @@ namespace Odasoft.XBOL.Data.Repositories
             {
                 DbContext.Dispose();
             }
-
             Disposed = true;
         }
 
-        private object[] GetPrimaryKeys(M entity)
+        private object[] GetPrimaryKeys(M entity) // Changed return type back to object[]
         {
             var keyNames = GetKeyNames();
             Type type = typeof(M);
-            var keys = new object[keyNames.Length];
+            var keys = new object[keyNames.Length]; // Back to a strict, non-nullable array
 
             for (int i = 0; i < keyNames.Length; i++)
             {
-                keys[i] = type.GetProperty(keyNames[i]).GetValue(entity, null);
+                var propertyInfo = type.GetProperty(keyNames[i]);
+
+                if (propertyInfo == null)
+                {
+                    throw new InvalidOperationException($"Property '{keyNames[i]}' was not found on entity '{type.Name}'.");
+                }
+
+                var keyValue = propertyInfo.GetValue(entity, null);
+
+                // NEW: Ensure the actual primary key value isn't null before adding it to the array
+                if (keyValue == null)
+                {
+                    throw new InvalidOperationException($"The primary key property '{keyNames[i]}' on entity '{type.Name}' cannot be null when performing an update.");
+                }
+
+                keys[i] = keyValue;
             }
 
             return keys;
@@ -362,11 +373,16 @@ namespace Odasoft.XBOL.Data.Repositories
 
         private string[] GetKeyNames()
         {
-            return DbContext
-                .Model.FindEntityType(typeof(M))
-                .FindPrimaryKey()
-                .Properties.Select(x => x.Name)
-                .ToArray();
+            var entityType = DbContext.Model.FindEntityType(typeof(M));
+            var primaryKey = entityType?.FindPrimaryKey(); // Use the null-conditional operator '?.'
+
+            // Safety check: Ensure the entity and its primary key actually exist
+            if (primaryKey == null)
+            {
+                throw new InvalidOperationException($"Entity type '{typeof(M).Name}' is not registered in the DbContext or does not have a primary key defined.");
+            }
+
+            return primaryKey.Properties.Select(x => x.Name).ToArray();
         }
     }
 }

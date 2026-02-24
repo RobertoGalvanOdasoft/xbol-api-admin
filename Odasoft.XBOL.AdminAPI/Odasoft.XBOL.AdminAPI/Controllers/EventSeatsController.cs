@@ -19,7 +19,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// Retrieves the list of seat prices for the specified event.
         /// </summary>
         /// <param name="eventId">The unique identifier of the event for which to retrieve seat prices.</param>
-        /// <returns>An asynchronous operation that returns an <see cref="ActionResult{IList{SeatPriceDTO}}"/> containing the
+        /// <returns>An asynchronous operation that returns an object containing the
         /// list of seat prices for the event.</returns>
         [HttpGet("{eventId}/seat-prices")]
         [EndpointName("GetSeatPricesByEventIdAsync")]

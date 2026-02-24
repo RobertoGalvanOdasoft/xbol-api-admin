@@ -12,7 +12,7 @@ namespace Odasoft.XBOL.Models.Mappers
             return new EntityDTO
             {
                 Id = entity.Id,
-                Name = entity.Name ?? string.Empty
+                Name = entity.Name ?? ""
             };
         }
 

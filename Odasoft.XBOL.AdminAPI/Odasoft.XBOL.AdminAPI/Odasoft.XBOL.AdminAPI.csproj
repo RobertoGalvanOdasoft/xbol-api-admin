@@ -19,40 +19,19 @@
         <PublishReadyToRun>true</PublishReadyToRun>
     </PropertyGroup>
 
-  <ItemGroup>
-    <OpenApiReference Include="OpenAPIs\v1.json" Options="/UseBaseUrl:false /GenerateClientInterfaces:true" ClassName="TicketingClient">
-      <SourceUri>https://localhost:7021/openapi/v1.json</SourceUri>
-    </OpenApiReference>
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="CsvHelper" Version="33.1.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.2" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="10.1.2" />
+        <PackageReference Include="WolverineFx" Version="5.15.0" />
+        <!-- Container environment variables -->
+        <ContainerEnvironmentVariable Include="ASPNETCORE_HTTP_PORTS" Value="8080" />
+        <ContainerEnvironmentVariable Include="ASPNETCORE_URLS" Value="http://+:8080" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
-    <PackageReference Include="Microsoft.Extensions.ApiDescription.Client" Version="7.0.2">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="NSwag.ApiDescription.Client" Version="13.18.2">
-    </PackageReference>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.1" />
-
-    <!-- Container environment variables -->
-    <ContainerEnvironmentVariable Include="ASPNETCORE_HTTP_PORTS" Value="8080" />
-    <ContainerEnvironmentVariable Include="ASPNETCORE_URLS" Value="http://+:8080" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="WolverineFx" Version="5.10.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\XBOL.Admin.Core.DTO\XBOL.Admin.Core.DTO.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Odasoft.XBOL.Business\Odasoft.XBOL.Business.csproj" />
-    <ProjectReference Include="..\Odasoft.XBOL.Data\Odasoft.XBOL.Data.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Odasoft.XBOL.Business\Odasoft.XBOL.Business.csproj" />
+        <ProjectReference Include="..\Odasoft.XBOL.Data\Odasoft.XBOL.Data.csproj" />
+    </ItemGroup>
 
 </Project>

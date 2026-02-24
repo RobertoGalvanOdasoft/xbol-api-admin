@@ -21,15 +21,25 @@ namespace Odasoft.XBOL.Data
         public DbSet<BaseZone> BaseZones => Set<BaseZone>();
         public DbSet<VenueMap> VenueMaps => Set<VenueMap>();
         public DbSet<Venue> Venues => Set<Venue>();
-        public DbSet<Event> Events { get; set; }
-        public DbSet<EventSeat> EventSeats { get; set; }
-        public DbSet<EventSchedule> EventSchedules { get; set; }
-        public DbSet<InventoryBatch> InventoryBatches { get; set; }
-        public DbSet<Performer> Performers { get; set; }
+        public DbSet<Event> Events => Set<Event>();
+        public DbSet<EventSeat> EventSeats => Set<EventSeat>();
+        public DbSet<EventSection> EventSections => Set<EventSection>();
+        public DbSet<EventSchedule> EventSchedules => Set<EventSchedule>();
+        public DbSet<SuiteLevel> SuiteLevels => Set<SuiteLevel>();
+        public DbSet<Suite> Suites => Set<Suite>();
+        public DbSet<SuiteAgreement> SuiteAgreements => Set<SuiteAgreement>();
+        public DbSet<SuiteAgreementFile> SuiteAgreementFiles => Set<SuiteAgreementFile>();
+        public DbSet<InventoryBatch> InventoryBatches => Set<InventoryBatch>();
+        public DbSet<Performer> Performers => Set<Performer>();
+        public DbSet<SeasonSection> SeasonSections => Set<SeasonSection>();
+        public DbSet<SeasonSeat> SeasonSeats => Set<SeasonSeat>();
+        public DbSet<ClientCreditAccount> ClientCreditAccounts => Set<ClientCreditAccount>();
+        public DbSet<ClientCreditTransaction> ClientCreditTransactions => Set<ClientCreditTransaction>();
+        public DbSet<LegalRepresentative> LegalRepresentatives => Set<LegalRepresentative>();
+        public DbSet<SequenceTracker> SequenceTrackers => Set<SequenceTracker>();
 
         public XBOLDbContext() : base()
         {
-
         }
 
         public XBOLDbContext(DbContextOptions<XBOLDbContext> options)
@@ -73,6 +83,12 @@ namespace Odasoft.XBOL.Data
 
             modelBuilder.ApplyConfiguration(new TicketConfiguration());
             modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new SuiteConfiguration());
+            modelBuilder.ApplyConfiguration(new SuiteAgreementConfiguration());
+            modelBuilder.ApplyConfiguration(new SuiteAgreementFileConfiguration());
+            modelBuilder.ApplyConfiguration(new ClientCreditAccountConfiguration());
+            modelBuilder.ApplyConfiguration(new ClientCreditTransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new LegalRepresentativeConfiguration());
         }
     }
 }

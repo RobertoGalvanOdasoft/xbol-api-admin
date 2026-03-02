@@ -111,7 +111,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Host.UseWolverine(opts =>
 {
-    opts.Discovery.IncludeAssembly(typeof(CreateBookingCommand).Assembly);
+    opts.Discovery.IncludeAssembly(typeof(CreateEventBookingCommand).Assembly);
 });
 
 // Add Http Clients

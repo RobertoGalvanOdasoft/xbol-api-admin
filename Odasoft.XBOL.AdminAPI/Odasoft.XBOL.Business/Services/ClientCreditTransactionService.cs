@@ -77,6 +77,7 @@ namespace Odasoft.XBOL.Business.Services
                 PaymentType = request.PaymentType,
                 TransactionDate = request.TransactionDate.ToUniversalTime(),
                 TransactionType = request.TransactionType,
+                Description = request.ReferenceId,
                 ReferenceId = localizer,
                 CreatedAt = DateTimeOffset.UtcNow.ToUniversalTime(),
                 CreatedBy = Guid.Empty,

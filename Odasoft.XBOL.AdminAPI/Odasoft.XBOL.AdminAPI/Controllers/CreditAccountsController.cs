@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Odasoft.XBOL.Business.Services;
+using Odasoft.XBOL.DTO.QueryParams;
 using Odasoft.XBOL.DTO.Requests;
+using Odasoft.XBOL.DTO.Response;
 using Odasoft.XBOL.DTO.Results;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
@@ -78,6 +80,16 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
             }
 
             return NotFound();
+        }
+
+        [HttpGet("orders")]
+        [EndpointName("GetCreditOrdersAsync")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResponse<OrderResult>))]
+        public async Task<ActionResult<PagedResponse<OrderResult>>> GetCreditOrdersAsync([FromQuery] OrdersQueryParams queryParams)
+        {
+            var result = await _creditAccountService.GetCreditOrdersAsync(queryParams);
+
+            return Ok(result);
         }
     }
 }

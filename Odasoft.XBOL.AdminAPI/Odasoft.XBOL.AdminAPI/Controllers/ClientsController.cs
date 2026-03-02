@@ -18,13 +18,12 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
 {
     [Route("api/clients")]
     [ApiController]
-    public class ClientsController(ClientService clientService, IStringLocalizerFactory _localizerFactory) : Controller
+    public class ClientsController(ClientService clientService, IStringLocalizerFactory _localizerFactory) : ControllerBase
     {
         // TODO: Check this method route, check if it belongs in Season Pass controller
         [HttpPost("season")]
         [EndpointName("GetClientSeasonEventInfoAsync")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ClientSeasonEvent))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ClientSeasonEvent>> GetClientSeasonEventInfoAsync([FromBody] ClientFilter filter, [FromServices] ClientService clientService)
         {
             ClientSeasonEvent? clientSeasonEvent = await clientService.GetClientSeasonEventInfoAsync(filter);
@@ -35,6 +34,38 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
             }
 
             return Ok(clientSeasonEvent);
+        }
+
+        /// <summary>
+        /// Searches for client contacts using the specified phone number or email address.
+        /// </summary>
+        /// <remarks>If both phone and email are null or empty, the request returns a BadRequest response
+        /// indicating that at least one search parameter must be specified.</remarks>
+        /// <param name="phone">The phone number to search for. At least one of the parameters, either phone or email, must be provided.</param>
+        /// <param name="email">The email address to search for. At least one of the parameters, either phone or email, must be provided.</param>
+        /// <returns>An ActionResult containing a ClientContactResponse with the search results. Returns 200 OK if matching
+        /// clients are found, 400 Bad Request if neither parameter is provided, or 404 Not Found if no matching clients
+        /// exist.</returns>
+        [HttpGet("search")]
+        [EndpointName("SearchClientAsync")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ClientContactResponse))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ClientContactResponse>> SearchClientAsync([FromQuery] string phone, [FromQuery] string email)
+        {
+            if (string.IsNullOrWhiteSpace(phone) && string.IsNullOrWhiteSpace(email))
+            {
+                return BadRequest("At least one search parameter (phone or email) must be provided.");
+            }
+
+            ClientContactResponse? result = await clientService.SearchClientAsync(phone, email);
+
+            if (result == null)
+            {
+                return NotFound("No matching clients found.");
+            }
+
+            return Ok(result);
         }
 
         [HttpGet]

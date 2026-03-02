@@ -6,8 +6,6 @@ namespace Odasoft.XBOL.Data.Repositories.Client
 {
     public class ClientRepository(XBOLDbContext dbContext) : BaseRepository<Models.Client>(dbContext)
     {
-        private readonly XBOLDbContext _context = dbContext;
-
         public async Task<ClientSeasonEvent?> GetClientSeasonEventInfoAsync(ClientFilter filter)
         {
             ClientSeasonEvent result = new() { AlreadyRenewed = false, CanRenovate = false };
@@ -21,6 +19,7 @@ namespace Odasoft.XBOL.Data.Repositories.Client
 
             result.ClientContact = new()
             {
+                Id = client.Id,
                 CountryPhoneISO = client.User?.CountryPhoneISO ?? "",
                 PhoneNumber = client.PhoneNumber ?? "",
                 Email = client.Email ?? "",
@@ -28,7 +27,7 @@ namespace Odasoft.XBOL.Data.Repositories.Client
                 LastName = ""
             };
 
-            var season = await _context.Seasons.FirstOrDefaultAsync(s => s.Id == filter.SeasonId);
+            var season = await dbContext.Seasons.FirstOrDefaultAsync(s => s.Id == filter.SeasonId);
 
             if (season is null)
             {
@@ -48,7 +47,7 @@ namespace Odasoft.XBOL.Data.Repositories.Client
         {
             var email = filter.Email?.Trim().ToLower();
 
-            return await _context.Clients
+            return await dbContext.Clients
                 .Include(c => c.User)
                 .FirstOrDefaultAsync(c =>
                     (!string.IsNullOrWhiteSpace(email) && (c.Email == null ? "" : c.Email.ToLower().Trim()) == email)
@@ -62,7 +61,7 @@ namespace Odasoft.XBOL.Data.Repositories.Client
         {
             var idsToCheck = GetSeasonIdsToCheck(currentSeason);
 
-            var seasonIds = await _context.SeasonPasses
+            var seasonIds = await dbContext.SeasonPasses
                 .Where(sp => sp.ClientId == clientId && idsToCheck.Contains(sp.SeasonId))
                 .Select(sp => sp.SeasonId)
                 .ToListAsync();

@@ -1,11 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Odasoft.XBOL.Business;
 using Odasoft.XBOL.Business.Services;
 using Odasoft.XBOL.Commons.Requests.Filters;
 using Odasoft.XBOL.Commons.Responses;
-using Odasoft.XBOL.DTO.QueryParams;
-using Odasoft.XBOL.DTO.Requests;
-using Odasoft.XBOL.DTO.Results;
 using XBOL.Admin.Core.DTO;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
@@ -14,22 +10,11 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
     [ApiController]
     public class OrdersController : ControllerBase
     {
-        private readonly ITicketingClient _ticketingClient;
         private readonly OrderService _orderService;
 
-        public OrdersController(ITicketingClient ticketingClient, OrderService orderService)
+        public OrdersController(OrderService orderService)
         {
-            _ticketingClient = ticketingClient;
             _orderService = orderService;
-        }
-
-        [HttpGet]
-        [EndpointName("GetOrdersAsync")]
-        public async Task<ActionResult<Odasoft.XBOL.DTO.Response.PagedResponse<OrderResult>>> GetOrdersAsync([FromQuery] OrdersQueryParams queryParams)
-        {
-            var result = await _orderService.GetOrdersAsync(queryParams);
-
-            return Ok(result);
         }
 
         // TODO: Fix logic and implementation
@@ -51,21 +36,6 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
             // order reference and we can also get the information of the season pass even if the client doesn't have an order reference for that season pass
 
             ClientSeasonEvent result = await _orderService.GetClientSeasonEventByOrderReferenceAsync(orderReference);
-            return Ok(result);
-        }
-
-        [HttpPost("book-season")]
-        [EndpointName("BookSeasonAsync")]
-        public async Task<ActionResult<List<string>>> BookSeasonAsync([FromBody] BookSeasonRequest request)
-        {
-            BookingRequest bookingRequest = new BookingRequest();
-            bookingRequest.Seats = request.Seats;
-            bookingRequest.HoldToken = request.HoldToken;
-            bookingRequest.EventId = request.EventKey;
-
-            var result = await _ticketingClient.BookSeatsAsync(bookingRequest);
-            await _orderService.BookSeasonAsync(request);
-
             return Ok(result);
         }
     }

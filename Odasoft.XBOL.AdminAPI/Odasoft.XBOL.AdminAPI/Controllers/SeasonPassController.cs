@@ -10,7 +10,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
 {
     [Route("api/season-pass")]
     [ApiController]
-    public class SeasonPassController : Controller
+    public class SeasonPassController : ControllerBase
     {
         private readonly IStringLocalizerFactory _localizerFactory;
 

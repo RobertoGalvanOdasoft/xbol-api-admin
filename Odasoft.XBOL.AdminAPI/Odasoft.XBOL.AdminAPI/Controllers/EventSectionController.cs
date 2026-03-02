@@ -6,7 +6,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
 {
     [Route("api/event-sections")]
     [ApiController]
-    public class EventSectionController(EventSectionService _eventSectionService) : Controller
+    public class EventSectionController(EventSectionService _eventSectionService) : ControllerBase
     {
         /// <summary>
         /// Retrieves the list of zone prices for the specified event.

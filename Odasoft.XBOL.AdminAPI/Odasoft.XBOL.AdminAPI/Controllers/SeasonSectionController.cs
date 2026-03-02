@@ -6,7 +6,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
 {
     [Route("api/season-sections")]
     [ApiController]
-    public class SeasonSectionController(SeasonSectionService seasonSectionService) : Controller
+    public class SeasonSectionController(SeasonSectionService seasonSectionService) : ControllerBase
     {
         /// <summary>
         /// Retrieves the list of zone prices for the specified season.

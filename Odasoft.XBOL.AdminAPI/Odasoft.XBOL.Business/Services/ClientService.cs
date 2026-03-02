@@ -22,13 +22,14 @@ namespace Odasoft.XBOL.Business.Services
 
         public async Task<ClientResult> CreateClientAsync(CreateClientRequest request)
         {
+            // This should be throw in the controller
             ArgumentNullException.ThrowIfNull(request);
 
             Client newClient = new()
             {
                 ClientType = request.PersonTypeId ?? ClientType.Business,
                 FullName = request.CompanyName,
-                BusinessName = request.SocialReason,
+                BusinessName = request.SocialReason ?? request.CompanyName,
                 Email = request.Email,
                 CountryPhoneCode = request.CountryPhoneCode,
                 PhoneNumber = request.Phone,
@@ -233,11 +234,16 @@ namespace Odasoft.XBOL.Business.Services
                             .Select(c => new ClientResult
                             {
                                 Id = c.Id,
-                                ClientName = c.BusinessName ?? c.FullName,
+                                ClientName = c.BusinessName ?? c.FullName ?? "",
                                 LegalRepName = c.LegalRepresentative != null ? c.LegalRepresentative.FullName : null,
                                 HasCredit = c.ClientCreditAccount != null,
                                 CreditAmount = c.ClientCreditAccount != null ? c.ClientCreditAccount.CreditLimit : null,
-                                PendingAmount = c.Orders.Sum(x => x.Total)
+                                PendingAmount = (c.ClientCreditAccount == null ? 0
+                                                : c.ClientCreditAccount.ClientCreditTransactions
+                                                .Where(ct => ct.TransactionType == CreditTransactionType.Drawdown
+                                                    || ct.TransactionType == CreditTransactionType.Fee
+                                                    || ct.TransactionType == CreditTransactionType.AdjustmentCredit)
+                                                .Sum(x => x.Amount))
                                                 - (c.ClientCreditAccount == null ? 0
                                                 : c.ClientCreditAccount.ClientCreditTransactions
                                                 .Where(ct => ct.TransactionType == CreditTransactionType.Payment
@@ -280,14 +286,22 @@ namespace Odasoft.XBOL.Business.Services
                                 LegalRepName = c.LegalRepresentative != null ? c.LegalRepresentative.FullName : null,
                                 HasCredit = c.ClientCreditAccount != null,
                                 CreditAmount = c.ClientCreditAccount != null ? c.ClientCreditAccount.CreditLimit : null,
-                                PendingAmount = c.Orders.Sum(x => x.Total)
+                                PendingAmount = (c.ClientCreditAccount == null ? 0
+                                                : c.ClientCreditAccount.ClientCreditTransactions
+                                                .Where(ct => ct.TransactionType == CreditTransactionType.Drawdown
+                                                    || ct.TransactionType == CreditTransactionType.Fee
+                                                    || ct.TransactionType == CreditTransactionType.AdjustmentCredit)
+                                                .Sum(x => x.Amount))
                                                 - (c.ClientCreditAccount == null ? 0
                                                 : c.ClientCreditAccount.ClientCreditTransactions
                                                 .Where(ct => ct.TransactionType == CreditTransactionType.Payment
                                                     || ct.TransactionType == CreditTransactionType.Reversal
                                                     || ct.TransactionType == CreditTransactionType.AdjustmentCredit)
                                                 .Sum(x => x.Amount)),
-                                AmountPaid = c.ClientCreditAccount != null ? c.ClientCreditAccount.ClientCreditTransactions.Where(t => t.TransactionType == Commons.Enums.CreditTransactionType.Payment).Sum(t => t.Amount) : null,
+                                AmountPaid = c.ClientCreditAccount != null
+                                                ? c.ClientCreditAccount.ClientCreditTransactions
+                                                    .Where(t => t.TransactionType == Commons.Enums.CreditTransactionType.Payment).Sum(t => t.Amount)
+                                                : null,
                                 CreditStatus = c.ClientCreditAccount != null ? c.ClientCreditAccount.CreditStatus : null
                             });
 
@@ -324,17 +338,30 @@ namespace Odasoft.XBOL.Business.Services
                         CreditLimit = c.ClientCreditAccount.CreditLimit,
                         AppliesInterestRate = c.ClientCreditAccount.AppliesInterestRate,
                         PaymentFrequency = c.ClientCreditAccount.PaymentFrequency,
-                        PendingAmount = c.Orders.Sum(x => x.Total)
-                                        - (c.ClientCreditAccount == null ? 0
-                                        : c.ClientCreditAccount.ClientCreditTransactions
-                                        .Where(ct => ct.TransactionType == CreditTransactionType.Payment
-                                            || ct.TransactionType == CreditTransactionType.Reversal
-                                            || ct.TransactionType == CreditTransactionType.AdjustmentCredit)
-                                        .Sum(x => x.Amount)),
-                        CreditStatus = c.ClientCreditAccount.CreditStatus,
-                        AmountPaid = c.ClientCreditAccount.ClientCreditTransactions.Where(t => t.TransactionType == CreditTransactionType.Payment).Sum(t => t.Amount),
-                        StartDate = c.ClientCreditAccount.StartDate,
-                        EndDate = c.ClientCreditAccount.EndDate
+                        PendingAmount = (c.ClientCreditAccount == null ? 0
+                                                : c.ClientCreditAccount.ClientCreditTransactions
+                                                .Where(ct => ct.TransactionType == CreditTransactionType.Drawdown
+                                                    || ct.TransactionType == CreditTransactionType.Fee
+                                                    || ct.TransactionType == CreditTransactionType.AdjustmentCredit)
+                                                .Sum(x => x.Amount))
+                                                - (c.ClientCreditAccount == null ? 0
+                                                : c.ClientCreditAccount.ClientCreditTransactions
+                                                .Where(ct => ct.TransactionType == CreditTransactionType.Payment
+                                                    || ct.TransactionType == CreditTransactionType.Reversal
+                                                    || ct.TransactionType == CreditTransactionType.AdjustmentCredit)
+                                                .Sum(x => x.Amount)),
+                        CreditStatus = c.ClientCreditAccount == null
+                                        ? CreditStatus.Pending
+                                        : c.ClientCreditAccount.CreditStatus,
+                        AmountPaid = c.ClientCreditAccount == null
+                                        ? 0m
+                                        : c.ClientCreditAccount.ClientCreditTransactions.Where(t => t.TransactionType == CreditTransactionType.Payment).Sum(t => t.Amount),
+                        StartDate = c.ClientCreditAccount == null
+                                    ? DateTimeOffset.UtcNow
+                                    : c.ClientCreditAccount.StartDate,
+                        EndDate = c.ClientCreditAccount == null
+                                    ? null
+                                    : c.ClientCreditAccount.EndDate
                     } : null,
                     LegalRepresentative = c.LegalRepresentative != null ? new LegalRepresentativeDTO
                     {
@@ -350,6 +377,31 @@ namespace Odasoft.XBOL.Business.Services
             //TODO: Use localization to get enum label
             result?.ClientCredit?.PaymentFrequencyLabel = result.ClientCredit.PaymentFrequency.ToString();
             result?.ClientCredit?.CreditStatusLabel = result.ClientCredit.CreditStatus.ToString();
+
+            return result;
+        }
+
+        // TODO:
+        // 1- Consider if this method should be in a separate service, as it might be used in other contexts (e.g., during client creation or update)
+        // 2- Also consider that phone and email are not unique identifiers, so this method might return multiple results in some cases.
+        // We might want to return a list of matches instead of a single result, or we might want to enforce that only one of the parameters is provided at a time.
+        // 3- If we are using an email as an identifier, we should consider normalizing it (e.g., converting to lowercase) before searching, to avoid case sensitivity issues.
+        // 4- If we are using a phone number as an identifier, we should consider normalizing it as well (e.g., removing spaces, dashes, or country codes) before searching, to improve matching accuracy.
+        // 5- We should also consider the performance implications of this method, especially if the clients table is large.
+        // We might want to add indexes on the phone and email columns to speed up the search.
+        public async Task<ClientContactResponse?> SearchClientAsync(string phone, string email)
+        {
+            ClientContactResponse? result = await repository.Get()
+                .AsNoTracking()
+                .Where(c => c.IsActive && (c.PhoneNumber == phone || c.Email == email))
+                .Select(c => new ClientContactResponse
+                {
+                    Id = c.Id,
+                    Name = c.FullName ?? "",
+                    Email = c.Email ?? "",
+                    CountryPhoneISO = c.CountryPhoneCode ?? "",
+                    PhoneNumber = c.PhoneNumber ?? ""
+                }).SingleOrDefaultAsync();
 
             return result;
         }
@@ -378,7 +430,7 @@ namespace Odasoft.XBOL.Business.Services
             {
                 string lowerSearchTerm = searchTerm.ToLower();
                 query = query.Where(x => x.ClientName.ToLower().Contains(lowerSearchTerm)
-                            || x.LegalRepName.ToLower().Contains(lowerSearchTerm));
+                            || (x.LegalRepName != null && x.LegalRepName.ToLower().Contains(lowerSearchTerm)));
             }
         }
 

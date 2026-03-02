@@ -1,16 +1,15 @@
 using Microsoft.EntityFrameworkCore;
-using Odasoft.XBOL.Commons.Constants;
-using Odasoft.XBOL.Commons.Enums;
+using Microsoft.EntityFrameworkCore.Storage;
 using Odasoft.XBOL.Commons.Requests.Filters;
 using Odasoft.XBOL.Commons.Responses;
 using Odasoft.XBOL.Data.Repositories;
+using Odasoft.XBOL.Data.Repositories.Client;
 using Odasoft.XBOL.Data.Repositories.Order;
 using Odasoft.XBOL.Data.Repositories.Season;
-using Odasoft.XBOL.DTO.QueryParams;
 using Odasoft.XBOL.DTO.Requests;
-using Odasoft.XBOL.DTO.Results;
 using Odasoft.XBOL.Models;
 using XBOL.Admin.Core.DTO;
+using Enums = Odasoft.XBOL.Commons.Enums;
 
 namespace Odasoft.XBOL.Business.Services
 {
@@ -19,70 +18,191 @@ namespace Odasoft.XBOL.Business.Services
         private readonly OrderRepository _orderRepository;
         private readonly EventScheduleRepository _eventScheduleRepository;
         private readonly TicketRepository _ticketRepository;
+        private readonly EventSeatRepository _eventSeatRepository;
         private readonly SeasonPassRepository _seasonPassRepository;
+        private readonly SeasonSeatRepository _seasonSeatRepository;
+        private readonly ClientRepository _clientRepository;
+
+        private readonly ClientCreditTransactionService _clientCreditTransactionService;
         private readonly SequenceTrackerService _sequenceTrackerService;
 
-        private const string ORDER_LOCALIZER_PREFIX = "ORD"; // TODO: Get this value from a configuration file or database in the future
+        private const string EVENT_ORDER_LOCALIZER_PREFIX = "ORD-E";
+        private const string SEASON_ORDER_LOCALIZER_PREFIX = "ORD-S";
 
         public OrderService(OrderRepository orderRepository,
             EventScheduleRepository eventScheduleRepository,
             TicketRepository ticketRepository,
+            EventSeatRepository eventSeatRepository,
             SeasonPassRepository seasonPassRepository,
+            SeasonSeatRepository seasonSeatRepository,
+            ClientRepository clientService,
+            ClientCreditTransactionService clientCreditTransactionService,
             SequenceTrackerService sequenceTrackerService)
         {
             _orderRepository = orderRepository;
             _eventScheduleRepository = eventScheduleRepository;
             _ticketRepository = ticketRepository;
+            _eventSeatRepository = eventSeatRepository;
             _seasonPassRepository = seasonPassRepository;
+            _seasonSeatRepository = seasonSeatRepository;
+            _clientRepository = clientService;
+
+            _clientCreditTransactionService = clientCreditTransactionService;
             _sequenceTrackerService = sequenceTrackerService;
         }
 
-        public async Task CreateOrderAsync(BookingRequest request)
+        // Move to a SalesService and rename to BookEventAsync or something like that, also we need to consider the flow for the payment,
+        // we will need to create the order after payment confirmation
+        public async Task CreateEventOrderAsync(EventBookingRequest request)
         {
-            // TODO: Get seller from Identity, and buyer email from request, create custom NotFoundException
+            IDbContextTransaction transaction = await _orderRepository.BeginTransactionAsync();
 
-            EventSchedule schedule = _eventScheduleRepository.Get(x => x.ExternalEventKey == request.EventId).First();
-
-            var localizer = await _sequenceTrackerService.GenerateLocalizerAsync(ORDER_LOCALIZER_PREFIX, schedule.EventId);
-
-            // TODO: Calculate total, taxes, and fees
-
-            // Create Order
-            var newOrder = new Order
+            try
             {
-                UserId = null,
-                Reference = localizer,
-                Status = OrderStatus.Pending,
-                SubTotal = 0,
-                TotalFees = 0,
-                TotalTaxes = 0,
-                Total = 0,
-                // TODO: Get OrderType and ItemType from request
-                OrderType = OrderType.Ticket,
-                PayformType = PayformType.BoxOffice,
+                EventSchedule schedule = await _eventScheduleRepository.Get(x => x.ExternalEventKey == request.EventKey).FirstAsync();
 
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = Guid.Empty,
-                UpdatedAt = DateTime.UtcNow,
-                UpdatedBy = Guid.Empty,
-                Items = [.. request.Seats.Select(x => new OrderItem
+                var localizer = await _sequenceTrackerService.GenerateLocalizerAsync(EVENT_ORDER_LOCALIZER_PREFIX, schedule.EventId);
+
+                Client client;
+
+                if (request.ClientContact.Id.HasValue)
+                {
+                    client = await _clientRepository
+                                    .Get()
+                                    .AsNoTracking()
+                                    .FirstAsync(x => x.Id == request.ClientContact.Id.Value);
+                }
+                else
+                {
+                    client = await CreateClientAsync(request.ClientContact);
+                    request.ClientContact.Id = client.Id;
+                }
+
+                List<Ticket> tickets = await CreateTicketsAsync(request.Seats, schedule.EventId, client);
+
+                var newOrder = new Order
+                {
+                    ClientId = client.Id,
+                    UserId = client.UserId,
+                    Reference = localizer,
+                    Status = Enums.OrderStatus.Paid,
+                    SubTotal = 0,
+                    TotalFees = 0,
+                    TotalTaxes = 0,
+                    Total = (request.PaymentInfoRequest.IsCourtesy ?? false)
+                                ? 0
+                                : request.Seats.Sum(x => x.Value),
+                    OrderType = Enums.OrderType.Ticket,
+                    PayformType = Enums.PayformType.BoxOffice,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = Guid.Empty,
+                    UpdatedAt = DateTime.UtcNow,
+                    UpdatedBy = Guid.Empty,
+                    Items = [.. tickets.Select(x => new OrderItem
                     {
-                        ItemType = ItemType.Ticket,
-                    // TODO: Insert reference Id, for this we need to either generate tickets first or update this field after payment confirmation for that we need another field to find the relationship with the ticket like the seat, we could also generate items and tickets after payment confirmation but that doesn't make much sense since Items it's part of an order that could be cancelled
-                        ItemReferenceId = 0,
-                        Price = 0
+                        ItemType = Enums.ItemType.Ticket,
+                        ItemReferenceId = x.Id,
+                        Price = x.PricePaid,
+                        IsCourtesy = request.PaymentInfoRequest.IsCourtesy ?? false
                     })]
-            };
+                };
 
-            // TODO: Confirm if Ticket creation should be done after payment confirmation
+                await _orderRepository.InsertAsync(newOrder);
+                await _orderRepository.CommitAsync();
 
-            await _orderRepository.InsertAsync(newOrder);
-            await _orderRepository.CommitAsync();
+                // We should validate in the request that the client has credit before even processing the payment
+                if (request.PaymentInfoRequest.CreditAmount > 0
+                    && client.ClientCreditAccount != null
+                    && client.IsActive)
+                {
+                    await CreateClientCreditTransactionAsync(client, request.PaymentInfoRequest.CreditAmount.Value, newOrder.Reference);
+                }
 
-            // TODO: Create Client Credit Transaction is the order was paid with client credit
-            // Use the localizer as description for the transaction to find the relationship between them
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unable to create event order. Error: {ex.Message}");
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
 
-            // Process Payment
+        public async Task CreateSeasonOrderAsync(SeasonBookingRequest request)
+        {
+            IDbContextTransaction transaction = await _orderRepository.BeginTransactionAsync();
+
+            try
+            {
+                var season = await _seasonPassRepository.Get(x => x.Season.ExternalSeasonKey == request.SeasonKey)
+                                    .Include(x => x.Season)
+                                    .FirstAsync();
+
+                var localizer = await _sequenceTrackerService.GenerateLocalizerAsync(SEASON_ORDER_LOCALIZER_PREFIX, season.Id);
+
+                Client client;
+
+                if (request.ClientContact.Id.HasValue)
+                {
+                    client = await _clientRepository
+                                    .Get()
+                                    .AsNoTracking()
+                                    .FirstAsync(x => x.Id == request.ClientContact.Id.Value);
+                }
+                else
+                {
+                    client = await CreateClientAsync(request.ClientContact);
+                    request.ClientContact.Id = client.Id;
+                }
+
+                List<SeasonPass> seasonPasses = await CreateSeasonPassesAsync(request.Seats, season.Id, client);
+
+                var newOrder = new Order
+                {
+                    ClientId = client.Id,
+                    UserId = client.UserId,
+                    Reference = localizer,
+                    Status = Enums.OrderStatus.Paid,
+                    SubTotal = 0,
+                    TotalFees = 0,
+                    TotalTaxes = 0,
+                    Total = (request.PaymentInfoRequest.IsCourtesy ?? false)
+                                ? 0
+                                : request.Seats.Sum(x => x.Value),
+                    OrderType = Enums.OrderType.Ticket,
+                    PayformType = Enums.PayformType.BoxOffice,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = Guid.Empty,
+                    UpdatedAt = DateTime.UtcNow,
+                    UpdatedBy = Guid.Empty,
+                    Items = [.. seasonPasses.Select(x => new OrderItem
+                    {
+                        ItemType = Enums.ItemType.Ticket,
+                        ItemReferenceId = x.Id,
+                        Price = x.Price,
+                        IsCourtesy = request.PaymentInfoRequest.IsCourtesy ?? false
+                    })]
+                };
+
+                await _orderRepository.InsertAsync(newOrder);
+                await _orderRepository.CommitAsync();
+
+                // We should validate in the request that the client has credit before even processing the payment
+                if (request.PaymentInfoRequest.CreditAmount > 0
+                    && client.ClientCreditAccount != null
+                    && client.IsActive)
+                {
+                    await CreateClientCreditTransactionAsync(client, request.PaymentInfoRequest.CreditAmount.Value, newOrder.Reference);
+                }
+
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unable to create season pass order. Error: {ex.Message}");
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         public async Task<PagedResponse<OrderListItem>> GetOrderListAsync(OrderListFilters filters)
@@ -107,104 +227,127 @@ namespace Odasoft.XBOL.Business.Services
             return await _orderRepository.GetClientSeasonEventByOrderReferenceAsync(orderReference);
         }
 
-        public async Task BookSeasonAsync(BookSeasonRequest request)
+        private async Task<Client> CreateClientAsync(ClientInfoRequest clientInfo)
         {
-            await _orderRepository.BookSeasonAsync(request);
-        }
-
-        public async Task<DTO.Response.PagedResponse<OrderResult>> GetOrdersAsync(OrdersQueryParams queryParams)
-        {
-            IQueryable<Order> orders = queryParams.ClientId.HasValue
-                                        ? _orderRepository.Get().AsNoTracking().Where(x => x.ClientId == queryParams.ClientId)
-                                        : _orderRepository.Get().AsNoTracking();
-
-            IQueryable<Ticket> tickets = _ticketRepository.Get().AsNoTracking();
-            IQueryable<SeasonPass> seasonPasses = _seasonPassRepository.Get().AsNoTracking();
-
-            var query = orders.Select(o => new OrderResult
+            var client = new Client
             {
-                Id = o.Id,
-                OrderDate = o.CreatedAt,
-                NumberOfItems = o.Items.Count,
-                Amount = o.Total, // Assuming Total is the Amount you want
-
-                // We look at the first item in the order, check its type,
-                // and query the respective IQueryable to get the event name.
-                Event = o.Items.OrderBy(i => i.Id) // Optional: Ensures we consistently get the "first" item
-                        .Select(i => i.ItemType == ItemType.Ticket
-                        ? tickets
-                            .Where(t => t.Id == i.ItemReferenceId)
-                            .Select(t => t.EventSchedule.Event.Name)
-                            .FirstOrDefault()
-                        : seasonPasses
-                            .Where(sp => sp.Id == i.ItemReferenceId)
-                            .Select(sp => sp.Season.Name)
-                            .FirstOrDefault()
-                ).FirstOrDefault() ?? "No Event"
-            });
-
-            SetFilters(ref query, queryParams);
-            SetSearchTermFilter(ref query, queryParams.SearchTerm);
-            SetOrder(ref query, queryParams.SortBy, queryParams.Descending);
-
-            List<OrderResult> result = await query.ToListAsync();
-
-            int totalCount = result.Count();
-
-            return new DTO.Response.PagedResponse<OrderResult>
-            {
-                Items = result
-                        .Skip(queryParams.Page * queryParams.PageSize)
-                        .Take(queryParams.PageSize)
-                        .ToList(),
-                TotalCount = totalCount,
-                Page = queryParams.Page,
-                PageSize = queryParams.PageSize
+                Email = clientInfo.Email,
+                CountryPhoneCode = clientInfo.CountryPhoneISO,
+                PhoneNumber = clientInfo.PhoneNumber,
+                FullName = clientInfo.FullName,
+                BusinessName = clientInfo.FullName,
+                ClientType = Enums.ClientType.Individual,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = Guid.Empty,
+                UpdatedAt = DateTime.UtcNow,
+                UpdatedBy = Guid.Empty
             };
+
+            await _clientRepository.InsertAsync(client);
+            await _clientRepository.CommitAsync();
+
+            return client;
         }
 
-        private void SetFilters(ref IQueryable<OrderResult> query, OrdersQueryParams queryParams)
+        private async Task<List<Ticket>> CreateTicketsAsync(IDictionary<string, decimal> seats, long eventId, Client client)
         {
-            if (queryParams.Events is not null && queryParams.Events.Any())
+            List<Ticket> tickets = new List<Ticket>();
+            var seatKeys = seats.Keys.ToList();
+            var eventSeats = await _eventSeatRepository
+                                    .Get()
+                                    .AsNoTracking()
+                                    .Include(x => x.EventSection)
+                                        .ThenInclude(x => x.EventSchedule)
+                                    .Where(x => x.EventSection.EventSchedule.EventId == eventId
+                                        && seatKeys.Contains(x.ExternalSeatObjectKey))
+                                    .ToListAsync();
+
+            var now = DateTimeOffset.UtcNow;
+
+            foreach (var seat in eventSeats)
             {
-                query = query.Where(x => queryParams.Events.Contains(x.Event));
+                var ticket = new Ticket
+                {
+                    EventScheduleId = seat.EventSection.EventScheduleId,
+                    EventSectionId = seat.EventSectionId,
+                    EventSeatId = seat.Id,
+                    OriginalClientId = client.Id,
+                    CurrentClientId = client.Id,
+                    TicketCode = seat.ExternalSeatObjectKey,
+                    TicketType = "General Admission", // TODO: Define how to manage different ticket types
+                    PrivateToken = Guid.NewGuid().ToString("N"), // TODO: Define the logic for the private token
+                    PricePaid = seats[seat.ExternalSeatObjectKey],
+                    Status = Enums.TicketStatus.Issued,
+                    SeatLabelSnapshot = seat.ExternalSeatObjectKey,
+                    SectionLabelSnapshot = seat.EventSection.DisplayName,
+                    CreatedAt = now,
+                    CreatedBy = Guid.Empty,
+                    UpdatedAt = now,
+                    UpdatedBy = Guid.Empty
+                };
+
+                await _ticketRepository.InsertAsync(ticket);
+                tickets.Add(ticket);
             }
 
-            // Filter between dates
-            if (queryParams.StartDate.HasValue && queryParams.EndDate.HasValue)
-            {
-                var startDateUtc = queryParams.StartDate.Value.ToUniversalTime();
-                var endDateUtc = queryParams.EndDate.Value.ToUniversalTime();
-
-                query = query.Where(ct => ct.OrderDate >= startDateUtc && ct.OrderDate <= endDateUtc);
-            }
+            await _ticketRepository.CommitAsync();
+            return tickets;
         }
 
-        private void SetSearchTermFilter(ref IQueryable<OrderResult> query, string searchTerm)
+        private async Task<List<SeasonPass>> CreateSeasonPassesAsync(IDictionary<string, decimal> seats, long seasonId, Client client)
         {
-            if (string.IsNullOrWhiteSpace(searchTerm) == false)
+            List<SeasonPass> seasonPasses = new List<SeasonPass>();
+            var seatKeys = seats.Keys.ToList();
+            var seasonSeats = await _seasonSeatRepository
+                                    .Get()
+                                    .AsNoTracking()
+                                    .Include(x => x.SeasonSection)
+                                    .Where(x => x.SeasonSection.SeasonId == seasonId
+                                        && seatKeys.Contains(x.ExternalSeatObjectKey))
+                                    .ToListAsync();
+
+            var now = DateTimeOffset.UtcNow;
+
+            foreach (var seat in seasonSeats)
             {
-                var lowerSearchTerm = searchTerm.ToLower();
-                query = query.Where(x => x.Event.ToLower().Contains(lowerSearchTerm));
+                var seasonPass = new SeasonPass
+                {
+                    ClientId = client.Id,
+                    UserId = client.UserId,
+                    SeasonId = seasonId,
+                    BaseSeatId = seat.Id,
+                    Price = seats[seat.ExternalSeatObjectKey],
+                    PurchasedAt = now,
+                    SeasonPassType = Enums.SeasonPassType.Full,
+                    TrackingCode = seat.ExternalSeatObjectKey,
+                    PrivateToken = Guid.NewGuid().ToString("N"), // TODO: Define the logic for the private token
+                    Status = Enums.SeasonPassStatus.Active,
+                    CreatedAt = now,
+                    CreatedBy = Guid.Empty,
+                    UpdatedAt = now,
+                    UpdatedBy = Guid.Empty
+                };
+
+                await _seasonPassRepository.InsertAsync(seasonPass);
+                seasonPasses.Add(seasonPass);
             }
+
+            await _seasonPassRepository.CommitAsync();
+            return seasonPasses;
         }
 
-        private void SetOrder(ref IQueryable<OrderResult> query, string sortBy, bool descending)
+        private async Task CreateClientCreditTransactionAsync(Client client, decimal amount, string referenceId)
         {
-            if (string.IsNullOrWhiteSpace(sortBy))
+            var transaction = new ClientCreditTransactionRequest
             {
-                return;
-            }
-
-            // TODO: validate each case
-            query = sortBy.ToLower() switch
-            {
-                QueryParamsFieldNames.ORDER_AMOUNT => descending ? query.OrderByDescending(x => x.Amount) : query.OrderBy(x => x.Amount),
-                QueryParamsFieldNames.ORDER_EVENT => descending ? query.OrderByDescending(x => x.Event) : query.OrderBy(x => x.Event),
-                QueryParamsFieldNames.ORDER_DATE => descending ? query.OrderByDescending(x => x.OrderDate) : query.OrderBy(x => x.OrderDate),
-                QueryParamsFieldNames.ORDER_NUMBER_OF_ITEMS => descending ? query.OrderByDescending(x => x.NumberOfItems) : query.OrderBy(x => x.NumberOfItems),
-                _ => query
+                Amount = amount,
+                PaymentType = Enums.PaymentType.Cash, // TODO: Define logic to determine payment type
+                TransactionType = Enums.CreditTransactionType.Drawdown,
+                TransactionDate = DateTimeOffset.UtcNow,
+                Description = referenceId
             };
+
+            await _clientCreditTransactionService.CreateCreditTransactionByCreditAccountIdAsync(client.ClientCreditAccount.Id, transaction);
         }
     }
 }

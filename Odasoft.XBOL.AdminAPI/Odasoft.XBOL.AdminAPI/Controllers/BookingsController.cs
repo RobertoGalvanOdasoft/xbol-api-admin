@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Odasoft.XBOL.Business;
 using Odasoft.XBOL.Business.Messages;
 using Odasoft.XBOL.DTO.Results;
@@ -11,16 +12,64 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
     public class BookingsController(IMessageBus bus) : ControllerBase
     {
         /// <summary>
-        /// Books the specified seat selection for the event and returns the identifiers of the booked seats.
+        /// Books seats for an event based on the provided booking request.
         /// </summary>
-        /// <param name="request">The booking request containing event and seat selection details. Cannot be null.</param>
-        /// <returns>An action result containing a collection of strings that represent the keys of the successfully booked
-        /// seats.</returns>
-        [HttpPost("book-seats")]
-        [EndpointName("BookSeatsAsync")]
-        public async Task<ActionResult<BookingResult>> BookSeatsAsync([FromBody] BookingRequest request)
+        /// <remarks>This method processes the booking asynchronously and returns appropriate HTTP status
+        /// codes based on the outcome of the booking request.</remarks>
+        /// <param name="request">The event booking request containing details such as event ID and number of seats to book. This parameter
+        /// cannot be null.</param>
+        /// <returns>A BookingResult object that contains the details of the booking operation, including confirmation of the
+        /// booked seats.</returns>
+        [HttpPost("event/book-seats")]
+        [EndpointName("BookEventSeatsAsync")]
+        [ProducesResponseType(typeof(BookingResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ModelStateDictionary), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
+        public async Task<ActionResult<BookingResult>> BookSeatsAsync([FromBody] EventBookingRequest request)
         {
-            var result = await bus.InvokeAsync<BookingResult>(new CreateBookingCommand(request));
+            if (ModelState.IsValid == false)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await bus.InvokeAsync<BookingResult>(new CreateEventBookingCommand(request));
+
+            if (result is null)
+            {
+                return UnprocessableEntity("Booking failed. Please check the request details and try again.");
+            }
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Books seats for an event based on the provided booking request.
+        /// </summary>
+        /// <remarks>This method processes the booking asynchronously and returns appropriate HTTP status
+        /// codes based on the outcome of the booking request.</remarks>
+        /// <param name="request">The event booking request containing details such as event ID and number of seats to book. This parameter
+        /// cannot be null.</param>
+        /// <returns>A BookingResult object that contains the details of the booking operation, including confirmation of the
+        /// booked seats.</returns>
+        [HttpPost("season/book-season")]
+        [EndpointName("BookSeasonSeatsAsync")]
+        [ProducesResponseType(typeof(BookingResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ModelStateDictionary), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
+        public async Task<ActionResult<List<string>>> BookSeasonSeatsAsync([FromBody] SeasonBookingRequest request)
+        {
+            if (ModelState.IsValid == false)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await bus.InvokeAsync<BookingResult>(new CreateSeasonBookingCommand(request));
+
+            if (result is null)
+            {
+                return UnprocessableEntity("Booking failed. Please check the request details and try again.");
+            }
+
             return Ok(result);
         }
     }

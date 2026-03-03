@@ -21,12 +21,12 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// <param name="eventId">The unique identifier of the event for which to retrieve seat prices.</param>
         /// <returns>An asynchronous operation that returns an object containing the
         /// list of seat prices for the event.</returns>
-        [HttpGet("{eventId}/seat-prices")]
+        [HttpGet("{eventId:long}/seat-prices")]
         [EndpointName("GetSeatPricesByEventIdAsync")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<SeatPriceDTO>))]
+        [ProducesResponseType(typeof(List<SeatPriceDTO>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<SeatPriceDTO>>> GetSeatPricesByEventIdAsync([FromRoute] long eventId)
         {
-            IList<SeatPriceDTO> result = await _eventSeatService.GetSeatPricesByEventIdAsync(eventId);
+            List<SeatPriceDTO> result = await _eventSeatService.GetSeatPricesByEventIdAsync(eventId);
 
             return Ok(result);
         }

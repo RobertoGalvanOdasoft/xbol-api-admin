@@ -5,7 +5,7 @@ namespace Odasoft.XBOL.Business.Services
 {
     public class SeasonSectionService(SeasonSectionRepository seasonSectionRepository)
     {
-        public async Task<IList<ZonePriceDTO>> GetZonePricesBySeasonIdAsync(long seasonId)
+        public async Task<List<ZonePriceDTO>> GetZonePricesBySeasonIdAsync(long seasonId)
         {
             return await seasonSectionRepository.GetSeasonZonePricesAsync(seasonId);
         }

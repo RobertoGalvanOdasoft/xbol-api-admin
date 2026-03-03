@@ -11,13 +11,18 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// <summary>
         /// Retrieves the list of seat prices for the specified season.
         /// </summary>
-        /// <param name="seasonId">The unique identifier of the season for which to retrieve seat prices.</param>
+        /// <remarks>This method performs an asynchronous operation to fetch seat prices associated with
+        /// the provided season ID. The returned list reflects the current pricing for all seats in the specified
+        /// season.</remarks>
+        /// <param name="seasonId">The unique identifier of the season for which to obtain seat prices. Must be a positive long value.</param>
+        /// <returns>An HTTP 200 response containing a list of <see cref="SeatPriceDTO"/> objects representing the seat prices
+        /// for the given season. The list will be empty if no seat prices are available.</returns>
         [HttpGet("{seasonId}/seat-prices")]
         [EndpointName("GetSeatPricesBySeasonIdAsync")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<SeatPriceDTO>))]
+        [ProducesResponseType(typeof(List<SeatPriceDTO>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<SeatPriceDTO>>> GetSeatPricesBySeasonIdAsync([FromRoute] long seasonId)
         {
-            IList<SeatPriceDTO> result = await seasonSeatsService.GetSeatPricesBySeasonIdAsync(seasonId);
+            List<SeatPriceDTO> result = await seasonSeatsService.GetSeatPricesBySeasonIdAsync(seasonId);
 
             return Ok(result);
         }

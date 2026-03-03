@@ -9,7 +9,7 @@ namespace Odasoft.XBOL.Data.Repositories
         // TODO: The default value for a seat could be a setting of an event or venue.
         private const decimal DEFAULT_PRICE = 0m;
 
-        public async Task<IList<SeatPriceDTO>> GetEventSeatPricesAsync(long eventId)
+        public async Task<List<SeatPriceDTO>> GetEventSeatPricesAsync(long eventId)
         {
             return await dbContext.EventSeats
                 .AsNoTracking()

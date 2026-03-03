@@ -6,7 +6,7 @@ namespace Odasoft.XBOL.Data.Repositories.Season
 {
     public class SeasonSectionRepository(XBOLDbContext dbContext) : BaseRepository<SeasonSection>(dbContext)
     {
-        public async Task<IList<ZonePriceDTO>> GetSeasonZonePricesAsync(long seasonId)
+        public async Task<List<ZonePriceDTO>> GetSeasonZonePricesAsync(long seasonId)
         {
             return await DbSet
                 .Where(ss => ss.SeasonId == seasonId)

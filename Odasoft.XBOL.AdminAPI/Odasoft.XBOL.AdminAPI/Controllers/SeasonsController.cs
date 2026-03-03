@@ -12,8 +12,14 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
     public class SeasonsController(SeasonService seasonService) : ControllerBase
     {
         /// <summary>
-        /// Get paginated list of seasons with filters.
+        /// Retrieves a paginated list of seasons that match the specified query parameters.
         /// </summary>
+        /// <remarks>This method is asynchronous and may take additional time to complete depending on the
+        /// data source and query complexity. Ensure that the provided query parameters are valid to avoid unexpected
+        /// results.</remarks>
+        /// <param name="queryParams">The parameters used to filter, sort, and paginate the list of seasons. This parameter must not be null.</param>
+        /// <returns>An HTTP 200 response containing a paged result set of season items. The response includes pagination
+        /// metadata such as total count and page information.</returns>
         [HttpGet]
         [EndpointName("GetSeasonsAsync")]
         [ProducesResponseType(typeof(PagedResponse<SeasonListItem>), StatusCodes.Status200OK)]
@@ -25,8 +31,13 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         }
 
         /// <summary>
-        /// Get season by ID.
+        /// Retrieves the details of a season specified by its unique identifier.
         /// </summary>
+        /// <remarks>This method performs an asynchronous lookup for the season using the provided
+        /// identifier. If no season exists for the given identifier, the response will indicate that the resource was
+        /// not found.</remarks>
+        /// <param name="id">The unique identifier of the season to retrieve. Must be a positive long value.</param>
+        /// <returns>An ActionResult containing the season details if found; otherwise, a 404 Not Found response.</returns>
         [HttpGet("{id:long}")]
         [EndpointName("GetSeasonByIdAsync")]
         [ProducesResponseType(typeof(SeasonResult), StatusCodes.Status200OK)]
@@ -43,9 +54,15 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         }
 
         /// <summary>
-        /// Creates a new season.
+        /// Creates a new season using the specified request data and returns the result of the operation.
         /// </summary>
-        /// <param name="request">The details of the season to create.</param>
+        /// <remarks>If the model state is invalid, the method returns a 400 Bad Request response. On
+        /// successful creation, a 201 Created response is returned with the location of the newly created season. If
+        /// the creation fails, a 422 Unprocessable Entity response is returned.</remarks>
+        /// <param name="request">The request object containing the details required to create a new season. Must not be null and must satisfy
+        /// model validation requirements.</param>
+        /// <returns>An ActionResult containing the created SeasonResult if successful; otherwise, a BadRequest result if the
+        /// input is invalid, or an UnprocessableEntity result if the season could not be created.</returns>
         [HttpPost]
         [EndpointName("CreateSeasonAsync")]
         [ProducesResponseType(typeof(SeasonResult), StatusCodes.Status201Created)]
@@ -69,10 +86,16 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         }
 
         /// <summary>
-        /// Updates an existing season.
+        /// Updates the details of an existing season identified by its unique identifier.
         /// </summary>
-        /// <param name="id">The unique identifier of the season to update.</param>
-        /// <param name="request">The updated season details.</param>
+        /// <remarks>The method validates the input model state before attempting to update the season. If
+        /// the model state is invalid, a BadRequest response is returned. If the update cannot be processed, an
+        /// UnprocessableEntity response is returned.</remarks>
+        /// <param name="id">The unique identifier of the season to update. Must be a positive long value.</param>
+        /// <param name="request">An object containing the updated season details. This parameter is required and cannot be null.</param>
+        /// <returns>An IActionResult that indicates the result of the update operation. Returns NoContent if the update is
+        /// successful; otherwise, returns BadRequest if the input is invalid or UnprocessableEntity if the update
+        /// fails.</returns>
         [HttpPut("{id:long}")]
         [EndpointName("UpdateSeasonAsync")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -96,9 +119,14 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         }
 
         /// <summary>
-        /// Deletes the season with the specified identifier.
+        /// Deletes the season identified by the specified unique identifier.
         /// </summary>
-        /// <param name="id">The unique identifier of the season to delete.</param>
+        /// <remarks>This method does not delete a season if the specified identifier does not match any
+        /// existing season.</remarks>
+        /// <param name="id">The unique identifier of the season to delete. Must be a valid long integer corresponding to an existing
+        /// season.</param>
+        /// <returns>An IActionResult that indicates the result of the delete operation. Returns 204 No Content if the deletion
+        /// is successful; otherwise, returns 422 Unprocessable Entity with an error message.</returns>
         [HttpDelete("{id:long}")]
         [EndpointName("DeleteSeasonAsync")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

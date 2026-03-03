@@ -22,10 +22,10 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// Retrieves the client credit account information using the client Id as identifier.
         /// </summary>
         /// <param name="clientId">Client unique identifier.</param>
-        /// <returns>An object containing the client credit account info.</returns>
+        /// <returns>An ActionResult containing the client credit account info.</returns>
         [HttpGet("client/{clientId:long}")]
         [EndpointName("GetCreditAccountByClientIdAsync")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreditAccountResult))]
+        [ProducesResponseType(typeof(CreditAccountResult), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<CreditAccountResult>> GetCreditAccountByClientIdAsync([FromRoute] long clientId)
         {
@@ -44,10 +44,10 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// </summary>
         /// <param name="creditAccountId">Unique identifier.</param>
         /// <param name="request">An object containing the updated credit account information.</param>
-        /// <returns>An <see cref="ActionResult{T}"/> containing <see langword="true"/> if the credit account was updated successfully.</returns>
+        /// <returns>An actiron result containing <see langword="true"/> if the credit account was updated successfully.</returns>
         [HttpPut("{creditAccountId:long}")]
         [EndpointName("UpdateCreditAccountByIdAsync")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(bool))]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> UpdateCreditAccountByIdAsync([FromRoute] long creditAccountId, [FromBody] UpdateClientCreditAccountRequest request)
         {
@@ -65,10 +65,10 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// Deletes an existing client credit.
         /// </summary>
         /// <param name="creditAccountId">Unique identifier</param>
-        /// <returns>An <see cref="ActionResult{T}"/> containing <see langword="true"/> if the credit account was deleted successfully.</returns>
+        /// <returns>An ActionResult containing <see langword="true"/> if the credit account was deleted successfully.</returns>
         [HttpDelete("{creditAccountId:long}")]
         [EndpointName("DeleteCreditAccountByIdAsync")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(bool))]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DeleteCreditAccountByIdAsync([FromRoute] long creditAccountId)
         {
@@ -82,9 +82,18 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
             return NotFound();
         }
 
+        /// <summary>
+        /// Retrieves a paginated list of credit orders that match the specified query parameters.
+        /// </summary>
+        /// <remarks>This method is asynchronous and returns an HTTP 200 response with the paginated
+        /// results if successful. Ensure that the provided query parameters are valid to avoid unexpected
+        /// results.</remarks>
+        /// <param name="queryParams">The parameters used to filter, sort, and paginate the credit orders. This parameter must not be null.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="ActionResult{T}"/>
+        /// whose value is a paged response with the paginated list of credit orders.</returns>
         [HttpGet("orders")]
         [EndpointName("GetCreditOrdersAsync")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResponse<OrderResult>))]
+        [ProducesResponseType(typeof(PagedResponse<OrderResult>), StatusCodes.Status200OK)]
         public async Task<ActionResult<PagedResponse<OrderResult>>> GetCreditOrdersAsync([FromQuery] OrdersQueryParams queryParams)
         {
             var result = await _creditAccountService.GetCreditOrdersAsync(queryParams);

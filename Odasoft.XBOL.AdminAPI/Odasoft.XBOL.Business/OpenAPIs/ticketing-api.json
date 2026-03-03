@@ -232,6 +232,7 @@
         "tags": [
           "Categories"
         ],
+        "summary": "Retrieves a list of category names available in the system.",
         "operationId": "GetCategoriesNames",
         "responses": {
           "200": {
@@ -271,11 +272,13 @@
         "tags": [
           "Events"
         ],
+        "summary": "Retrieves a paginated list of events filtered by venue, category, date range, and search criteria.",
         "operationId": "GetEventsAsync",
         "parameters": [
           {
             "name": "venues",
             "in": "query",
+            "description": "A comma-separated list of venue identifiers used to filter the events. If null or empty, events from all\r\n            venues are included.",
             "schema": {
               "type": "string"
             }
@@ -283,6 +286,7 @@
           {
             "name": "categories",
             "in": "query",
+            "description": "A comma-separated list of event category names used to filter the events. If null or empty, events from all\r\n            categories are included.",
             "schema": {
               "type": "string"
             }
@@ -290,6 +294,7 @@
           {
             "name": "startDate",
             "in": "query",
+            "description": "The start date and time for filtering events. Only events occurring on or after this date are included. If\r\n            null, no lower date bound is applied.",
             "schema": {
               "type": "string",
               "format": "date-time"
@@ -298,6 +303,7 @@
           {
             "name": "endDate",
             "in": "query",
+            "description": "The end date and time for filtering events. Only events occurring on or before this date are included. If\r\n            null, no upper date bound is applied.",
             "schema": {
               "type": "string",
               "format": "date-time"
@@ -306,6 +312,7 @@
           {
             "name": "search",
             "in": "query",
+            "description": "A search term used to filter events by name or description. If null or empty, no search filtering is\r\n            applied.",
             "schema": {
               "type": "string"
             }
@@ -313,6 +320,7 @@
           {
             "name": "sortBy",
             "in": "query",
+            "description": "The field by which to sort the events. Defaults to \"dateTime\" if not specified.",
             "schema": {
               "type": "string",
               "default": "dateTime"
@@ -321,6 +329,7 @@
           {
             "name": "descending",
             "in": "query",
+            "description": "Indicates whether the results should be sorted in descending order. Set to true to sort\r\n            descending; otherwise, ascending.",
             "schema": {
               "type": "boolean",
               "default": false
@@ -329,6 +338,7 @@
           {
             "name": "page",
             "in": "query",
+            "description": "The page number of results to retrieve. Must be greater than zero.",
             "schema": {
               "type": "integer",
               "format": "int32",
@@ -338,6 +348,7 @@
           {
             "name": "pageSize",
             "in": "query",
+            "description": "The maximum number of events to include in a single page of results. Must be greater than zero.",
             "schema": {
               "type": "integer",
               "format": "int32",
@@ -374,11 +385,14 @@
         "tags": [
           "Events"
         ],
+        "summary": "Retrieves the details of the event specified by its unique identifier.",
+        "description": "This method performs an asynchronous operation to fetch event details from the event\r\n            service. If the event is not found, a 404 Not Found response is returned.",
         "operationId": "GetEvenByIdAsync",
         "parameters": [
           {
             "name": "eventId",
             "in": "path",
+            "description": "The unique identifier of the event to retrieve. Must be a positive long value.",
             "required": true,
             "schema": {
               "type": "integer",
@@ -406,6 +420,26 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -415,8 +449,11 @@
         "tags": [
           "Hold"
         ],
+        "summary": "Asynchronously holds the specified seats for an event and returns a token representing the hold.",
+        "description": "This method reserves the requested seats for a limited time, allowing further actions\r\n            such as purchase or release. If the event is not found or the seat information is invalid, the operation may\r\n            fail. Exception handling should be implemented to manage such cases appropriately.",
         "operationId": "HoldSeatsAsync",
         "requestBody": {
+          "description": "The request containing the event identifier and the collection of seat identifiers to be held. The event\r\n            identifier must correspond to an existing event, and the seat identifiers must be valid for that event.",
           "content": {
             "application/json-patch+json": {
               "schema": {
@@ -483,11 +520,14 @@
         "tags": [
           "Hold"
         ],
+        "summary": "Retrieves the hold token associated with the specified token string.",
+        "description": "This method is asynchronous and may involve network calls to retrieve the hold token.\r\n            Ensure that the hold token is valid before calling this method.",
         "operationId": "GetHoldTokenAsync",
         "parameters": [
           {
             "name": "holdToken",
             "in": "query",
+            "description": "The hold token string used to identify the specific hold request. This parameter cannot be null or empty.",
             "schema": {
               "type": "string"
             }
@@ -520,11 +560,14 @@
         "tags": [
           "Hold"
         ],
+        "summary": "Releases the hold on seats associated with the specified hold token.",
+        "description": "This method is asynchronous and should be awaited. It communicates with the seat\r\n            management service to release the hold, and may throw exceptions if the hold token is invalid or if service\r\n            errors occur.",
         "operationId": "ReleaseHoldSeatsAsync",
         "parameters": [
           {
             "name": "holdToken",
             "in": "query",
+            "description": "The token that identifies the hold to be released. This value must be a valid, non-null hold token.",
             "schema": {
               "type": "string"
             }
@@ -615,6 +658,8 @@
         "tags": [
           "VenueMaps"
         ],
+        "summary": "Retrieves a collection of venue maps available in the system.",
+        "description": "This method is intended for use in a web API context and asynchronously calls the\r\n            underlying venue map service to obtain the data. The response will contain an empty list if no venue maps\r\n            are available.",
         "operationId": "GetVenueMapsAsync",
         "responses": {
           "200": {
@@ -654,11 +699,14 @@
         "tags": [
           "VenueMaps"
         ],
+        "summary": "Retrieves the venue map associated with the specified identifier.",
+        "description": "This method asynchronously fetches the venue map from the service. If no venue map is\r\n            found for the given identifier, a 404 Not Found response is returned.",
         "operationId": "GetVenueMapByIdAsync",
         "parameters": [
           {
             "name": "venueMapId",
             "in": "path",
+            "description": "The unique identifier of the venue map to retrieve. Must be a positive long value.",
             "required": true,
             "schema": {
               "type": "integer",
@@ -686,6 +734,26 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -695,6 +763,8 @@
         "tags": [
           "Venues"
         ],
+        "summary": "Retrieves a list of available venues asynchronously.",
+        "description": "This method is intended for scenarios where venue data is required. It performs a\r\n            non-blocking operation by leveraging the underlying venue service to fetch venue information\r\n            asynchronously.",
         "operationId": "GetVenuesAsync",
         "responses": {
           "200": {
@@ -1023,6 +1093,33 @@
           }
         },
         "additionalProperties": false
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": { }
       },
       "SeasonBookingRequest": {
         "required": [

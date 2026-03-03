@@ -19,11 +19,12 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// <summary>
         /// Retrieves the suite-level catalog as a collection of list items.
         /// </summary>
-        /// <returns>An object containing the suite-level catalog. The collection will
+        /// <returns>An actrion result containing the suite-level catalog. The collection will
         /// be empty if no items are available.</returns>
         [HttpGet("catalog")]
         [EndpointName("GetSuiteLevelCatalogAsync")]
-        public async Task<ActionResult<ICollection<ListItem>>> GetSuiteLevelCatalogAsync()
+        [ProducesResponseType(typeof(List<ListItem>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<ListItem>>> GetSuiteLevelCatalogAsync()
         {
             var result = await _suiteLevelService.GetSuiteLevelCatalogAsync();
             return Ok(result);
@@ -35,10 +36,13 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// <remarks>Returns a 400 Bad Request response if the request model is invalid, or a 422
         /// Unprocessable Entity response if the suite level could not be created.</remarks>
         /// <param name="request">The request object containing the details required to create the suite level. Cannot be null.</param>
-        /// <returns>An <see cref="ActionResult{T}"/> containing <see langword="true"/> if the suite level was created
+        /// <returns>An ActionResult containing <see langword="true"/> if the suite level was created
         /// successfully; otherwise, an error response indicating the reason for failure.</returns>
         [HttpPost]
         [EndpointName("CreateSuiteLevelAsync")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
         public async Task<ActionResult<bool>> CreateSuiteLevelAsync([FromBody] CreateSuiteLevelRequest request)
         {
             if (ModelState.IsValid == false)
@@ -63,10 +67,13 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// Unprocessable Entity response if the update operation fails.</remarks>
         /// <param name="request">An object containing the updated suite level information. Must not be null and must satisfy all model
         /// validation requirements.</param>
-        /// <returns>An <see cref="ActionResult{T}"/> containing <see langword="true"/> if the suite level was updated
+        /// <returns>An ActionResult containing <see langword="true"/> if the suite level was updated
         /// successfully; otherwise, an error response indicating the reason for failure.</returns>
         [HttpPut]
         [EndpointName("UpdateSuiteLevelAsync")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
         public async Task<ActionResult<bool>> UpdateSuiteLevelAsync([FromBody] UpdateSuiteLevelRequest request)
         {
             if (ModelState.IsValid == false)
@@ -88,10 +95,12 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// Deletes the suite level with the specified identifier.
         /// </summary>
         /// <param name="suiteLevelId">The unique identifier of the suite level to delete.</param>
-        /// <returns>An <see cref="ActionResult{T}"/> containing <see langword="true"/> if the suite level was successfully
+        /// <returns>An ActionResult containing <see langword="true"/> if the suite level was successfully
         /// deleted; otherwise, an unprocessable entity result.</returns>
-        [HttpDelete("{suiteLevelId}")]
+        [HttpDelete("{suiteLevelId:long}")]
         [EndpointName("DeleteSuiteLevelAsync")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
         public async Task<ActionResult<bool>> DeleteSuiteLevelAsync([FromRoute] long suiteLevelId)
         {
             var result = await _suiteLevelService.DeleteSuiteLevelAsync(suiteLevelId);

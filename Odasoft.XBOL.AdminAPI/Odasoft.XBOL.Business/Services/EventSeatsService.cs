@@ -12,7 +12,7 @@ namespace Odasoft.XBOL.Business.Services
             _eventSeatRepository = eventSeatRepository;
         }
 
-        public async Task<IList<SeatPriceDTO>> GetSeatPricesByEventIdAsync(long eventId)
+        public async Task<List<SeatPriceDTO>> GetSeatPricesByEventIdAsync(long eventId)
         {
             var seatPrices = await _eventSeatRepository.GetEventSeatPricesAsync(eventId);
 

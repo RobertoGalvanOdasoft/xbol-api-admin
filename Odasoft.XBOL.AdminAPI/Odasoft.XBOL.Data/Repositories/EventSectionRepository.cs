@@ -6,7 +6,7 @@ namespace Odasoft.XBOL.Data.Repositories
 {
     public class EventSectionRepository(XBOLDbContext dbContext) : BaseRepository<EventSection>(dbContext)
     {
-        public async Task<IList<ZonePriceDTO>> GetEventZonePricesAsync(long eventId)
+        public async Task<List<ZonePriceDTO>> GetEventZonePricesAsync(long eventId)
         {
             return await DbSet
                 .Where(es => es.EventSchedule.EventId == eventId)

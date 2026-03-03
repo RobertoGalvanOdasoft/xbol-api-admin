@@ -20,11 +20,11 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// Retreives the detail of a legal representative using the client Id as the identifier.
         /// </summary>
         /// <param name="clientId">The unique identifier of the client.</param>
-        /// <returns>An object containing the info of the legal representative. If is not found; otherwise,
+        /// <returns>An ActionResult containing the info of the legal representative. If is not found; otherwise,
         /// a 404 Not Found response.</returns>
         [HttpGet("{clientId:long}")]
         [EndpointName("GetLegalRepresentativeByClientIdAsync")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LegalRepresentativeResult))]
+        [ProducesResponseType(typeof(LegalRepresentativeResult), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> GetLegalRepresentativeByClientIdAsync([FromRoute] long clientId)
         {
@@ -42,10 +42,10 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// Creates a new legal representative based on the specified request data.
         /// </summary>
         /// <param name="request">The details of the legal representative to create.</param>
-        /// <returns>An <see cref="ActionResult{T}"/> containing <see langword="true"/> if the suite was created successfully.</returns>
+        /// <returns>An ActionResult containing <see langword="true"/> if the suite was created successfully.</returns>
         [HttpPost]
         [EndpointName("CreateLegalRepresentativeAsync")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(bool))]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> CreateLegalRepresentativeAsync([FromBody] LegalRepresentativeRequest request)
         {
@@ -63,10 +63,10 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// Updates an existing legal representative with the specified details, using the Client Id as unique identifier.
         /// </summary>
         /// <param name="request">The request object containing the updated legal representative information.</param>
-        /// <returns>An <see cref="ActionResult{T}"/> containing <see langword="true"/> if the suite was updated successfully.</returns>
+        /// <returns>An ActionResult containing <see langword="true"/> if the suite was updated successfully.</returns>
         [HttpPut]
         [EndpointName("UpdateLegalRepresentativeByClientIdAsync")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(bool))]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> UpdateLegalRepresentativeByClientIdAsync([FromBody] LegalRepresentativeRequest request)
         {
@@ -84,10 +84,10 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// Deletes the legal representative with the specified client as identifier.
         /// </summary>
         /// <param name="clientId"></param>
-        /// <returns>An <see cref="ActionResult{T}"/> containing <see langword="true"/> if the suite was deleted successfully.</returns>
+        /// <returns>An ActionResult containing <see langword="true"/> if the suite was deleted successfully.</returns>
         [HttpDelete("{clientId:long}")]
         [EndpointName("DeleteLegalRepresentativeByClientIdAsync")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(bool))]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DeleteLegalRepresentativeByClientIdAsync([FromRoute] long clientId)
         {

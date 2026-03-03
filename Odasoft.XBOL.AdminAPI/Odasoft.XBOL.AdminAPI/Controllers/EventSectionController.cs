@@ -14,12 +14,12 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// <param name="eventId">The unique identifier of the event for which to retrieve zone prices.</param>
         /// <returns>An asynchronous operation that returns an object containing the
         /// list of zone prices for the event.</returns>
-        [HttpGet("{eventId}/zone-prices")]
+        [HttpGet("{eventId:long}/zone-prices")]
         [EndpointName("GetZonePricesByEventIdAsync")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<ZonePriceDTO>))]
+        [ProducesResponseType(typeof(List<ZonePriceDTO>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<ZonePriceDTO>>> GetZonePricesByEventIdAsync([FromRoute] long eventId)
         {
-            IList<ZonePriceDTO> result = await _eventSectionService.GetZonePricesByEventIdAsync(eventId);
+            List<ZonePriceDTO> result = await _eventSectionService.GetZonePricesByEventIdAsync(eventId);
 
             return Ok(result);
         }

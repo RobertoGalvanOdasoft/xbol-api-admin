@@ -308,7 +308,7 @@ namespace Odasoft.XBOL.Business.Services
             return query.ToListAsync();
         }
 
-        public async Task<ClientDetailResult?> GetClientDetailById(long clientId)
+        public async Task<ClientDetailResult?> GetClientDetailByIdAsync(long clientId)
         {
             ClientDetailResult? result = await repository.Get()
                 .AsNoTracking()

@@ -8,7 +8,7 @@ namespace Odasoft.XBOL.Data.Repositories.Season
     {
         private const decimal DEFAULT_PRICE = 0m;
 
-        public async Task<IList<SeatPriceDTO>> GetSeasonSeatPricesAsync(long seasonId)
+        public async Task<List<SeatPriceDTO>> GetSeasonSeatPricesAsync(long seasonId)
         {
             return await dbContext.SeasonSeats
                 .AsNoTracking()

@@ -5,7 +5,7 @@ namespace Odasoft.XBOL.Business.Services
 {
     public class EventSectionService(EventSectionRepository _eventSectionRepository)
     {
-        public async Task<IList<ZonePriceDTO>> GetZonePricesByEventIdAsync(long eventId)
+        public async Task<List<ZonePriceDTO>> GetZonePricesByEventIdAsync(long eventId)
         {
             var zonePrices = await _eventSectionRepository.GetEventZonePricesAsync(eventId);
             return zonePrices;

@@ -25,6 +25,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// representing the suite agreements.</returns>
         [HttpGet]
         [EndpointName("GetSuiteAgreementsAsync")]
+        [ProducesResponseType(typeof(List<SuiteAgreementResult>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<SuiteAgreementResult>>> GetSuiteAgreementsAsync()
         {
             var suiteAgreements = await _suiteAgreementService.GetSuiteAgreementsAsync();
@@ -35,10 +36,12 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// Retrieves the suite agreement with the specified identifier.
         /// </summary>
         /// <param name="suiteAgreementId">The unique identifier of the suite agreement to retrieve.</param>
-        /// <returns>An object containing the suite agreement if found; otherwise, a 404 Not Found
+        /// <returns>An ActionResult containing the suite agreement if found; otherwise, a 404 Not Found
         /// response.</returns>
         [HttpGet("{suiteAgreementId:long}")]
         [EndpointName("GetSuiteAgreementByIdAsync")]
+        [ProducesResponseType(typeof(SuiteAgreementResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<SuiteAgreementResult>> GetSuiteAgreementByIdAsync([FromRoute] long suiteAgreementId)
         {
             var suiteAgreement = await _suiteAgreementService.GetSuiteAgreementByIdAsync(suiteAgreementId);
@@ -59,7 +62,8 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// result with an error message.</returns>
         [HttpPost]
         [EndpointName("CreateSuiteAgreementAsync")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(long))]
+        [ProducesResponseType(typeof(long), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
         public async Task<ActionResult> CreateSuiteAgreementAsync([FromBody] CreateSuiteAgreementRequest request)
         {
             var agreementId = await _suiteAgreementService.CreateSuiteAgreementAsync(request);
@@ -77,11 +81,14 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// Updates an existing suite agreement with the specified details.
         /// </summary>
         /// <param name="request">The request object containing the updated suite agreement information. Must not be null.</param>
-        /// <returns>An <see cref="OkResult"/> if the update is successful; a <see cref="NotFoundObjectResult"/> if the suite
-        /// agreement is not found; or an <see cref="UnprocessableEntityObjectResult"/> if the update cannot be
+        /// <returns>An ActionResult if the update is successful; a NotFound if the suite
+        /// agreement is not found; or an UnprocessableEntityObjectResult if the update cannot be
         /// processed.</returns>
         [HttpPut]
         [EndpointName("UpdateSuiteAgreementAsync")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
         public async Task<ActionResult> UpdateSuiteAgreementAsync([FromBody] UpdateSuiteAgreementRequest request)
         {
             try
@@ -106,11 +113,14 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// Deletes the suite agreement with the specified identifier.
         /// </summary>
         /// <param name="suiteAgreementId">The unique identifier of the suite agreement to delete.</param>
-        /// <returns>An <see cref="ActionResult"/> indicating the result of the operation. Returns 200 OK if the suite agreement
+        /// <returns>An ActionResult indicating the result of the operation. Returns 200 OK if the suite agreement
         /// was deleted successfully; 404 Not Found if no suite agreement with the specified identifier exists; or 422
         /// Unprocessable Entity if the deletion could not be completed due to a server error.</returns>
         [HttpDelete("{suiteAgreementId:long}")]
         [EndpointName("DeleteSuiteAgreementAsync")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
         public async Task<ActionResult> DeleteSuiteAgreementAsync([FromRoute] long suiteAgreementId)
         {
             try
@@ -136,13 +146,12 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// </summary>
         /// <param name="suiteAgreementId">The unique identifier of the suite agreement whose file is to be downloaded.</param>
         /// <param name="agreementFile">The file content</param>
-        /// <returns>An <see cref="FileContentResult"/> containing the file content if found; otherwise, a <see
-        /// cref="NotFoundResult"/> if the suite agreement file does not exist.</returns>
+        /// <returns>An FileContentResult containing the file content if found; otherwise, a NotFoundResult if the suite agreement file does not exist.</returns>
         [HttpPost("upload")]
         [EndpointName("UploadSuiteAgreementFileAsync")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(bool))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(string))]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
         public async Task<ActionResult> UploadSuiteAgreementFileAsync([FromForm] long suiteAgreementId, IFormFile agreementFile)
         {
             var agreement = await _suiteAgreementService.GetSuiteAgreementByIdAsync(suiteAgreementId);
@@ -166,12 +175,12 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// Downloads the file associated with the specified suite agreement.
         /// </summary>
         /// <param name="suiteAgreementId">The unique identifier of the suite agreement whose file is to be downloaded.</param>
-        /// <returns>An <see cref="FileContentResult"/> containing the file content if found; otherwise, a <see
-        /// cref="NotFoundResult"/> if the suite agreement file does not exist.</returns>
+        /// <returns>An FileContentResult containing the file content if found; otherwise, a NotFoundResult if the suite agreement file does not exist.</returns>
         [HttpGet("{suiteAgreementId:long}/download")]
         [EndpointName("DownloadSuiteAgreementFileAsync")]
         [Produces("application/octet-stream")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(FileResult))]
+        [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DownloadSuiteAgreementFileAsync([FromRoute] long suiteAgreementId)
         {
             var agreementFile = await _suiteAgreementService.GetSuiteAgreementFileBySuiteAgreementIdAsync(suiteAgreementId);
@@ -196,7 +205,9 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         [HttpGet("download-batch")]
         [EndpointName("DownloadMultipleSuiteAgreementsAsync")]
         [Produces("application/octet-stream")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(FileResult))]
+        [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DownloadMultipleSuiteAgreementsAsync([FromQuery] List<long> suiteAgreementIds)
         {
             if (suiteAgreementIds == null || suiteAgreementIds.Count == 0)

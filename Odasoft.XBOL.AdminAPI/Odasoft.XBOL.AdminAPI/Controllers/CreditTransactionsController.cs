@@ -18,8 +18,16 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
             _clientCreditTransactionService = clientCreditTransactionService;
         }
 
+        /// <summary>
+        /// Retrieves a paged list of credit transactions that match the specified query parameters.
+        /// </summary>
+        /// <remarks>This method is asynchronous and may take additional time to complete depending on the
+        /// number of transactions and the complexity of the query parameters.</remarks>
+        /// <param name="queryParams">The parameters used to filter and paginate the credit transactions. This parameter must not be null.</param>
+        /// <returns>An ActionResult containing a paged response with the total number of matching transactions and the current page of results.</returns>
         [HttpGet]
         [EndpointName("GetCreditTransactionsAsync")]
+        [ProducesResponseType(typeof(PagedResponse<CreditTransactionResult>), StatusCodes.Status200OK)]
         public async Task<ActionResult<PagedResponse<CreditTransactionResult>>> GetCreditTransactionsAsync([FromQuery] CreditTransactionsQueryParams queryParams)
         {
             var result = await _clientCreditTransactionService.GetCreditTransactionsAsync(queryParams);
@@ -32,10 +40,10 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// </summary>
         /// <param name="creditAccountId">The unique identifier of the credit account.</param>
         /// <param name="request">An object containing the info for the credit transaction to create.</param>
-        /// <returns>An <see cref="ActionResult{T}"/> containing <see langword="true"/> if the credit transaction was created successfully.</returns>
+        /// <returns>An ActionResult containing <see langword="true"/> if the credit transaction was created successfully.</returns>
         [HttpPost("{creditAccountId:long}")]
         [EndpointName("CreateCreditTransactionByCreditAccountIdAsync")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(bool))]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> CreateCreditTransactionByCreditAccountIdAsync([FromRoute] long creditAccountId, [FromBody] ClientCreditTransactionRequest request)
         {
@@ -54,10 +62,10 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// </summary>
         /// <param name="creditTransactionId">Unique identifier.</param>
         /// <param name="request">The request object containing the updated credit transaction information.</param>
-        /// <returns>An <see cref="ActionResult{T}"/> containing <see langword="true"/> if the credit transaction was updated successfully.</returns>
+        /// <returns>An ActionResult containing <see langword="true"/> if the credit transaction was updated successfully.</returns>
         [HttpPut("{creditTransactionId:long}")]
         [EndpointName("UpdateCreditTransactionByIdAsync")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(bool))]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> UpdateCreditTransactionByIdAsync([FromRoute] long creditTransactionId, [FromBody] ClientCreditTransactionRequest request)
         {
@@ -75,10 +83,10 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// Deletes an existing credit transaction.
         /// </summary>
         /// <param name="creditTransactionId">Unique identifier</param>
-        /// <returns>An <see cref="ActionResult{T}"/> containing <see langword="true"/> if the credit transaction was deleted successfully.</returns>
+        /// <returns>An ActionResult containing <see langword="true"/> if the credit transaction was deleted successfully.</returns>
         [HttpDelete("{creditTransactionId:long}")]
         [EndpointName("DeleteCreditTransactionByIdAsync")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(bool))]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DeleteCreditTransaction(long creditTransactionId)
         {

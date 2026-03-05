@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.OpenApi;
 using Odasoft.XBOL.AdminAPI;
+using Odasoft.XBOL.AdminAPI.Filters;
 using Odasoft.XBOL.Business;
 using Odasoft.XBOL.Business.Extensions;
 using Odasoft.XBOL.Business.Messages;
@@ -45,6 +46,7 @@ builder.Services.ConfigureRepositories();
 
 builder.Services.AddControllers(options =>
 {
+    options.Filters.Add(new ValidationFilter());
     options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
 }).AddNewtonsoftJson(options =>
 {
@@ -58,7 +60,7 @@ builder.Services.AddLocalization(options => options.ResourcesPath = "Resources")
 
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
-    string[] supportedCultures = ["es-MX"];
+    string[] supportedCultures = ["es-MX", "en"];
     options.SetDefaultCulture("es-MX");
     options.AddSupportedCultures(supportedCultures);
     options.AddSupportedUICultures(supportedCultures);
@@ -162,6 +164,8 @@ app.UseAuthorization();
 var mexicoCulture = new CultureInfo("es-MX");
 CultureInfo.DefaultThreadCurrentCulture = mexicoCulture;
 CultureInfo.DefaultThreadCurrentUICulture = mexicoCulture;
+
+app.UseRequestLocalization();
 
 app.MapControllers();
 

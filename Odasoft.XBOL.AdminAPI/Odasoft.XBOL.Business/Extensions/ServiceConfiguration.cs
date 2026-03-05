@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Odasoft.XBOL.Business.Services;
 
@@ -27,6 +28,8 @@ namespace Odasoft.XBOL.Business.Extensions
             services.AddScoped<ClientCreditTransactionService>();
             services.AddScoped<LegalRepresentativeService>();
             services.AddScoped<SequenceTrackerService>();
+
+            services.AddValidatorsFromAssembly(typeof(ServiceConfiguration).Assembly);
 
             return services;
         }

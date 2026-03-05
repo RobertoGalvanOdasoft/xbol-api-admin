@@ -70,11 +70,6 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
         public async Task<ActionResult<SeasonResult>> CreateSeasonAsync([FromBody] CreateSeasonRequest request)
         {
-            if (ModelState.IsValid == false)
-            {
-                return BadRequest(ModelState);
-            }
-
             var result = await seasonService.CreateSeasonAsync(request);
 
             if (result != null)
@@ -103,11 +98,6 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
         public async Task<IActionResult> UpdateSeasonAsync([FromRoute] long id, [FromBody] UpdateSeasonRequest request)
         {
-            if (ModelState.IsValid == false)
-            {
-                return BadRequest(ModelState);
-            }
-
             var result = await seasonService.UpdateSeasonAsync(id, request);
 
             if (result)

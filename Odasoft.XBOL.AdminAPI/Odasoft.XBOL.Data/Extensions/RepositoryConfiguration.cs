@@ -10,28 +10,34 @@ namespace Odasoft.XBOL.Data.Extensions
     {
         public static IServiceCollection ConfigureRepositories(this IServiceCollection services)
         {
-            services.AddScoped<EventRepository>();
-            services.AddScoped<EventSeatRepository>();
-            services.AddScoped<EventSectionRepository>();
-            services.AddScoped<EventScheduleRepository>();
+            services.AddScoped<ClientRepository>();
+
             services.AddScoped<OrderRepository>();
-            services.AddScoped<UserRepository>();
-            services.AddScoped<SuiteLevelRepository>();
-            services.AddScoped<SuiteRepository>();
-            services.AddScoped<SuiteAgreementRepository>();
-            services.AddScoped<SuiteAgreementFileRepository>();
-            services.AddScoped<VenueRepository>();
-            services.AddScoped<VenueMapRepository>();
-            services.AddScoped<SeasonPassRepository>();
+
             services.AddScoped<SeasonRepository>();
             services.AddScoped<SeasonSeatRepository>();
             services.AddScoped<SeasonSectionRepository>();
-            services.AddScoped<ClientRepository>();
+
+            services.AddScoped<SeasonPassRepository>();
+
             services.AddScoped<ClientCreditAccountRepository>();
             services.AddScoped<ClientCreditTransactionRepository>();
+            services.AddScoped<EventRepository>();
+            services.AddScoped<EventScheduleRepository>();
+            services.AddScoped<EventSeatRepository>();
+            services.AddScoped<EventSectionRepository>();
             services.AddScoped<LegalRepresentativeRepository>();
-            services.AddScoped<TicketRepository>();
+            services.AddScoped<PhoneRegionCodeRepository>();
+            services.AddScoped<RoleRepository>();
             services.AddScoped<SequenceTrackerRepository>();
+            services.AddScoped<SuiteAgreementFileRepository>();
+            services.AddScoped<SuiteAgreementRepository>();
+            services.AddScoped<SuiteLevelRepository>();
+            services.AddScoped<SuiteRepository>();
+            services.AddScoped<TicketRepository>();
+            services.AddScoped<UserRepository>();
+            services.AddScoped<VenueRepository>();
+            services.AddScoped<VenueMapRepository>();
 
             return services;
         }

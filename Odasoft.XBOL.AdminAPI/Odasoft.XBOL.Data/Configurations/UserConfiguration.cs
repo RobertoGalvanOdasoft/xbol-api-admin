@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Odasoft.XBOL.Models;
 
@@ -8,6 +8,8 @@ namespace Odasoft.XBOL.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
+            builder.Property(x => x.PhoneNumber).HasMaxLength(15);
+
             builder.HasOne(x => x.Client)
                    .WithOne(x => x.User)
                    .HasForeignKey<Client>(x => x.UserId);

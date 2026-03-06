@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Odasoft.XBOL.Commons.Helpers;
 using Odasoft.XBOL.Commons.Requests.Filters;
 using Odasoft.XBOL.Commons.Responses;
 using Odasoft.XBOL.Data.Repositories;
@@ -229,11 +230,12 @@ namespace Odasoft.XBOL.Business.Services
 
         private async Task<Client> CreateClientAsync(ClientInfoRequest clientInfo)
         {
+            // TODO: Better use the client service to create the client
             var client = new Client
             {
                 Email = clientInfo.Email,
-                CountryPhoneCode = clientInfo.CountryPhoneISO,
-                PhoneNumber = clientInfo.PhoneNumber,
+                PhoneRegionCodeId = clientInfo.PhoneRegionCodeId,
+                PhoneNumber = PhoneNumberHelper.NormalizePhoneNumber(clientInfo.PhoneNumber ?? ""),
                 FullName = clientInfo.FullName,
                 BusinessName = clientInfo.FullName,
                 ClientType = Enums.ClientType.Individual,

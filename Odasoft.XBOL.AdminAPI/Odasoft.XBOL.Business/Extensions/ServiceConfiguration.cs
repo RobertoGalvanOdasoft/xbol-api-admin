@@ -9,25 +9,26 @@ namespace Odasoft.XBOL.Business.Extensions
         // Add your service configurations here in the future
         public static IServiceCollection ConfigureServices(this IServiceCollection services)
         {
-            services.AddScoped<EventService>();
-            services.AddScoped<EventSeatsService>();
-            services.AddScoped<EventSectionService>();
-            services.AddScoped<OrderService>();
-            services.AddScoped<SuiteLevelService>();
-            services.AddScoped<SuiteService>();
-            services.AddScoped<SuiteAgreementService>();
-            services.AddScoped<VenueService>();
-            services.AddScoped<VenueMapService>();
             services.AddScoped<CategoryService>();
-            services.AddScoped<SeasonService>();
-            services.AddScoped<SeasonSeatsService>();
-            services.AddScoped<SeasonSectionService>();
-            services.AddScoped<ClientService>();
-            services.AddScoped<SeasonPassService>();
             services.AddScoped<ClientCreditAccountService>();
             services.AddScoped<ClientCreditTransactionService>();
+            services.AddScoped<ClientService>();
+            services.AddScoped<EventSeatsService>();
+            services.AddScoped<EventSectionService>();
+            services.AddScoped<EventService>();
             services.AddScoped<LegalRepresentativeService>();
+            services.AddScoped<PhoneRegionCodesService>();
+            services.AddScoped<OrderService>();
+            services.AddScoped<SeasonPassService>();
+            services.AddScoped<SeasonSeatsService>();
+            services.AddScoped<SeasonSectionService>();
+            services.AddScoped<SeasonService>();
             services.AddScoped<SequenceTrackerService>();
+            services.AddScoped<SuiteAgreementService>();
+            services.AddScoped<SuiteLevelService>();
+            services.AddScoped<SuiteService>();
+            services.AddScoped<VenueMapService>();
+            services.AddScoped<VenueService>();
 
             services.AddValidatorsFromAssembly(typeof(ServiceConfiguration).Assembly);
 

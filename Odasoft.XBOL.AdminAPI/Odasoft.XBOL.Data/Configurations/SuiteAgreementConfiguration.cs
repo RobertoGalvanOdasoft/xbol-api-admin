@@ -12,9 +12,7 @@ namespace Odasoft.XBOL.Data.Configurations
                    .WithMany(s => s.SuiteAgreements)
                    .HasForeignKey(sa => sa.SuiteId);
 
-            builder.Property(sa => sa.OwnerName).HasMaxLength(200).IsRequired();
-            builder.Property(sa => sa.OwnerEmail).HasMaxLength(200);
-            builder.Property(sa => sa.OwnerPhone).HasMaxLength(50);
+            builder.Property(x => x.PhoneNumber).HasMaxLength(15);
         }
     }
 }

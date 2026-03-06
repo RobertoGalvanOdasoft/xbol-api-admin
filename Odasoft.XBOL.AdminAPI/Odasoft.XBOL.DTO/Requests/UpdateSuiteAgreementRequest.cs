@@ -12,10 +12,12 @@ namespace Odasoft.XBOL.DTO.Requests
         public required string OwnerName { get; set; } = "";
 
         [EmailAddress]
-        public required string OwnerEmail { get; set; } = "";
+        public required string Email { get; set; } = "";
+
+        public long? PhoneRegionCodeId { get; set; }
 
         [Phone]
-        public required string OwnerPhone { get; set; } = "";
+        public required string PhoneNumber { get; set; } = "";
 
         public required DateTimeOffset StartDate { get; set; }
 

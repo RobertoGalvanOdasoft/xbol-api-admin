@@ -810,8 +810,10 @@
             "format": "int64",
             "nullable": true
           },
-          "countryPhoneISO": {
-            "type": "string"
+          "phoneRegionCodeId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
           },
           "phoneNumber": {
             "type": "string"

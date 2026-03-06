@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Odasoft.XBOL.Commons.Extensions;
+using Odasoft.XBOL.Commons.Helpers;
 using Odasoft.XBOL.Data.Repositories;
 using Odasoft.XBOL.DTO.Requests;
 using Odasoft.XBOL.DTO.Results;
@@ -32,8 +33,10 @@ namespace Odasoft.XBOL.Business.Services
                                 SuiteLevelId = sa.Suite.SuiteLevel.Id,
                                 SuiteLevel = sa.Suite.SuiteLevel.Name,
                                 OwnerName = sa.OwnerName,
-                                OwnerEmail = sa.OwnerEmail,
-                                OwnerPhone = sa.OwnerPhone,
+                                Email = sa.Email,
+                                PhoneRegionCodeId = sa.PhoneRegionCodeId,
+                                DialCode = sa.PhoneRegionCode != null ? sa.PhoneRegionCode.DialCode : "",
+                                PhoneNumber = sa.PhoneNumber,
                                 StartDate = sa.StartDate,
                                 EndDate = sa.EndDate,
                                 FileName = sa.SuiteAgreementFile != null ? sa.SuiteAgreementFile.FileName : ""
@@ -48,6 +51,7 @@ namespace Odasoft.XBOL.Business.Services
                                                     .Include(x => x.Suite)
                                                         .ThenInclude(x => x.SuiteLevel)
                                                     .Include(x => x.SuiteAgreementFile)
+                                                    .Include(x => x.PhoneRegionCode)
                                                     .AsNoTracking()
                                                     .Where(x => x.Id == suiteAgreementId)
                                                     .FirstOrDefaultAsync();
@@ -65,8 +69,10 @@ namespace Odasoft.XBOL.Business.Services
                 SuiteLevelId = suiteAgreement.Suite.SuiteLevel.Id,
                 SuiteLevel = suiteAgreement.Suite.SuiteLevel.Name,
                 OwnerName = suiteAgreement.OwnerName,
-                OwnerEmail = suiteAgreement.OwnerEmail,
-                OwnerPhone = suiteAgreement.OwnerPhone,
+                Email = suiteAgreement.Email,
+                PhoneRegionCodeId = suiteAgreement.PhoneRegionCodeId,
+                DialCode = suiteAgreement.PhoneRegionCode != null ? suiteAgreement.PhoneRegionCode.DialCode : "",
+                PhoneNumber = suiteAgreement.PhoneNumber,
                 StartDate = suiteAgreement.StartDate,
                 EndDate = suiteAgreement.EndDate,
                 FileName = suiteAgreement.SuiteAgreementFile != null ? suiteAgreement.SuiteAgreementFile.FileName : ""
@@ -81,8 +87,9 @@ namespace Odasoft.XBOL.Business.Services
                 {
                     SuiteId = request.SuiteId,
                     OwnerName = request.OwnerName,
-                    OwnerEmail = request.OwnerEmail,
-                    OwnerPhone = request.OwnerPhone,
+                    Email = request.Email,
+                    PhoneRegionCodeId = request.PhoneRegionCodeId,
+                    PhoneNumber = PhoneNumberHelper.NormalizePhoneNumber(request.PhoneNumber),
                     StartDate = request.StartDate.ToUniversalTime(),
                     EndDate = request.EndDate.ToUniversalTime(),
                     CreatedBy = Guid.Empty,
@@ -116,8 +123,9 @@ namespace Odasoft.XBOL.Business.Services
 
                 suiteAgreement.SuiteId = request.SuiteId;
                 suiteAgreement.OwnerName = request.OwnerName;
-                suiteAgreement.OwnerEmail = request.OwnerEmail;
-                suiteAgreement.OwnerPhone = request.OwnerPhone;
+                suiteAgreement.Email = request.Email;
+                suiteAgreement.PhoneRegionCodeId = request.PhoneRegionCodeId;
+                suiteAgreement.PhoneNumber = PhoneNumberHelper.NormalizePhoneNumber(request.PhoneNumber);
                 suiteAgreement.StartDate = request.StartDate.ToUniversalTime();
                 suiteAgreement.EndDate = request.EndDate.ToUniversalTime();
                 suiteAgreement.UpdatedAt = DateTimeOffset.Now.ToUniversalTime();

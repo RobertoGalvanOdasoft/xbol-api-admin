@@ -37,6 +37,7 @@ namespace Odasoft.XBOL.Data
         public DbSet<ClientCreditTransaction> ClientCreditTransactions => Set<ClientCreditTransaction>();
         public DbSet<LegalRepresentative> LegalRepresentatives => Set<LegalRepresentative>();
         public DbSet<SequenceTracker> SequenceTrackers => Set<SequenceTracker>();
+        public DbSet<PhoneRegionCode> PhoneRegionCodes => Set<PhoneRegionCode>();
 
         public XBOLDbContext() : base()
         {
@@ -81,14 +82,17 @@ namespace Odasoft.XBOL.Data
 
             modelBuilder.RemovePluralizingTableNameConvention();
 
-            modelBuilder.ApplyConfiguration(new TicketConfiguration());
-            modelBuilder.ApplyConfiguration(new UserConfiguration());
-            modelBuilder.ApplyConfiguration(new SuiteConfiguration());
-            modelBuilder.ApplyConfiguration(new SuiteAgreementConfiguration());
-            modelBuilder.ApplyConfiguration(new SuiteAgreementFileConfiguration());
+            modelBuilder.ApplyConfiguration(new ClientConfiguration());
             modelBuilder.ApplyConfiguration(new ClientCreditAccountConfiguration());
             modelBuilder.ApplyConfiguration(new ClientCreditTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new LegalRepresentativeConfiguration());
+            modelBuilder.ApplyConfiguration(new OrganizerConfiguration());
+            modelBuilder.ApplyConfiguration(new SuiteAgreementConfiguration());
+            modelBuilder.ApplyConfiguration(new SuiteAgreementFileConfiguration());
+            modelBuilder.ApplyConfiguration(new SuiteConfiguration());
+            modelBuilder.ApplyConfiguration(new TicketConfiguration());
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new VenueConfiguration());
         }
     }
 }

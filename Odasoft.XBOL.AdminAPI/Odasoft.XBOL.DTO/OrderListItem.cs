@@ -6,7 +6,7 @@ namespace XBOL.Admin.Core.DTO
     {
         public long OrderId { get; set; }
         public string Order { get; set; } = null!;
-        public string CountryPhoneISO { get; set; } = null!;
+        public long? PhoneRegionCodeId { get; set; }
         public string PhoneNumber { get; set; } = null!;
         public string Email { get; set; } = null!;
         public required int SeatCount { get; set; }

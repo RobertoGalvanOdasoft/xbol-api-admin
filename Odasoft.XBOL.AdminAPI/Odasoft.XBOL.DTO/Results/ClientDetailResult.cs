@@ -9,7 +9,8 @@ namespace Odasoft.XBOL.DTO.Results
         public string? ClientName { get; set; }
         public string? BusinessName { get; set; }
         public string? Email { get; set; }
-        public string? CountryPhoneCode { get; set; }
+        public long? PhoneRegionCodeId { get; set; }
+        public string? DialCode { get; set; }
         public string? PhoneNumber { get; set; }
         public string? TaxId { get; set; }
         public string? Country { get; set; }

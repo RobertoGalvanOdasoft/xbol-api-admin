@@ -41,7 +41,8 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// </summary>
         /// <remarks>If both phone and email are null or empty, the request returns a BadRequest response
         /// indicating that at least one search parameter must be specified.</remarks>
-        /// <param name="phone">The phone number to search for. At least one of the parameters, either phone or email, must be provided.</param>
+        /// <param name="phoneRegionCodeId">The country code associated with the phone number. This parameter is optional but should be provided if phoneNumber is used for searching.</param>
+        /// <param name="phoneNumber">The phone number to search for. At least one of the parameters, either phone or email, must be provided.</param>
         /// <param name="email">The email address to search for. At least one of the parameters, either phone or email, must be provided.</param>
         /// <returns>An ActionResult containing a ClientContactResponse with the search results. Returns 200 OK if matching
         /// clients are found, 400 Bad Request if neither parameter is provided, or 404 Not Found if no matching clients
@@ -51,14 +52,14 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         [ProducesResponseType(typeof(ClientContactResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ClientContactResponse>> SearchClientAsync([FromQuery] string phone, [FromQuery] string email)
+        public async Task<ActionResult<ClientContactResponse>> SearchClientAsync([FromQuery] long? phoneRegionCodeId, [FromQuery] string phoneNumber, [FromQuery] string email)
         {
-            if (string.IsNullOrWhiteSpace(phone) && string.IsNullOrWhiteSpace(email))
+            if (phoneRegionCodeId.HasValue == false && string.IsNullOrWhiteSpace(phoneNumber) && string.IsNullOrWhiteSpace(email))
             {
                 return BadRequest("At least one search parameter (phone or email) must be provided.");
             }
 
-            ClientContactResponse? result = await clientService.SearchClientAsync(phone, email);
+            ClientContactResponse? result = await clientService.SearchClientAsync(phoneRegionCodeId, phoneNumber, email);
 
             if (result == null)
             {

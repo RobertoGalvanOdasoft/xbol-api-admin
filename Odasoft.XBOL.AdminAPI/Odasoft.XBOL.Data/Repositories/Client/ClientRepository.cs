@@ -20,7 +20,7 @@ namespace Odasoft.XBOL.Data.Repositories.Client
             result.ClientContact = new()
             {
                 Id = client.Id,
-                CountryPhoneISO = client.User?.CountryPhoneISO ?? "",
+                PhoneRegionCodeId = client.PhoneRegionCodeId,
                 PhoneNumber = client.PhoneNumber ?? "",
                 Email = client.Email ?? "",
                 Name = string.IsNullOrWhiteSpace(client.BusinessName) ? (client.FullName ?? "") : client.BusinessName,
@@ -53,7 +53,7 @@ namespace Odasoft.XBOL.Data.Repositories.Client
                     (!string.IsNullOrWhiteSpace(email) && (c.Email == null ? "" : c.Email.ToLower().Trim()) == email)
                     || (!string.IsNullOrEmpty(filter.PhoneNumber)
                         && c.PhoneNumber == filter.PhoneNumber
-                        && c.User!.CountryPhoneISO == filter.CountryPhoneISO)
+                        && c.PhoneRegionCodeId == filter.PhoneRegionCodeId)
                 );
         }
 

@@ -1,6 +1,7 @@
 using CsvHelper.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Odasoft.XBOL.Commons.Enums;
+using Odasoft.XBOL.Commons.Helpers;
 using Odasoft.XBOL.Commons.Requests.Filters;
 using Odasoft.XBOL.Data.Repositories;
 using Odasoft.XBOL.Data.Repositories.Client;
@@ -31,8 +32,8 @@ namespace Odasoft.XBOL.Business.Services
                 FullName = request.CompanyName,
                 BusinessName = request.SocialReason ?? request.CompanyName,
                 Email = request.Email,
-                CountryPhoneCode = request.CountryPhoneCode,
-                PhoneNumber = request.Phone,
+                PhoneRegionCodeId = request.PhoneRegionCodeId,
+                PhoneNumber = PhoneNumberHelper.NormalizePhoneNumber(request.PhoneNumber ?? ""),
                 TaxId = request.RFC,
                 Country = request.Country,
                 State = request.State,
@@ -112,8 +113,8 @@ namespace Odasoft.XBOL.Business.Services
                 existingClient.FullName = request.CompanyName;
                 existingClient.BusinessName = request.SocialReason;
                 existingClient.Email = request.Email;
-                existingClient.CountryPhoneCode = request.CountryPhoneCode;
-                existingClient.PhoneNumber = request.Phone;
+                existingClient.PhoneRegionCodeId = request.PhoneRegionCodeId;
+                existingClient.PhoneNumber = PhoneNumberHelper.NormalizePhoneNumber(request.PhoneNumber ?? "");
                 existingClient.TaxId = request.RFC;
                 existingClient.Country = request.Country;
                 existingClient.State = request.State;
@@ -320,7 +321,10 @@ namespace Odasoft.XBOL.Business.Services
                     ClientName = c.FullName,
                     BusinessName = c.BusinessName,
                     Email = c.Email,
-                    CountryPhoneCode = c.CountryPhoneCode,
+                    PhoneRegionCodeId = c.PhoneRegionCodeId,
+                    DialCode = c.PhoneRegionCode == null
+                                ? ""
+                                : c.PhoneRegionCode.DialCode ?? "",
                     PhoneNumber = c.PhoneNumber,
                     TaxId = c.TaxId,
                     Country = c.Country,
@@ -389,17 +393,22 @@ namespace Odasoft.XBOL.Business.Services
         // 4- If we are using a phone number as an identifier, we should consider normalizing it as well (e.g., removing spaces, dashes, or country codes) before searching, to improve matching accuracy.
         // 5- We should also consider the performance implications of this method, especially if the clients table is large.
         // We might want to add indexes on the phone and email columns to speed up the search.
-        public async Task<ClientContactResponse?> SearchClientAsync(string phone, string email)
+        public async Task<ClientContactResponse?> SearchClientAsync(long? phoneRegionCodeId, string phoneNumber, string email)
         {
             ClientContactResponse? result = await repository.Get()
                 .AsNoTracking()
-                .Where(c => c.IsActive && (c.PhoneNumber == phone || c.Email == email))
+                .Where(c => c.IsActive
+                    && ((phoneRegionCodeId.HasValue
+                            ? (c.PhoneNumber == phoneNumber && c.PhoneRegionCodeId == phoneRegionCodeId.Value)
+                            : c.PhoneNumber == phoneNumber)
+                        || c.Email == email)
+                        )
                 .Select(c => new ClientContactResponse
                 {
                     Id = c.Id,
                     Name = c.FullName ?? "",
                     Email = c.Email ?? "",
-                    CountryPhoneISO = c.CountryPhoneCode ?? "",
+                    PhoneRegionCodeId = c.PhoneRegionCodeId,
                     PhoneNumber = c.PhoneNumber ?? ""
                 }).SingleOrDefaultAsync();
 

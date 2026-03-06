@@ -7,6 +7,7 @@ namespace Odasoft.XBOL.DTO.Requests
     {
         [Required]
         public string? CompanyName { get; set; }
+
         public string? SocialReason { get; set; }
         public string? RFC { get; set; }
         public ClientType? PersonTypeId { get; set; }
@@ -18,8 +19,8 @@ namespace Odasoft.XBOL.DTO.Requests
         public string? PostalCode { get; set; }
         public string? Neighborhood { get; set; }
         public string? City { get; set; }
-        public string? CountryPhoneCode { get; set; }
-        public string? Phone { get; set; }
+        public long? PhoneRegionCodeId { get; set; }
+        public string? PhoneNumber { get; set; }
         public string? Email { get; set; }
 
         public bool HasCredit { get; set; }

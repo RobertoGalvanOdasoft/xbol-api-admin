@@ -5,8 +5,10 @@ namespace Odasoft.XBOL.Models
         public long SuiteId { get; set; }
         public Suite Suite { get; set; } = null!;
         public string OwnerName { get; set; } = "";
-        public string OwnerEmail { get; set; } = "";
-        public string OwnerPhone { get; set; } = "";
+        public string Email { get; set; } = "";
+        public long? PhoneRegionCodeId { get; set; }
+        public PhoneRegionCode? PhoneRegionCode { get; set; }
+        public string PhoneNumber { get; set; } = "";
 
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }

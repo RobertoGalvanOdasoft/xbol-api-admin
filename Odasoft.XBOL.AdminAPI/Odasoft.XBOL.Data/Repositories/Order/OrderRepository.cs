@@ -95,9 +95,9 @@ namespace Odasoft.XBOL.Data.Repositories.Order
             {
                 Order = o.Reference,
                 Email = o.Client == null ? "" : o.Client.Email ?? "",
-                CountryPhoneISO = o.Client == null
-                                    ? ""
-                                    : (o.Client.User == null ? "" : o.Client.User.CountryPhoneISO ?? ""),
+                PhoneRegionCodeId = o.Client == null
+                                    ? null
+                                    : o.Client.PhoneRegionCodeId,
                 PhoneNumber = o.Client == null ? "" : o.Client.PhoneNumber ?? "",
                 Total = o.Total,
                 SeatCount = o.Tickets.GroupBy(x =>
@@ -147,7 +147,7 @@ namespace Odasoft.XBOL.Data.Repositories.Order
                 {
                     ClientContact = new ClientContactRequest
                     {
-                        CountryPhoneISO = o.Client == null ? "" : o.Client.User!.CountryPhoneISO ?? "",
+                        PhoneRegionCodeId = o.Client == null ? null : o.Client.PhoneRegionCodeId,
                         PhoneNumber = o.Client == null ? "" : o.Client.PhoneNumber ?? "",
                         Email = o.Client == null ? "" : o.Client.Email ?? "",
                         Name = o.Client == null ? ""

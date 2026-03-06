@@ -1,0 +1,45 @@
+info:
+  name: Create Suite Validation Error
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/suites"
+  headers:
+    - name: Content-Type
+      value: application/json
+    - name: Accept-Language
+      value: es
+  body:
+    type: json
+    data: "{}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("returns 400", () => {
+          expect(res.status).to.equal(400);
+        });
+        test("content-type is application/problem+json", () => {
+          expect(res.headers["content-type"]).to.contain("application/problem+json");
+        });
+        test("is ValidationProblemDetails with errors object", () => {
+          expect(res.body.errors).to.be.an("object");
+        });
+        test("has validation errors for required fields", () => {
+          expect(res.body.errors.Name).to.be.an("array");
+        });
+        test("Name error is localized", () => {
+          expect(res.body.errors.Name[0]).to.contain("Nombre");
+        });
+        test("title is localized", () => {
+          expect(res.body.title).to.contain("validación");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

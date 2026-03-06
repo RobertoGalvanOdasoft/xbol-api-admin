@@ -1,0 +1,48 @@
+info:
+  name: Create Season Date Order Error
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/seasons"
+  headers:
+    - name: Content-Type
+      value: application/json
+    - name: Accept-Language
+      value: en
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Test Season",
+        "code": "TS-2026",
+        "startDate": "2026-12-01T00:00:00Z",
+        "endDate": "2026-01-01T00:00:00Z"
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("returns 400", () => {
+          expect(res.status).to.equal(400);
+        });
+        test("content-type is application/problem+json", () => {
+          expect(res.headers["content-type"]).to.contain("application/problem+json");
+        });
+        test("has EndDate validation error", () => {
+          expect(res.body.errors.EndDate).to.be.an("array");
+        });
+        test("EndDate error mentions must be after", () => {
+          expect(res.body.errors.EndDate[0]).to.contain("must be after");
+        });
+        test("title is in English", () => {
+          expect(res.body.title).to.contain("validation errors");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

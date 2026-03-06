@@ -30,6 +30,21 @@
   <data name="OffSaleDate" xml:space="preserve">
     <value>Fecha de cierre de venta</value>
   </data>
+  <data name="The {0} field must not exceed {1} characters." xml:space="preserve">
+    <value>El campo {0} no debe exceder {1} caracteres.</value>
+  </data>
+  <data name="The {0} field must be greater than {1}." xml:space="preserve">
+    <value>El campo {0} debe ser mayor que {1}.</value>
+  </data>
+  <data name="Id" xml:space="preserve">
+    <value>Id</value>
+  </data>
+  <data name="SuiteLevelId" xml:space="preserve">
+    <value>Nivel de Suite</value>
+  </data>
+  <data name="Seats" xml:space="preserve">
+    <value>Asientos</value>
+  </data>
   <data name="ValidationTitle" xml:space="preserve">
     <value>Se produjeron uno o más errores de validación.</value>
   </data>

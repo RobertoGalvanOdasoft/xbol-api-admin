@@ -1,6 +1,6 @@
 namespace Odasoft.XBOL.DTO.Requests
 {
-    public class UpdateSuiteRequest
+    public class UpdateSuiteRequest : ISuiteRequest
     {
         public required long Id { get; set; }
 

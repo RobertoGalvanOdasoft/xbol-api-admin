@@ -1,6 +1,6 @@
 namespace Odasoft.XBOL.DTO.Requests
 {
-    public class CreateSuiteRequest
+    public class CreateSuiteRequest : ISuiteRequest
     {
         public required string Name { get; set; } = "";
 

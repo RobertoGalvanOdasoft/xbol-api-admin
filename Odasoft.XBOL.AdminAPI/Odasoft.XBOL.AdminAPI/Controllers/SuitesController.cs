@@ -70,11 +70,6 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
         public async Task<ActionResult<bool>> CreateSuiteAsync([FromBody] CreateSuiteRequest request)
         {
-            if (ModelState.IsValid == false)
-            {
-                return BadRequest(ModelState);
-            }
-
             var result = await _suiteService.CreateSuiteAsync(request);
 
             if (result)
@@ -99,11 +94,6 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
         public async Task<ActionResult<bool>> UpdateSuiteAsync([FromBody] UpdateSuiteRequest request)
         {
-            if (ModelState.IsValid == false)
-            {
-                return BadRequest(ModelState);
-            }
-
             var result = await _suiteService.UpdateSuiteAsync(request);
 
             if (result)

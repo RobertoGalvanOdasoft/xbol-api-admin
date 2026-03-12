@@ -75,6 +75,9 @@ jobs:
           echo $IMAGE_TAG
           docker build \
             --build-arg DOCKER_IMAGE_VERSION="${IMAGE_VERSION}" \
+            --build-arg ASPNETCORE_HTTP_PORTS="8080" \
+            --build-arg ASPNETCORE_URLS="http://+:8080" \
+            --build-arg ASPNETCORE_ENVIRONMENT="Production" \
             -t "${IMAGE_TAG}" \
             -f Odasoft.XBOL.AdminAPI/Dockerfile \
             Odasoft.XBOL.AdminAPI

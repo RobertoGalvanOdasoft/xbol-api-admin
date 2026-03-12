@@ -119,7 +119,7 @@ jobs:
           echo "✅ Image version updated."
   deploy-gke:
     needs: build-and-push
-    runs-on: self-hosted-boletera-qa
+    runs-on: boletera-qa
     environment: GCP_DEV
     permissions:
       contents: read

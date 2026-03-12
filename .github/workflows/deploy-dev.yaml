@@ -1,4 +1,4 @@
-name: Build and Push Admin API to GCP (DEV)
+name: Build and Push API Admin to GCP (DEV)
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
       - dev
 env:
   IMAGE_VERSION: '0.0.0001'
-  IMAGE_NAME: dev-xbol-admin-api
+  IMAGE_NAME: dev-xbol-api-admin
   IMAGE_BASE: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/club-tijuana-docker-repo/
 
 jobs:
@@ -34,7 +34,7 @@ jobs:
           if [ -n "$INFRA_REPO_TOKEN" ]; then
             git clone --depth 1 "https://x-access-token:${INFRA_REPO_TOKEN}@github.com/club-tijuana/infra-cloud.git" infra-cloud-version 2>/dev/null || true
 
-            DEPLOY_FILE="infra-cloud-version/workloads/boletera/dev/xbol-admin-api/deployment.yaml"
+            DEPLOY_FILE="infra-cloud-version/workloads/boletera/dev/xbol-api-admin/deployment.yaml"
             if [ -f "$DEPLOY_FILE" ]; then
               CURRENT_IMAGE_GET_VERSION=$(yq e '.spec.template.spec.containers[0].image' "$DEPLOY_FILE" 2>/dev/null || true)
               if [ -n "$CURRENT_IMAGE_GET_VERSION" ]; then
@@ -87,7 +87,7 @@ jobs:
             echo "⚠️ INFRA_CLOUD_REPO_TOKEN no configurado, se omite actualización"
             exit 0
           fi
-          DEPLOY_FILE="workloads/boletera/dev/xbol-admin-api/deployment.yaml"
+          DEPLOY_FILE="workloads/boletera/dev/xbol-api-admin/deployment.yaml"
           git clone --depth 1 "https://x-access-token:${INFRA_REPO_TOKEN}@github.com/club-tijuana/infra-cloud.git" infra-cloud
           cd infra-cloud
           if [ ! -f "$DEPLOY_FILE" ]; then
@@ -111,7 +111,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add "$DEPLOY_FILE"
-          git diff --staged --quiet && echo "Sin cambios" || git commit -m "chore(dev-xbol-admin-api): actualizar imagen a ${IMAGE_VERSION}"
+          git diff --staged --quiet && echo "Sin cambios" || git commit -m "chore(dev-xbol-api-admin): actualizar imagen a ${IMAGE_VERSION}"
           git push
           echo "✅ Image version updated."
   deploy-gke:
@@ -147,7 +147,7 @@ jobs:
           fi
           gcloud container clusters get-credentials "${{ secrets.GKE_CLUSTER_NAME }}" $GET_CRED_ARGS
           git clone --depth 1 "https://x-access-token:${INFRA_REPO_TOKEN}@github.com/club-tijuana/infra-cloud.git" infra-cloud-deploy
-          DEPLOY_FILE="infra-cloud-deploy/workloads/boletera/dev/xbol-admin-api/deployment.yaml"
+          DEPLOY_FILE="infra-cloud-deploy/workloads/boletera/dev/xbol-api-admin/deployment.yaml"
           if [ ! -f "$DEPLOY_FILE" ]; then
             echo "❌ No existe $DEPLOY_FILE"
             exit 1

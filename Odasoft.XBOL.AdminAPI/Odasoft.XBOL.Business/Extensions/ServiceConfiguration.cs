@@ -6,7 +6,6 @@ namespace Odasoft.XBOL.Business.Extensions
 {
     public static class ServiceConfiguration
     {
-        // Add your service configurations here in the future
         public static IServiceCollection ConfigureServices(this IServiceCollection services)
         {
             services.AddScoped<CategoryService>();

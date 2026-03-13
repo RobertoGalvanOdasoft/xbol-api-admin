@@ -1,0 +1,19 @@
+using Microsoft.Extensions.Options;
+using Odasoft.XBOL.Commons.Options;
+using Odasoft.XBOL.Business;
+
+namespace Odasoft.XBOL.AdminAPI.Extensions;
+
+public static class HttpClientConfiguration
+{
+    public static IServiceCollection ConfigureHttpClients(this IServiceCollection services)
+    {
+        services.AddHttpClient<ITicketingClient, TicketingClient>((sp, client) =>
+        {
+            var opts = sp.GetRequiredService<IOptions<TicketingClientOptions>>();
+            client.BaseAddress = new Uri(opts.Value.BaseAddress);
+        });
+
+        return services;
+    }
+}

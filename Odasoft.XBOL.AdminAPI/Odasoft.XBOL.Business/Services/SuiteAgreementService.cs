@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Odasoft.XBOL.Commons.Extensions;
 using Odasoft.XBOL.Commons.Helpers;
+using Odasoft.XBOL.Commons.Options;
 using Odasoft.XBOL.Data.Repositories;
 using Odasoft.XBOL.DTO.Requests;
 using Odasoft.XBOL.DTO.Results;
@@ -13,11 +15,16 @@ namespace Odasoft.XBOL.Business.Services
     {
         private readonly SuiteAgreementRepository _suiteAgreementRepository;
         private readonly SuiteAgreementFileRepository _suiteAgreementFileRepository;
+        private readonly FileUploadOptions _fileUploadOptions;
 
-        public SuiteAgreementService(SuiteAgreementRepository suiteAgreementRepository, SuiteAgreementFileRepository suiteAgreementFileRepository)
+        public SuiteAgreementService(
+            SuiteAgreementRepository suiteAgreementRepository,
+            SuiteAgreementFileRepository suiteAgreementFileRepository,
+            IOptions<FileUploadOptions> fileUploadOptions)
         {
             _suiteAgreementRepository = suiteAgreementRepository;
             _suiteAgreementFileRepository = suiteAgreementFileRepository;
+            _fileUploadOptions = fileUploadOptions.Value;
         }
 
         public async Task<List<SuiteAgreementResult>> GetSuiteAgreementsAsync()
@@ -196,6 +203,12 @@ namespace Odasoft.XBOL.Business.Services
 
         public async Task<bool> SaveSuiteAgreementFileBySuiteAgreementIdAsync(long suiteAgreementId, IFormFile file)
         {
+            var extension = Path.GetExtension(file.FileName);
+            if (!_fileUploadOptions.AllowedExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
             try
             {
                 var fileContent = FileExtensions.ConvertIFormFileToByteArray(file);

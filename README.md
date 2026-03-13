@@ -20,6 +20,16 @@ In Visual Studio, press `F5` or the play button. For the command-line interface:
 dotnet watch --project Odasoft.XBOL.AdminAPI/Odasoft.XBOL.AdminAPI
 ```
 
+### Configuration
+
+Application settings are strongly typed via Options classes in `Odasoft.XBOL.AdminAPI/Options/`. All options are validated at startup using `DataAnnotations` and `ValidateOnStart()`.
+
+A JSON Schema (`appsettings.schema.json`) is auto-generated on Debug builds for IDE autocomplete. To regenerate manually:
+
+```bash
+dotnet run --project Odasoft.XBOL.AdminAPI/Odasoft.XBOL.AdminAPI -- --generate-schema
+```
+
 ## Deployment
 
 The container is production-ready with:

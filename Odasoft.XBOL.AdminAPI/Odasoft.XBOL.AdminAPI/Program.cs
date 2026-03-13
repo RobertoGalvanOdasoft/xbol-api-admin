@@ -1,127 +1,41 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Localization;
-using Microsoft.OpenApi;
-using Odasoft.XBOL.AdminAPI;
-using Odasoft.XBOL.AdminAPI.Filters;
-using Odasoft.XBOL.Business;
-using Odasoft.XBOL.Business.Extensions;
-using Odasoft.XBOL.Business.Messages;
-using Odasoft.XBOL.Data;
-using Odasoft.XBOL.Data.Extensions;
-using Odasoft.XBOL.Models;
 using System.Globalization;
-using System.Reflection;
-using Wolverine;
+using Microsoft.Extensions.Options;
+using Odasoft.XBOL.AdminAPI.Extensions;
+using LocalizationOptions = Odasoft.XBOL.Commons.Options.LocalizationOptions;
+using Odasoft.XBOL.AdminAPI.Schema;
+using Odasoft.XBOL.Business.Extensions;
+using Odasoft.XBOL.Data.Extensions;
+
+if (args.Contains("--generate-schema"))
+{
+    var outputPath = Path.GetFullPath(
+        Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "appsettings.schema.json"));
+    AppSettingsSchemaGenerator.GenerateAndWrite(outputPath);
+    return;
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("Default");
-builder.Services.AddDbContext<XBOLDbContext>(options =>
-    options.UseNpgsql(connectionString));
+// Infrastructure
+builder.Services.ConfigureOptions(builder.Configuration);
+builder.Services.ConfigureDatabase(builder.Configuration);
 
-// Identity + EF Core store
-builder.Services.AddDataProtection();
+// Security
+builder.Services.ConfigureIdentity();
 
-builder.Services
-    .AddIdentityCore<User>(options =>
-    {
-        options.Password.RequireDigit = true;
-        options.Password.RequiredLength = 8;
-        options.User.RequireUniqueEmail = true;
-    })
-    .AddRoles<Role>()
-    .AddEntityFrameworkStores<XBOLDbContext>()
-    .AddSignInManager()
-    .AddDefaultTokenProviders();
-
-// Add services to the container.
-builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
-{
-    options.MultipartBodyLengthLimit = 104857600; // 100 MB
-});
+// Application
 builder.Services.ConfigureServices();
 builder.Services.ConfigureRepositories();
+builder.Host.ConfigureWolverine();
 
-builder.Services.AddControllers(options =>
-{
-    options.Filters.Add(new ValidationFilter());
-    options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
-}).AddNewtonsoftJson(options =>
-{
-    options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
-});
-
-// Add health check services
+// Web framework
+builder.Services.ConfigureMvc();
 builder.Services.AddHealthChecks();
-// Add localization services
-builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+builder.Services.ConfigureLocalization();
+builder.Services.ConfigureSwagger();
 
-builder.Services.Configure<RequestLocalizationOptions>(options =>
-{
-    string[] supportedCultures = ["es-MX", "en"];
-    options.SetDefaultCulture("es-MX");
-    options.AddSupportedCultures(supportedCultures);
-    options.AddSupportedUICultures(supportedCultures);
-});
-
-builder.Services.AddMvc()
-    .AddDataAnnotationsLocalization(options =>
-    {
-        options.DataAnnotationLocalizerProvider = (type, factory) =>
-            factory.Create(typeof(SharedResource));
-    });
-
-builder.Services.Configure<ApiBehaviorOptions>(options =>
-{
-    options.InvalidModelStateResponseFactory = context =>
-    {
-        var localizer = context.HttpContext.RequestServices
-            .GetRequiredService<IStringLocalizerFactory>()
-            .Create(typeof(SharedResource));
-
-        var details = new ValidationProblemDetails(context.ModelState)
-        {
-            Title = localizer["ValidationTitle"]
-        };
-
-        return new BadRequestObjectResult(details);
-    };
-});
-
-// Add OpenAPI services
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new() { Title = "XBOL Admin API", Version = "v1" });
-
-    // Include XML comments if available
-    string xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-
-    if (File.Exists(xmlPath))
-    {
-        c.IncludeXmlComments(xmlPath);
-    }
-
-    c.MapType<decimal>(() => new OpenApiSchema { Type = JsonSchemaType.Number, Format = "decimal" });
-
-    c.UseAllOfToExtendReferenceSchemas();
-    c.SupportNonNullableReferenceTypes();
-}).AddSwaggerGenNewtonsoftSupport();
-
-builder.Host.UseWolverine(opts =>
-{
-    opts.Discovery.IncludeAssembly(typeof(CreateEventBookingCommand).Assembly);
-});
-
-// Add Http Clients
-builder.Services.AddHttpClient<ITicketingClient, TicketingClient>(
-    (provider, client) =>
-    {
-        client.BaseAddress = new Uri(builder.Configuration.GetValue("TicketingClientBaseAddress", "https://localhost:7021/"));
-    });
+// External clients
+builder.Services.ConfigureHttpClients();
 
 var app = builder.Build();
 
@@ -148,8 +62,6 @@ if (app.Environment.IsDevelopment())
     );
 }
 
-// Configure the HTTP request pipeline.
-
 // Only use HTTPS redirection when running directly (Visual Studio, dotnet run)
 // Containers handle TLS at load balancer/reverse proxy level
 if (!app.Environment.IsProduction()
@@ -161,14 +73,14 @@ if (!app.Environment.IsProduction()
 app.UseAuthentication();
 app.UseAuthorization();
 
-var mexicoCulture = new CultureInfo("es-MX");
-CultureInfo.DefaultThreadCurrentCulture = mexicoCulture;
-CultureInfo.DefaultThreadCurrentUICulture = mexicoCulture;
+var defaultCulture = new CultureInfo(
+    app.Services.GetRequiredService<IOptions<LocalizationOptions>>().Value.DefaultCulture);
+CultureInfo.DefaultThreadCurrentCulture = defaultCulture;
+CultureInfo.DefaultThreadCurrentUICulture = defaultCulture;
 
 app.UseRequestLocalization();
 
 app.MapControllers();
 
-// Map health check endpoint for container health monitoring
 app.MapHealthChecks("/healthz");
 app.Run();

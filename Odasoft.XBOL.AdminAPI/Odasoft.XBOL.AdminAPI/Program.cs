@@ -165,6 +165,19 @@ CultureInfo.DefaultThreadCurrentUICulture = mexicoCulture;
 
 app.MapControllers();
 
-// Map health check endpoint for container health monitoring
-app.MapHealthChecks("/healthz");
+// Map health check endpoint for container health monitoring (includes DOCKER_IMAGE_VERSION)
+app.MapHealthChecks("/healthz", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        var dockerImageVersion = Environment.GetEnvironmentVariable("DOCKER_IMAGE_VERSION") ?? "unknown";
+        var response = new
+        {
+            status = report.Status.ToString(),
+            dockerImageVersion
+        };
+        await context.Response.WriteAsJsonAsync(response);
+    }
+});
 app.Run();

@@ -27,6 +27,11 @@ public static class OptionsConfiguration
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        services.AddOptions<BackgroundJobsOptions>()
+            .BindConfiguration("BackgroundJobs")
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         return services;
     }
 }

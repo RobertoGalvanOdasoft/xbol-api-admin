@@ -83,5 +83,8 @@ public static class AppSettingsSchemaGenerator
 
         [Description("File upload size and extension restrictions")]
         public FileUploadOptions? FileUpload { get; set; }
+
+        [Description("Background job processing (Hangfire) settings")]
+        public BackgroundJobsOptions? BackgroundJobs { get; set; }
     }
 }

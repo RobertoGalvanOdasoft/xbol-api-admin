@@ -1,4 +1,5 @@
 using System.Globalization;
+using Hangfire;
 using Microsoft.Extensions.Options;
 using Odasoft.XBOL.AdminAPI.Extensions;
 using LocalizationOptions = Odasoft.XBOL.Commons.Options.LocalizationOptions;
@@ -19,6 +20,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Infrastructure
 builder.Services.ConfigureOptions(builder.Configuration);
 builder.Services.ConfigureDatabase(builder.Configuration);
+builder.Services.ConfigureBackgroundJobs(builder.Configuration);
 
 // Security
 builder.Services.ConfigureIdentity();
@@ -42,6 +44,8 @@ var app = builder.Build();
 // Enable middleware to serve generated OpenAPI as a JSON endpoint and the Swagger UI.
 if (app.Environment.IsDevelopment())
 {
+    app.UseHangfireDashboard("/hangfire");
+
     app.UseSwagger(c =>
     {
         c.RouteTemplate = "swagger/{documentName}/admin-api.json";

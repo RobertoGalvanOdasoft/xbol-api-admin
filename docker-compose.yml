@@ -10,6 +10,18 @@ services:
       ASPNETCORE_HTTP_PORTS: "8080"
       ASPNETCORE_URLS: "http://+:8080"
       ASPNETCORE_ENVIRONMENT: "Production"
+    restart: unless-stopped
+    networks:
+      - xbol-network
+
+  xbol-worker:
+    container_name: xbol-worker
+    build:
+      context: ./Odasoft.XBOL.AdminAPI
+      dockerfile: Odasoft.XBOL.WorkerService/Dockerfile
+    environment:
+      DOTNET_ENVIRONMENT: "Production"
+    restart: unless-stopped
     networks:
       - xbol-network
 

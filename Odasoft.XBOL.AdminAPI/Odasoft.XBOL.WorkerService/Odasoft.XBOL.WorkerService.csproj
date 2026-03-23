@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <UserSecretsId>dotnet-Odasoft.XBOL.WorkerService-08b43a03-7882-473a-9479-40090ab04e62</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Hangfire.NetCore" Version="1.8.23" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Odasoft.XBOL.Business\Odasoft.XBOL.Business.csproj" />
+    <ProjectReference Include="..\Odasoft.XBOL.Commons\Odasoft.XBOL.Commons.csproj" />
+  </ItemGroup>
+
+</Project>

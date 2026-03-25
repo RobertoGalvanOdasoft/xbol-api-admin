@@ -40,10 +40,6 @@ namespace Odasoft.XBOL.Data
         public DbSet<PhoneRegionCode> PhoneRegionCodes => Set<PhoneRegionCode>();
         public DbSet<VenueImage> VenueImages => Set<VenueImage>();
 
-        public XBOLDbContext() : base()
-        {
-        }
-
         public XBOLDbContext(DbContextOptions<XBOLDbContext> options)
            : base(options)
         {

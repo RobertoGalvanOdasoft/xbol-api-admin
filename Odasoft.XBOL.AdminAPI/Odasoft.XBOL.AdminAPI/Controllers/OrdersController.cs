@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Odasoft.XBOL.Business.Services;
 using Odasoft.XBOL.Commons.Requests.Filters;
 using Odasoft.XBOL.Commons.Responses;
+using Odasoft.XBOL.DTO.Responses;
 using XBOL.Admin.Core.DTO;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
@@ -58,6 +59,22 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
             // order reference and we can also get the information of the season pass even if the client doesn't have an order reference for that season pass
 
             ClientSeasonEvent result = await _orderService.GetClientSeasonEventByOrderReferenceAsync(orderReference);
+            return Ok(result);
+        }
+
+        [HttpGet("renewal-info/{orderReference}")]
+        [EndpointName("GetOrderDetailsByReferenceAsync")]
+        [ProducesResponseType(typeof(OrderRenewalInfoResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<OrderRenewalInfoResponse>> GetOrderDetailsByReferenceAsync([FromRoute] string orderReference)
+        {
+            OrderRenewalInfoResponse? result = await _orderService.GetOrderRenawalInfoByReferenceAsync(orderReference);
+
+            if (result == null)
+            {
+                return NotFound($"There is no information for Order '{orderReference}'.");
+            }
+
             return Ok(result);
         }
     }

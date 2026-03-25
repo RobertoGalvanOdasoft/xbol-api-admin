@@ -10,6 +10,7 @@ public static class WolverineConfiguration
         host.UseWolverine(opts =>
         {
             opts.Discovery.IncludeAssembly(typeof(CreateEventBookingCommand).Assembly);
+            opts.Discovery.IncludeAssembly(typeof(CreateSeasonBookingCommand).Assembly);
         });
 
         return host;

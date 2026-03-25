@@ -8,6 +8,7 @@ using Odasoft.XBOL.Data.Repositories.Client;
 using Odasoft.XBOL.Data.Repositories.Order;
 using Odasoft.XBOL.Data.Repositories.Season;
 using Odasoft.XBOL.DTO.Requests;
+using Odasoft.XBOL.DTO.Responses;
 using Odasoft.XBOL.Models;
 using XBOL.Admin.Core.DTO;
 using Enums = Odasoft.XBOL.Commons.Enums;
@@ -20,6 +21,7 @@ namespace Odasoft.XBOL.Business.Services
         private readonly EventScheduleRepository _eventScheduleRepository;
         private readonly TicketRepository _ticketRepository;
         private readonly EventSeatRepository _eventSeatRepository;
+        private readonly SeasonRepository _seasonRepository;
         private readonly SeasonPassRepository _seasonPassRepository;
         private readonly SeasonSeatRepository _seasonSeatRepository;
         private readonly ClientRepository _clientRepository;
@@ -34,6 +36,7 @@ namespace Odasoft.XBOL.Business.Services
             EventScheduleRepository eventScheduleRepository,
             TicketRepository ticketRepository,
             EventSeatRepository eventSeatRepository,
+            SeasonRepository seasonRepository,
             SeasonPassRepository seasonPassRepository,
             SeasonSeatRepository seasonSeatRepository,
             ClientRepository clientService,
@@ -44,6 +47,7 @@ namespace Odasoft.XBOL.Business.Services
             _eventScheduleRepository = eventScheduleRepository;
             _ticketRepository = ticketRepository;
             _eventSeatRepository = eventSeatRepository;
+            _seasonRepository = seasonRepository;
             _seasonPassRepository = seasonPassRepository;
             _seasonSeatRepository = seasonSeatRepository;
             _clientRepository = clientService;
@@ -135,9 +139,10 @@ namespace Odasoft.XBOL.Business.Services
 
             try
             {
-                var season = await _seasonPassRepository.Get(x => x.Season.ExternalSeasonKey == request.SeasonKey)
-                                    .Include(x => x.Season)
-                                    .FirstAsync();
+                Season? season = await _seasonRepository
+                                    .Get()
+                                    .Where(s => s.ExternalSeasonKey == request.SeasonKey)
+                                    .SingleOrDefaultAsync();
 
                 var localizer = await _sequenceTrackerService.GenerateLocalizerAsync(SEASON_ORDER_LOCALIZER_PREFIX, season.Id);
 
@@ -170,7 +175,7 @@ namespace Odasoft.XBOL.Business.Services
                     Total = (request.PaymentInfoRequest.IsCourtesy ?? false)
                                 ? 0
                                 : request.Seats.Sum(x => x.Value),
-                    OrderType = Enums.OrderType.Ticket,
+                    OrderType = Enums.OrderType.SeasonPass,
                     PayformType = Enums.PayformType.BoxOffice,
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = Guid.Empty,
@@ -178,7 +183,7 @@ namespace Odasoft.XBOL.Business.Services
                     UpdatedBy = Guid.Empty,
                     Items = [.. seasonPasses.Select(x => new OrderItem
                     {
-                        ItemType = Enums.ItemType.Ticket,
+                        ItemType = Enums.ItemType.SeasonPass,
                         ItemReferenceId = x.Id,
                         Price = x.Price,
                         IsCourtesy = request.PaymentInfoRequest.IsCourtesy ?? false
@@ -226,6 +231,44 @@ namespace Odasoft.XBOL.Business.Services
         public async Task<ClientSeasonEvent> GetClientSeasonEventByOrderReferenceAsync(string orderReference)
         {
             return await _orderRepository.GetClientSeasonEventByOrderReferenceAsync(orderReference);
+        }
+
+        public async Task<OrderRenewalInfoResponse?> GetOrderRenawalInfoByReferenceAsync(string referenceId)
+        {
+            Order? order = await _orderRepository
+                                    .Get()
+                                    .Include(x => x.Items)
+                                    .Include(x => x.Client)
+                                        .ThenInclude(c => c.PhoneRegionCode)
+                                    .AsNoTracking()
+                                    .Where(o => o.Reference.Trim().ToLower() == referenceId.Trim().ToLower())
+                                    .SingleOrDefaultAsync();
+
+            if (order == null)
+            {
+                return null;
+            }
+
+            if (order.OrderType == Enums.OrderType.SeasonPass)
+            {
+                Season? latestSeason = await _seasonRepository
+                                                .Get()
+                                                .Where(s => s.DeletedAt == null)
+                                                .AsNoTracking()
+                                                .OrderByDescending(s => s.StartDate)
+                                                .FirstOrDefaultAsync();
+
+                if (latestSeason == null)
+                {
+                    return null;
+                }
+
+                List<string> seatsSold = await GetSeatsSoldInSeasonAsync(latestSeason.Id);
+
+                return await GetSeasonOrderRenewalInfoAsync(order, latestSeason, seatsSold);
+            }
+
+            return await GetOrderRenewalInfo(order);
         }
 
         private async Task<Client> CreateClientAsync(ClientInfoRequest clientInfo)
@@ -350,6 +393,108 @@ namespace Odasoft.XBOL.Business.Services
             };
 
             await _clientCreditTransactionService.CreateCreditTransactionByCreditAccountIdAsync(client.ClientCreditAccount.Id, transaction);
+        }
+
+        private async Task<List<string>> GetSeatsSoldInSeasonAsync(long seasonId)
+        {
+            return await _seasonPassRepository
+                            .Get()
+                            .AsNoTracking()
+                            .Where(sp => sp.SeasonId == seasonId)
+                            .Select(sp => sp.TrackingCode)
+                            .ToListAsync();
+        }
+
+        private async Task<OrderRenewalInfoResponse?> GetSeasonOrderRenewalInfoAsync(Order order, Season latestSeason, List<string> seatsSold)
+        {
+            List<long> seasonPassIds = order.Items.Select(oi => oi.ItemReferenceId).ToList();
+
+            List<SeasonPass> seasonPasses = await _seasonPassRepository
+                                                    .Get()
+                                                    .Include(sp => sp.Season)
+                                                    .Include(sp => sp.BaseSeat)
+                                                        .ThenInclude(bs => bs.BaseRow)
+                                                        .ThenInclude(br => br.BaseSection)
+                                                        .ThenInclude(s => s.BaseZone)
+                                                    .AsNoTracking()
+                                                    .Where(sp => seasonPassIds.Contains(sp.Id))
+                                                    .ToListAsync();
+
+            List<OrderItemResponse> orderItems = order.Items.Select(oi => new OrderItemResponse
+            {
+                Id = oi.Id,
+                IsSeasonItem = oi.ItemType == Enums.ItemType.SeasonPass,
+                SeatObjectKey = seasonPasses.Where(t => t.Id == oi.ItemReferenceId).FirstOrDefault()?.TrackingCode ?? "",
+                Zone = seasonPasses.Where(t => t.Id == oi.ItemReferenceId).FirstOrDefault()?.BaseSeat?.BaseRow.BaseSection.BaseZone.Name ?? "",
+                Section = seasonPasses.Where(t => t.Id == oi.ItemReferenceId).FirstOrDefault()?.BaseSeat?.BaseRow.BaseSection.Name ?? "",
+                Row = seasonPasses.Where(t => t.Id == oi.ItemReferenceId).FirstOrDefault()?.BaseSeat?.BaseRow.RowLabel ?? "",
+                Seat = seasonPasses.Where(t => t.Id == oi.ItemReferenceId).FirstOrDefault()?.BaseSeat?.SeatNumber ?? "",
+                IsSold = seatsSold.Contains(seasonPasses.Where(t => t.Id == oi.ItemReferenceId).FirstOrDefault()?.TrackingCode ?? "")
+            }).ToList();
+
+            return new OrderRenewalInfoResponse
+            {
+                OrderId = order.Id,
+                CurrentSeasonId = latestSeason.Id,
+                OrderSeasonId = seasonPasses.FirstOrDefault()?.SeasonId,
+                IsSeasonOrder = order.OrderType == Enums.OrderType.SeasonPass,
+                Items = orderItems,
+                Event = seasonPasses.FirstOrDefault()?.Season.Name ?? "",
+                ClientId = order.ClientId ?? 0,
+                ClientName = order.Client?.FullName ?? "",
+                PhoneRegionCodeId = order.Client?.PhoneRegionCodeId ?? 0,
+                DialCode = order.Client?.PhoneRegionCode?.DialCode ?? "",
+                PhoneNumber = order.Client?.PhoneNumber ?? "",
+                Email = order.Client?.Email ?? "",
+                Neighbourhood = order.Client?.Neighborhood ?? "",
+                City = order.Client?.City ?? ""
+            };
+        }
+
+        private async Task<OrderRenewalInfoResponse?> GetOrderRenewalInfo(Order order)
+        {
+            List<long> ticketIds = order.Items.Select(oi => oi.ItemReferenceId).ToList();
+
+            List<Ticket> tickets = await _ticketRepository
+                                            .Get()
+                                            .Include(t => t.EventSchedule)
+                                                .ThenInclude(tes => tes.Event)
+                                            .Include(t => t.EventSection)
+                                                .ThenInclude(es => es.BaseSection)
+                                                .ThenInclude(bs => bs.BaseZone)
+                                            .Include(t => t.EventSeat)
+                                                .ThenInclude(es => es.BaseSeat)
+                                                .ThenInclude(s => s.BaseRow)
+                                            .AsNoTracking()
+                                            .Where(t => ticketIds.Contains(t.Id))
+                                            .ToListAsync();
+
+            List<OrderItemResponse> orderItems = order.Items.Select(oi => new OrderItemResponse
+            {
+                Id = oi.Id,
+                IsSeasonItem = oi.ItemType == Enums.ItemType.SeasonPass,
+                SeatObjectKey = tickets.Where(t => t.Id == oi.ItemReferenceId).FirstOrDefault()?.TicketCode ?? "",
+                Zone = tickets.Where(t => t.Id == oi.ItemReferenceId).FirstOrDefault()?.EventSection.BaseSection.BaseZone.Name ?? "",
+                Section = tickets.Where(t => t.Id == oi.ItemReferenceId).FirstOrDefault()?.EventSection.BaseSection.Name ?? "",
+                Row = tickets.Where(t => t.Id == oi.ItemReferenceId).FirstOrDefault()?.EventSeat.BaseSeat.BaseRow.RowLabel ?? "",
+                Seat = tickets.Where(t => t.Id == oi.ItemReferenceId).FirstOrDefault()?.EventSeat.BaseSeat.SeatNumber ?? "",
+                IsSold = true
+            }).ToList();
+
+            return new OrderRenewalInfoResponse
+            {
+                OrderId = order.Id,
+                IsSeasonOrder = order.OrderType == Enums.OrderType.SeasonPass,
+                Items = orderItems,
+                Event = tickets.FirstOrDefault()?.EventSchedule.Event.Name ?? "",
+                ClientId = order.ClientId ?? 0,
+                ClientName = order.Client?.FullName ?? "",
+                PhoneRegionCodeId = order.Client?.PhoneRegionCodeId ?? 0,
+                DialCode = order.Client?.PhoneRegionCode?.DialCode ?? "",
+                PhoneNumber = order.Client?.PhoneNumber ?? "",
+                Email = order.Client?.Email ?? "",
+                Neighbourhood = order.Client?.Neighborhood ?? ""
+            };
         }
     }
 }

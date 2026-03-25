@@ -1,16 +1,12 @@
-using Odasoft.XBOL.Business.Extensions;
-using Odasoft.XBOL.Data.Extensions;
 using Odasoft.XBOL.WorkerService.Extensions;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-// Infrastructure
+// Infrastructure (SMTP, Hangfire, etc.)
 builder.Services.ConfigureOptions(builder.Configuration);
-builder.Services.ConfigureDatabase(builder.Configuration);
 
-// Application
-builder.Services.ConfigureRepositories();
-builder.Services.ConfigureServices();
+// Email & Templating
+builder.Services.ConfigureEmail();
 
 // Worker
 builder.Services.ConfigureBackgroundJobs(builder.Configuration);

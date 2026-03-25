@@ -1,6 +1,6 @@
 #!/bin/bash
 
-.PHONY: help run stop restart build logs health shell
+.PHONY: help run stop restart build logs health shell dev dev-stop
 
 DOCKER_BE = xbol-api-admin
 UID = $(shell id -u)
@@ -60,3 +60,9 @@ health: ## Check API health endpoint
 
 shell: ## ssh's into the be container
 	U_ID=${UID} ${CONTAINER_RUNTIME} exec -it --user ${UID} ${DOCKER_BE} bash
+
+dev: ## Start development services (smtp4dev)
+	${COMPOSE_CMD} -f docker-compose.dev.yml up -d
+
+dev-stop: ## Stop development services
+	${COMPOSE_CMD} -f docker-compose.dev.yml stop

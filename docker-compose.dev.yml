@@ -1,0 +1,10 @@
+# Development-only services (not deployed to production)
+# Usage: docker compose -f docker-compose.dev.yml up -d
+services:
+  smtp4dev:
+    image: rnwood/smtp4dev:latest
+    container_name: xbol-smtp4dev
+    ports:
+      - "2525:25"   # SMTP
+      - "8025:80"   # Web UI
+    restart: unless-stopped

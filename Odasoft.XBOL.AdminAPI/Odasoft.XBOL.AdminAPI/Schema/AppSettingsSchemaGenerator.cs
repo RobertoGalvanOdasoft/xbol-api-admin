@@ -86,5 +86,8 @@ public static class AppSettingsSchemaGenerator
 
         [Description("Background job processing (Hangfire) settings")]
         public BackgroundJobsOptions? BackgroundJobs { get; set; }
+
+        [Description("SMTP email delivery settings")]
+        public SmtpOptions? Smtp { get; set; }
     }
 }

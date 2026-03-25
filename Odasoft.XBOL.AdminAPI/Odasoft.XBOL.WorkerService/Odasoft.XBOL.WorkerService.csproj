@@ -15,8 +15,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Odasoft.XBOL.Business\Odasoft.XBOL.Business.csproj" />
     <ProjectReference Include="..\Odasoft.XBOL.Commons\Odasoft.XBOL.Commons.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Templates\**\*.liquid">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

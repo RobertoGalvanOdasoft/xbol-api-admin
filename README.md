@@ -11,24 +11,39 @@ This refers to development using Visual Studio 2026 on Windows, or using the .NE
 - [Visual Studio 2026](https://visualstudio.microsoft.com/insiders/) (Windows)
 - [.NET 10.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) (Linux)
 - PostgreSQL
+- [Docker](https://www.docker.com/) or [Podman](https://podman.io/) (for development services)
 
 ### Quick Start
 
-In Visual Studio, press `F5` or the play button. For the command-line interface:
+In Visual Studio, set **Odasoft.XBOL.AdminAPI** and **Odasoft.XBOL.WorkerService** as Startup Projects and press `F5`.
 
-```powershell
+For the command-line interface:
+
+**Start the Admin API:**
+
+```bash
 dotnet watch --project Odasoft.XBOL.AdminAPI/Odasoft.XBOL.AdminAPI
+```
+
+**Start the Worker Service (in a separate terminal):**
+
+```bash
+dotnet run --project Odasoft.XBOL.AdminAPI/Odasoft.XBOL.WorkerService --launch-profile "Odasoft.XBOL.WorkerService"
+```
+
+### Build & Compilation
+
+To build the entire solution (API, Worker, and shared libraries):
+
+```bash
+dotnet build Odasoft.XBOL.AdminAPI/Odasoft.XBOL.AdminAPI.slnx
 ```
 
 ### Configuration
 
-Application settings are strongly typed via Options classes in `Odasoft.XBOL.AdminAPI/Options/`. All options are validated at startup using `DataAnnotations` and `ValidateOnStart()`.
+Edit `appsettings.Development.json` for local settings (connection strings, service URLs, etc.). Settings cascade: `appsettings.json` → `appsettings.{Environment}.json` → environment variables. All settings are validated at startup.
 
-A JSON Schema (`appsettings.schema.json`) is auto-generated on Debug builds for IDE autocomplete. To regenerate manually:
-
-```bash
-dotnet run --project Odasoft.XBOL.AdminAPI/Odasoft.XBOL.AdminAPI -- --generate-schema
-```
+IDE autocomplete is provided by `appsettings.schema.json`, which regenerates automatically on Debug builds.
 
 ## Deployment
 

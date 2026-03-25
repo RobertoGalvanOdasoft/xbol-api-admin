@@ -22,7 +22,7 @@ public class SuiteRequestValidator : AbstractValidator<ISuiteRequest>
             .GreaterThan(0)
             .WithMessage(string.Format(localizer["The {0} field must be greater than {1}."], localizer["SuiteLevelId"], 0));
 
-        RuleFor(x => x.Seats)
+        RuleFor(x => x.Capacity)
             .GreaterThan(0)
             .WithMessage(string.Format(localizer["The {0} field must be greater than {1}."], localizer["Seats"], 0));
     }

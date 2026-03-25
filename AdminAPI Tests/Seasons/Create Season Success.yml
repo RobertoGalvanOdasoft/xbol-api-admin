@@ -1,0 +1,51 @@
+info:
+  name: Create Season Success
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/seasons"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Test Season OC",
+        "code": "TST-OC",
+        "startDate": "2026-04-01T00:00:00Z",
+        "endDate": "2026-09-30T00:00:00Z"
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("returns 201", () => {
+          expect(res.status).to.equal(201);
+        });
+        test("content-type is application/json", () => {
+          expect(res.headers["content-type"]).to.contain("application/json");
+        });
+        test("response body has id", () => {
+          expect(res.body.id).to.be.a("number");
+        });
+        test("response body has name", () => {
+          expect(res.body.name).to.equal("Test Season OC");
+        });
+        test("response body has code", () => {
+          expect(res.body.code).to.equal("TST-OC");
+        });
+        test("response body has status", () => {
+          expect(res.body.status).to.be.a("string");
+        });
+
+        bru.setVar("createdSeasonId", res.body.id);
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

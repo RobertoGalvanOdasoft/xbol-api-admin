@@ -36,8 +36,9 @@ namespace Odasoft.XBOL.Data.Extensions
             services.AddScoped<SuiteRepository>();
             services.AddScoped<TicketRepository>();
             services.AddScoped<UserRepository>();
-            services.AddScoped<VenueRepository>();
+            services.AddScoped<VenueImageRepository>();
             services.AddScoped<VenueMapRepository>();
+            services.AddScoped<VenueRepository>();
 
             return services;
         }

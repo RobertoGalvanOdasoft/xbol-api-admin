@@ -1,0 +1,50 @@
+info:
+  name: Create Suite Success
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/suites"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Test Suite OC",
+        "suiteLevelId": 1,
+        "seats": 10
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("returns 201", () => {
+          expect(res.status).to.equal(201);
+        });
+        test("content-type is application/json", () => {
+          expect(res.headers["content-type"]).to.contain("application/json");
+        });
+        test("response body has id", () => {
+          expect(res.body.id).to.be.a("number");
+        });
+        test("response body has name", () => {
+          expect(res.body.name).to.equal("Test Suite OC");
+        });
+        test("response body has seats", () => {
+          expect(res.body.seats).to.equal(10);
+        });
+        test("response body has suiteLevelId", () => {
+          expect(res.body.suiteLevelId).to.equal(1);
+        });
+
+        bru.setVar("createdSuiteId", res.body.id);
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,33 @@
+info:
+  name: Update Suite Success
+  type: http
+  seq: 3
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/api/suites/{{createdSuiteId}}"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Updated Suite OC",
+        "suiteLevelId": 1,
+        "seats": 20
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("returns 204", () => {
+          expect(res.status).to.equal(204);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

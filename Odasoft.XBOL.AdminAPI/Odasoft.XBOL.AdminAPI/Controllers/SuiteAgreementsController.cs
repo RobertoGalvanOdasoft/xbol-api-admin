@@ -58,7 +58,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// Creates a new Suite Agreement using the specified request data.
         /// </summary>
         /// <param name="request">The details of the Suite Agreement to create. Cannot be null.</param>
-        /// <returns>A 201 Created result if the Suite Agreement is successfully created; otherwise, a 422 Unprocessable Entity
+        /// <returns>A 200 Created result if the Suite Agreement is successfully created; otherwise, a 422 Unprocessable Entity
         /// result with an error message.</returns>
         [HttpPost]
         [EndpointName("CreateSuiteAgreementAsync")]

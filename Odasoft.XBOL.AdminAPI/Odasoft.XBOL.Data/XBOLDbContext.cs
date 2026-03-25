@@ -38,6 +38,7 @@ namespace Odasoft.XBOL.Data
         public DbSet<LegalRepresentative> LegalRepresentatives => Set<LegalRepresentative>();
         public DbSet<SequenceTracker> SequenceTrackers => Set<SequenceTracker>();
         public DbSet<PhoneRegionCode> PhoneRegionCodes => Set<PhoneRegionCode>();
+        public DbSet<VenueImage> VenueImages => Set<VenueImage>();
 
         public XBOLDbContext() : base()
         {

@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Options;
-using Odasoft.XBOL.Commons.Options;
 using Odasoft.XBOL.Business;
+using Odasoft.XBOL.Commons.Options;
 
 namespace Odasoft.XBOL.AdminAPI.Extensions;
 

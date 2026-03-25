@@ -3,9 +3,10 @@ using System.Text.Json.Serialization;
 namespace Odasoft.XBOL.Commons.Enums
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum MapType
+    public enum VenueStatus
     {
-        Seating,
-        GeneralAdmission
+        Draft,
+        Active,
+        Inactive
     }
 }

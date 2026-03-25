@@ -99,10 +99,10 @@ namespace Odasoft.XBOL.Business.Services
                     PhoneNumber = PhoneNumberHelper.NormalizePhoneNumber(request.PhoneNumber),
                     StartDate = request.StartDate.ToUniversalTime(),
                     EndDate = request.EndDate.ToUniversalTime(),
+                    CreatedAt = DateTimeOffset.UtcNow.ToUniversalTime(),
                     CreatedBy = Guid.Empty,
-                    UpdatedBy = Guid.Empty,
-                    CreatedAt = DateTimeOffset.Now.ToUniversalTime(),
-                    UpdatedAt = DateTimeOffset.Now.ToUniversalTime()
+                    UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime(),
+                    UpdatedBy = Guid.Empty
                 };
 
                 await _suiteAgreementRepository.InsertAsync(suiteAgreement);
@@ -135,7 +135,7 @@ namespace Odasoft.XBOL.Business.Services
                 suiteAgreement.PhoneNumber = PhoneNumberHelper.NormalizePhoneNumber(request.PhoneNumber);
                 suiteAgreement.StartDate = request.StartDate.ToUniversalTime();
                 suiteAgreement.EndDate = request.EndDate.ToUniversalTime();
-                suiteAgreement.UpdatedAt = DateTimeOffset.Now.ToUniversalTime();
+                suiteAgreement.UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime();
                 suiteAgreement.UpdatedBy = Guid.Empty;
 
                 await _suiteAgreementRepository.UpdateAsync(suiteAgreement);
@@ -221,10 +221,10 @@ namespace Odasoft.XBOL.Business.Services
                         FileName = file.FileName,
                         ContentType = file.ContentType,
                         Content = fileContent,
+                        CreatedAt = DateTimeOffset.UtcNow.ToUniversalTime(),
                         CreatedBy = Guid.Empty,
-                        UpdatedBy = Guid.Empty,
-                        CreatedAt = DateTimeOffset.Now.ToUniversalTime(),
-                        UpdatedAt = DateTimeOffset.Now.ToUniversalTime()
+                        UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime(),
+                        UpdatedBy = Guid.Empty
                     };
 
                     await _suiteAgreementFileRepository.InsertAsync(suiteAgreementFile);

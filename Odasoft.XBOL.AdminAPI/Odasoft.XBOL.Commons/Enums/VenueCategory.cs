@@ -16,6 +16,15 @@ namespace Odasoft.XBOL.Commons.Enums
         Theater,
 
         [Description("Club")]
-        Club
+        Club,
+
+        [Description("ConventionCenter")]
+        ConventionCenter,
+
+        [Description("Hotel")]
+        Hotel,
+
+        [Description("Explanade")]
+        Explanade
     }
 }

@@ -1,11 +1,13 @@
+using Ganss.Xss;
 using Microsoft.EntityFrameworkCore;
+using Odasoft.XBOL.Business.Extensions;
 using Odasoft.XBOL.Commons.Constants;
 using Odasoft.XBOL.Data.Repositories;
 using Odasoft.XBOL.DTO;
 using Odasoft.XBOL.DTO.QueryParams;
 using Odasoft.XBOL.DTO.Requests;
 using Odasoft.XBOL.DTO.Response;
-using Odasoft.XBOL.DTO.Results;
+using Odasoft.XBOL.DTO.Responses;
 using Odasoft.XBOL.Models;
 
 namespace Odasoft.XBOL.Business.Services
@@ -19,40 +21,32 @@ namespace Odasoft.XBOL.Business.Services
             _suiteRepository = suiteRepository;
         }
 
-        public async Task<PagedResponse<SuiteResult>> GetSuitesAsync(SuitesQueryParams queryParams)
+        public async Task<PagedResponse<SuiteResponse>> GetSuitesAsync(SuitesQueryParams queryParams)
         {
             var query = _suiteRepository.Get()
                             .AsNoTracking()
-                            .Select(s => new SuiteResult
+                            .Select(s => new SuiteResponse
                             {
                                 Id = s.Id,
+                                VenueId = s.SuiteLevel.VenueId,
+                                VenueName = s.SuiteLevel.Venue.Name,
                                 SuiteLevelId = s.SuiteLevelId,
                                 SuiteLevelName = s.SuiteLevel.Name,
                                 Name = s.Name,
-                                Seats = s.Seats
+                                SuiteType = s.SuiteType,
+                                Capacity = s.Capacity,
+                                Policies = s.Policies,
+                                Amenities = s.Amenities
                             });
 
             SetSuiteLevelsFilter(ref query, queryParams.Levels);
             SetSearchTermFilter(ref query, queryParams.SearchTerm);
             SetOrder(ref query, queryParams.SortBy, queryParams.Descending);
 
-            List<SuiteResult> suites = await query.ToListAsync();
-
-            int totalCount = suites.Count();
-
-            return new PagedResponse<SuiteResult>
-            {
-                Items = suites
-                        .Skip(queryParams.Page * queryParams.PageSize)
-                        .Take(queryParams.PageSize)
-                        .ToList(),
-                TotalCount = totalCount,
-                Page = queryParams.Page,
-                PageSize = queryParams.PageSize
-            };
+            return await query.ToPagedResponseAsync(queryParams.Page, queryParams.PageSize);
         }
 
-        public async Task<SuiteResult?> GetSuiteByIdAsync(long suiteId)
+        public async Task<SuiteResponse?> GetSuiteByIdAsync(long suiteId)
         {
             Suite? suite = await _suiteRepository.GetByIdAsync(suiteId);
 
@@ -61,25 +55,36 @@ namespace Odasoft.XBOL.Business.Services
                 return null;
             }
 
-            return new SuiteResult
+            return new SuiteResponse
             {
                 Id = suite.Id,
+                VenueId = suite.SuiteLevel.VenueId,
+                VenueName = suite.SuiteLevel.Venue.Name,
                 SuiteLevelId = suite.SuiteLevelId,
+                SuiteLevelName = suite.SuiteLevel.Name,
                 Name = suite.Name,
-                Seats = suite.Seats
+                SuiteType = suite.SuiteType,
+                Capacity = suite.Capacity,
+                Policies = suite.Policies,
+                Amenities = suite.Amenities
             };
         }
 
-        public async Task<bool> CreateSuiteAsync(CreateSuiteRequest request)
+        public async Task<long> CreateSuiteAsync(SuiteRequest request)
         {
+            var sanitizer = new HtmlSanitizer();
+
             var newSuite = new Suite
             {
                 SuiteLevelId = request.SuiteLevelId,
                 Name = request.Name,
-                Seats = request.Seats,
+                SuiteType = request.SuiteType,
+                Capacity = request.Capacity,
+                Policies = sanitizer.Sanitize(request.Policies),
+                Amenities = sanitizer.Sanitize(request.Amenities),
                 CreatedAt = DateTimeOffset.UtcNow.ToUniversalTime(),
-                UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime(),
                 CreatedBy = Guid.Empty,
+                UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime(),
                 UpdatedBy = Guid.Empty
             };
 
@@ -92,26 +97,31 @@ namespace Odasoft.XBOL.Business.Services
             {
                 // TODO: Implement proper logging
                 Console.WriteLine($"Error creating Suite: {ex.Message}");
-                return false;
+                return 0;
             }
 
-            return true;
+            return newSuite.Id;
         }
 
-        public async Task<bool> UpdateSuiteAsync(UpdateSuiteRequest request)
+        public async Task<bool> UpdateSuiteAsync(long suiteId, SuiteRequest request)
         {
-            Suite? existingSuite = await _suiteRepository.GetByIdAsync(request.Id);
+            Suite? existingSuite = await _suiteRepository.GetByIdAsync(suiteId);
 
             if (existingSuite == null)
             {
                 // TODO: Implement proper error handling
-                Console.WriteLine($"Suite with ID {request.Id} not found.");
+                Console.WriteLine($"Suite with ID {suiteId} not found.");
                 return false;
             }
 
+            var sanitizer = new HtmlSanitizer();
+
             existingSuite.Name = request.Name;
             existingSuite.SuiteLevelId = request.SuiteLevelId;
-            existingSuite.Seats = request.Seats;
+            existingSuite.SuiteType = request.SuiteType;
+            existingSuite.Capacity = request.Capacity;
+            existingSuite.Policies = sanitizer.Sanitize(request.Policies);
+            existingSuite.Amenities = sanitizer.Sanitize(request.Amenities);
             existingSuite.UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime();
             existingSuite.UpdatedBy = Guid.Empty;
 
@@ -156,7 +166,7 @@ namespace Odasoft.XBOL.Business.Services
             return true;
         }
 
-        public async Task<IList<ListItem>> GetSuiteCatalogBySuiteLevelIdAsync(long suiteLevelId)
+        public async Task<List<ListItem>> GetSuiteCatalogBySuiteLevelIdAsync(long suiteLevelId)
         {
             return await _suiteRepository.Get()
                             .AsNoTracking()
@@ -168,7 +178,7 @@ namespace Odasoft.XBOL.Business.Services
                             }).ToListAsync();
         }
 
-        private void SetSuiteLevelsFilter(ref IQueryable<SuiteResult> query, string levels)
+        private void SetSuiteLevelsFilter(ref IQueryable<SuiteResponse> query, string levels)
         {
             List<string> suiteLevels = string.IsNullOrWhiteSpace(levels)
                                 ? []
@@ -183,17 +193,19 @@ namespace Odasoft.XBOL.Business.Services
             }
         }
 
-        private void SetSearchTermFilter(ref IQueryable<SuiteResult> query, string searchTerm)
+        private void SetSearchTermFilter(ref IQueryable<SuiteResponse> query, string searchTerm)
         {
-            if (string.IsNullOrWhiteSpace(searchTerm) == false)
+            if (string.IsNullOrWhiteSpace(searchTerm))
             {
-                var lowerSearchTerm = searchTerm.ToLower();
-                query = query.Where(x => x.Name.ToLower().Contains(lowerSearchTerm)
-                            || x.SuiteLevelName.ToLower().Contains(lowerSearchTerm));
+                return;
             }
+
+            var lowerSearchTerm = searchTerm.ToLower();
+            query = query.Where(x => x.Name.ToLower().Contains(lowerSearchTerm)
+                        || x.SuiteLevelName.ToLower().Contains(lowerSearchTerm));
         }
 
-        private void SetOrder(ref IQueryable<SuiteResult> query, string sortBy, bool descending)
+        private void SetOrder(ref IQueryable<SuiteResponse> query, string sortBy, bool descending)
         {
             if (string.IsNullOrWhiteSpace(sortBy))
             {

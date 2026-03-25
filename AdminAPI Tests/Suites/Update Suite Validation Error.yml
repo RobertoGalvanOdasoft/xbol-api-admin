@@ -5,7 +5,7 @@ info:
 
 http:
   method: PUT
-  url: "{{baseUrl}}/api/suites"
+  url: "{{baseUrl}}/api/suites/{{createdSuiteId}}"
   headers:
     - name: Content-Type
       value: application/json
@@ -15,7 +15,6 @@ http:
     type: json
     data: |-
       {
-        "id": 0,
         "name": "",
         "suiteLevelId": 0,
         "seats": 0
@@ -33,9 +32,6 @@ runtime:
         });
         test("is ValidationProblemDetails with errors object", () => {
           expect(res.body.errors).to.be.an("object");
-        });
-        test("has Id validation error", () => {
-          expect(res.body.errors.Id).to.be.an("array");
         });
         test("has Name validation error", () => {
           expect(res.body.errors.Name).to.be.an("array");

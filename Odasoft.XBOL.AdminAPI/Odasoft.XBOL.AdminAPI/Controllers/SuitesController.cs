@@ -4,7 +4,7 @@ using Odasoft.XBOL.DTO;
 using Odasoft.XBOL.DTO.QueryParams;
 using Odasoft.XBOL.DTO.Requests;
 using Odasoft.XBOL.DTO.Response;
-using Odasoft.XBOL.DTO.Results;
+using Odasoft.XBOL.DTO.Responses;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
 {
@@ -26,8 +26,8 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// list if no suites are available.</returns>
         [HttpGet]
         [EndpointName("GetSuitesAsync")]
-        [ProducesResponseType(typeof(PagedResponse<SuiteResult>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<PagedResponse<SuiteResult>>> GetSuitesAsync([FromQuery] SuitesQueryParams queryParams)
+        [ProducesResponseType(typeof(PagedResponse<SuiteResponse>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PagedResponse<SuiteResponse>>> GetSuitesAsync([FromQuery] SuitesQueryParams queryParams)
         {
             var result = await _suiteService.GetSuitesAsync(queryParams);
 
@@ -43,9 +43,9 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         [HttpGet]
         [Route("{suiteId:long}")]
         [EndpointName("GetSuiteByIdAsync")]
-        [ProducesResponseType(typeof(SuiteResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(SuiteResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<SuiteResult>> GetSuiteByIdAsync([FromRoute] long suiteId)
+        public async Task<ActionResult<SuiteResponse>> GetSuiteByIdAsync([FromRoute] long suiteId)
         {
             var result = await _suiteService.GetSuiteByIdAsync(suiteId);
 
@@ -65,16 +65,16 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// otherwise, <see langword="false"/>. Returns a 400 Bad Request response if the request data is invalid.</returns>
         [HttpPost]
         [EndpointName("CreateSuiteAsync")]
-        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(long), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
-        public async Task<ActionResult<bool>> CreateSuiteAsync([FromBody] CreateSuiteRequest request)
+        public async Task<ActionResult<long>> CreateSuiteAsync([FromBody] SuiteRequest request)
         {
-            var result = await _suiteService.CreateSuiteAsync(request);
+            var newId = await _suiteService.CreateSuiteAsync(request);
 
-            if (result)
+            if (newId > 0)
             {
-                return Ok(result);
+                return CreatedAtAction("GetSuiteById", new { suiteId = newId }, newId);
             }
 
             return UnprocessableEntity("Unable to create Suite");
@@ -83,22 +83,23 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// <summary>
         /// Updates an existing suite with the specified details.
         /// </summary>
+        /// <param name="suiteId">The unique Id of the Suite.</param>
         /// <param name="request">The request object containing the updated suite information. Must not be null and must satisfy all
         /// validation requirements.</param>
         /// <returns>An ActionResult containing <see langword="true"/> if the suite was updated successfully;
         /// otherwise, <see langword="false"/>.</returns>
-        [HttpPut]
+        [HttpPut("{suiteId:long}")]
         [EndpointName("UpdateSuiteAsync")]
-        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
-        public async Task<ActionResult<bool>> UpdateSuiteAsync([FromBody] UpdateSuiteRequest request)
+        public async Task<ActionResult> UpdateSuiteAsync([FromRoute] long suiteId, [FromBody] SuiteRequest request)
         {
-            var result = await _suiteService.UpdateSuiteAsync(request);
+            var result = await _suiteService.UpdateSuiteAsync(suiteId, request);
 
             if (result)
             {
-                return Ok(result);
+                return NoContent();
             }
 
             return UnprocessableEntity("Unable to update Suite");
@@ -112,15 +113,15 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// otherwise, <see langword="false"/>.</returns>
         [HttpDelete("{suiteId:long}")]
         [EndpointName("DeleteSuiteAsync")]
-        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
-        public async Task<ActionResult<bool>> DeleteSuiteAsync([FromRoute] long suiteId)
+        public async Task<ActionResult> DeleteSuiteAsync([FromRoute] long suiteId)
         {
             var result = await _suiteService.DeleteSuiteAsync(suiteId);
 
             if (result)
             {
-                return Ok(result);
+                return NoContent();
             }
 
             return UnprocessableEntity("Unable to delete Suite");
@@ -136,7 +137,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         [HttpGet("{suiteLevelId:long}/catalog")]
         [EndpointName("GetSuiteCatalogBySuiteLevelIdAsync")]
         [ProducesResponseType(typeof(List<ListItem>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<ICollection<ListItem>>> GetSuiteCatalogBySuiteLevelIdAsync([FromRoute] long suiteLevelId)
+        public async Task<ActionResult<List<ListItem>>> GetSuiteCatalogBySuiteLevelIdAsync([FromRoute] long suiteLevelId)
         {
             var result = await _suiteService.GetSuiteCatalogBySuiteLevelIdAsync(suiteLevelId);
             return Ok(result);

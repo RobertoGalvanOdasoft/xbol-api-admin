@@ -1,8 +1,8 @@
+using Odasoft.XBOL.Commons.Options;
 using System.ComponentModel;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Schema;
-using Odasoft.XBOL.Commons.Options;
 
 namespace Odasoft.XBOL.AdminAPI.Schema;
 
@@ -25,7 +25,9 @@ public static class AppSettingsSchemaGenerator
                     .FirstOrDefault()?.Description;
 
                 if (description is not null)
+                {
                     node["description"] = description;
+                }
 
                 var defaultValue = context.PropertyInfo?.AttributeProvider
                     ?.GetCustomAttributes(typeof(DefaultValueAttribute), false)
@@ -33,7 +35,9 @@ public static class AppSettingsSchemaGenerator
                     .FirstOrDefault()?.Value;
 
                 if (defaultValue is not null)
+                {
                     node["default"] = JsonSerializer.SerializeToNode(defaultValue);
+                }
 
                 return node;
             }

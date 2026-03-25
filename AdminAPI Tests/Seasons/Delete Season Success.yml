@@ -1,0 +1,22 @@
+info:
+  name: Delete Season Success
+  type: http
+  seq: 4
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/api/seasons/{{createdSeasonId}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("returns 204", () => {
+          expect(res.status).to.equal(204);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

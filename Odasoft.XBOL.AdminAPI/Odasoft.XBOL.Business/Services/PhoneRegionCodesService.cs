@@ -18,6 +18,7 @@ namespace Odasoft.XBOL.Business.Services
             var result = await _phoneRegionCodeRepository
                                     .Get()
                                     .AsNoTracking()
+                                    .Where(x => (x.DialCode == "1" || x.DialCode == "52"))
                                     .Select(c => new PhoneRegionCodeResponse
                                     {
                                         Id = c.Id,

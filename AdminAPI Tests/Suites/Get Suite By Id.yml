@@ -1,0 +1,34 @@
+info:
+  name: Get Suite By Id
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/suites/{{createdSuiteId}}"
+  headers:
+    - name: Content-Type
+      value: application/json
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("returns 200", () => {
+          expect(res.status).to.equal(200);
+        });
+        test("content-type is application/json", () => {
+          expect(res.headers["content-type"]).to.contain("application/json");
+        });
+        test("response body has correct id", () => {
+          expect(res.body.id).to.equal(Number(bru.getVar("createdSuiteId")));
+        });
+        test("response body has name", () => {
+          expect(res.body.name).to.equal("Test Suite OC");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

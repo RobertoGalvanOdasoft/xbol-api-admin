@@ -8,6 +8,9 @@ namespace Odasoft.XBOL.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Suite> builder)
         {
+            builder.Property(s => s.Policies).HasColumnType("text");
+            builder.Property(s => s.Amenities).HasColumnType("text");
+
             builder.HasMany(s => s.SuiteAgreements)
                    .WithOne(sa => sa.Suite)
                    .HasForeignKey(sa => sa.SuiteId);

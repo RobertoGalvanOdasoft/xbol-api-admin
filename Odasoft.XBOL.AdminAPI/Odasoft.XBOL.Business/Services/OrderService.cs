@@ -1,6 +1,10 @@
+using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Localization;
+using Odasoft.XBOL.Commons.Email;
 using Odasoft.XBOL.Commons.Helpers;
+using Odasoft.XBOL.Commons.Requests;
 using Odasoft.XBOL.Commons.Requests.Filters;
 using Odasoft.XBOL.Commons.Responses;
 using Odasoft.XBOL.Data.Repositories;
@@ -28,6 +32,7 @@ namespace Odasoft.XBOL.Business.Services
 
         private readonly ClientCreditTransactionService _clientCreditTransactionService;
         private readonly SequenceTrackerService _sequenceTrackerService;
+        private readonly IStringLocalizer<EmailResource> _emailLocalizer;
 
         private const string EVENT_ORDER_LOCALIZER_PREFIX = "ORD-E";
         private const string SEASON_ORDER_LOCALIZER_PREFIX = "ORD-S";
@@ -41,7 +46,8 @@ namespace Odasoft.XBOL.Business.Services
             SeasonSeatRepository seasonSeatRepository,
             ClientRepository clientService,
             ClientCreditTransactionService clientCreditTransactionService,
-            SequenceTrackerService sequenceTrackerService)
+            SequenceTrackerService sequenceTrackerService,
+            IStringLocalizer<EmailResource> emailLocalizer)
         {
             _orderRepository = orderRepository;
             _eventScheduleRepository = eventScheduleRepository;
@@ -54,6 +60,7 @@ namespace Odasoft.XBOL.Business.Services
 
             _clientCreditTransactionService = clientCreditTransactionService;
             _sequenceTrackerService = sequenceTrackerService;
+            _emailLocalizer = emailLocalizer;
         }
 
         // Move to a SalesService and rename to BookEventAsync or something like that, also we need to consider the flow for the payment,
@@ -269,6 +276,79 @@ namespace Odasoft.XBOL.Business.Services
             }
 
             return await GetOrderRenewalInfo(order);
+        }
+
+        public async Task<OrderConfirmationModel> BuildOrderConfirmationAsync(long orderId, string toAddress, string toName, string culture = "es-MX")
+        {
+            var cultureInfo = new CultureInfo(culture);
+            CultureInfo.CurrentCulture = cultureInfo;
+            CultureInfo.CurrentUICulture = cultureInfo;
+
+            var order = await _orderRepository.Get(x => x.Id == orderId)
+                .Include(o => o.Items)
+                .FirstOrDefaultAsync()
+                ?? throw new InvalidOperationException($"Order {orderId} not found");
+
+            var ticketIds = order.Items
+                .Where(i => i.ItemType == Enums.ItemType.Ticket)
+                .Select(i => i.ItemReferenceId)
+                .ToList();
+
+            if (ticketIds.Count == 0)
+                throw new InvalidOperationException($"Order {orderId} has no tickets");
+
+            var tickets = await _ticketRepository.Get(t => ticketIds.Contains(t.Id))
+                .Include(t => t.EventSchedule)
+                    .ThenInclude(es => es.Event)
+                        .ThenInclude(e => e.VenueMap)
+                            .ThenInclude(vm => vm.Venue)
+                .Include(t => t.EventSeat)
+                    .ThenInclude(es => es.BaseSeat)
+                        .ThenInclude(bs => bs.BaseRow)
+                .ToListAsync();
+
+            var firstTicket = tickets[0];
+            var schedule = firstTicket.EventSchedule;
+            var @event = schedule.Event;
+            var venue = @event.VenueMap.Venue;
+
+            return new OrderConfirmationModel
+            {
+                ToAddress = toAddress,
+                ToName = toName,
+                Culture = culture,
+                Subject = string.Format(_emailLocalizer["OrderConfirmed_Subject"].Value, order.Reference),
+                EventTitle = @event.Name,
+                EventImageUrl = @event.PosterImageUrl,
+                OrderDetails = new OrderDetailsInfo
+                {
+                    OrderNumber = order.Reference,
+                    Date = schedule.StartDateTime.ToString(_emailLocalizer["DateFormat"].Value, cultureInfo),
+                    Time = schedule.StartDateTime.ToString("h:mm tt", cultureInfo),
+                    Venue = new VenueInfo
+                    {
+                        Name = venue.Name,
+                        Address = $"{venue.AddressLine}, {venue.City}, {venue.State}"
+                    }
+                },
+                Seats = [.. tickets.Select(t => new SeatInfo
+                {
+                    Zone = t.SectionLabelSnapshot,
+                    Row = t.EventSeat.BaseSeat.BaseRow.RowLabel,
+                    Seat = t.EventSeat.BaseSeat.SeatNumber
+                })],
+                GoogleWalletUrl = "#",
+                AppleWalletUrl = "#",
+                EntryInstructions =
+                [
+                    _emailLocalizer["EntryInstruction_1"].Value,
+                    _emailLocalizer["EntryInstruction_2"].Value,
+                    _emailLocalizer["EntryInstruction_3"].Value,
+                    _emailLocalizer["EntryInstruction_4"].Value,
+                ],
+                PromoBannerImageUrl = @event.BannerImageUrl,
+                PromoBannerLinkUrl = @event.LandingUrl
+            };
         }
 
         private async Task<Client> CreateClientAsync(ClientInfoRequest clientInfo)

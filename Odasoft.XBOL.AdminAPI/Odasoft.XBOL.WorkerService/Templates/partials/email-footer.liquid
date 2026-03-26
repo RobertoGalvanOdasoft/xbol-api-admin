@@ -1,0 +1,19 @@
+<!-- EmailFooter : BEGIN -->
+<tr>
+    <td style="padding: 32px 40px; text-align: center; background-color: {{ theme.surface }};" class="footer">
+        <p style="margin: 0 0 8px; font-family: {{ theme.fontFamily }}; font-size: 16px; line-height: 1.5; font-weight: 600; color: {{ theme.secondary }}">
+            {{ 'Footer_NeedHelp' | t }}
+        </p>
+        <p style="margin: 0; font-family: {{ theme.fontFamily }}; font-size: 14px; line-height: 1.5; color: {{ theme.secondary }}">
+            {{ 'Footer_HelpPrefix' | t }}
+            <a href="{{ theme.helpUrl }}" style="color: {{ theme.primary }}; text-decoration: none;"
+                >{{ 'Footer_HelpLink' | t }}</a
+            >
+            {{ 'Footer_ContactPrefix' | t }}
+            <a href="mailto:{{ theme.supportEmail }}" style="color: {{ theme.primary }}; text-decoration: none;">
+                {{- theme.supportEmail -}}
+            </a>
+        </p>
+    </td>
+</tr>
+<!-- EmailFooter : END -->

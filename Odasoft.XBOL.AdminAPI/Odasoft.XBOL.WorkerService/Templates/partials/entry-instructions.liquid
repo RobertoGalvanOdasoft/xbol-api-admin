@@ -1,0 +1,21 @@
+<!-- EntryInstructions : BEGIN -->
+<tr>
+    <td style="padding: 28px 40px; background-color: {{ theme.surface }};">
+        <h3 style="margin: 0 0 16px; font-family: {{ theme.fontFamily }}; font-size: 18px; line-height: 1.35; font-weight: 600; color: {{ theme.secondary }}; text-align: center;">
+            {{ 'EntryInstructions_Title' | t }}
+        </h3>
+        <ul style="padding: 0; margin: 0; list-style-type: disc;">
+            {% for instruction in entryInstructions %}
+                <li
+                    style="margin: 0 0 10px 20px; font-family: {{ theme.fontFamily }}; font-size: 14px; line-height: 1.5; color: {{ theme.secondary }};"
+                    {% if forloop.last %}
+                        class="list-item-last"
+                    {% endif %}
+                >
+                    {{ instruction }}
+                </li>
+            {% endfor %}
+        </ul>
+    </td>
+</tr>
+<!-- EntryInstructions : END -->

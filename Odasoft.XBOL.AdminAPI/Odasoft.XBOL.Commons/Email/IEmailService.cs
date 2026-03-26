@@ -7,5 +7,6 @@ public interface IEmailService
         string toName,
         string subject,
         string htmlBody,
+        IEnumerable<EmailAttachment>? attachments = null,
         CancellationToken cancellationToken = default);
 }

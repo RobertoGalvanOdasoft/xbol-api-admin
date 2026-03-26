@@ -39,6 +39,18 @@ To build the entire solution (API, Worker, and shared libraries):
 dotnet build Odasoft.XBOL.AdminAPI/Odasoft.XBOL.AdminAPI.slnx
 ```
 
+### Email
+
+Start the local SMTP server for email testing:
+
+```bash
+make dev
+```
+
+This runs [smtp4dev](https://github.com/rnwood/smtp4dev) in Docker. View captured emails at <http://localhost:8025>.
+
+To stop: `make dev-stop`
+
 ### Configuration
 
 Edit `appsettings.Development.json` for local settings (connection strings, service URLs, etc.). Settings cascade: `appsettings.json` → `appsettings.{Environment}.json` → environment variables. All settings are validated at startup.
@@ -72,3 +84,16 @@ make run      # Run the Docker Compose environment
 
 - **API Base URL**: <http://localhost:8080>
 - **API Health Check**: <http://localhost:8080/healthz>
+
+#### Email
+
+Configure SendGrid SMTP relay via environment variables:
+
+```
+Smtp__Host=smtp.sendgrid.net
+Smtp__Port=587
+Smtp__Username=apikey
+Smtp__Password=<SendGrid API key>
+Smtp__FromAddress=noreply@yourdomain.com
+Smtp__FromName=XBOL
+```

@@ -1,0 +1,376 @@
+<!doctype html>
+<html
+    lang="{{ 'HtmlLang' | t }}"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:v="urn:schemas-microsoft-com:vml"
+    xmlns:o="urn:schemas-microsoft-com:office:office"
+>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="x-apple-disable-message-reformatting">
+        <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
+        <meta name="color-scheme" content="light">
+        <meta name="supported-color-schemes" content="light">
+        <title>{{ subject }}</title>
+
+        <!--[if gte mso 9]>
+            <xml>
+                <o:OfficeDocumentSettings>
+                    <o:PixelsPerInch>96</o:PixelsPerInch>
+                </o:OfficeDocumentSettings>
+            </xml>
+        <![endif]-->
+
+        <!--[if mso]>
+            <style>
+                * { font-family: Helvetica, Arial, sans-serif !important; }
+            </style>
+        <![endif]-->
+        <!--[if !mso]>
+            <link
+                href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap"
+                rel="stylesheet"
+                type="text/css"
+            >
+        <![endif]-->
+
+        <!-- CSS Reset : BEGIN -->
+        <style>
+            :root {
+                color-scheme: light;
+                supported-color-schemes: light;
+            }
+
+            html,
+            body {
+                margin: 0 auto !important;
+                padding: 0 !important;
+                height: 100% !important;
+                width: 100% !important;
+            }
+
+            * {
+                -ms-text-size-adjust: 100%;
+                -webkit-text-size-adjust: 100%;
+            }
+
+            div[style*='margin: 16px 0'] {
+                margin: 0 !important;
+            }
+
+            #MessageViewBody,
+            #MessageWebViewDiv {
+                width: 100% !important;
+            }
+
+            table,
+            td {
+                mso-table-lspace: 0pt !important;
+                mso-table-rspace: 0pt !important;
+            }
+
+            th {
+                font-weight: normal;
+            }
+
+            table {
+                border-spacing: 0 !important;
+                border-collapse: collapse !important;
+                table-layout: fixed !important;
+                margin: 0 auto !important;
+            }
+
+            a {
+                text-decoration: none;
+            }
+
+            img {
+                -ms-interpolation-mode: bicubic;
+            }
+
+            a[x-apple-data-detectors],
+            .unstyle-auto-detected-links a,
+            .aBn {
+                border-bottom: 0 !important;
+                cursor: default !important;
+                color: inherit !important;
+                text-decoration: none !important;
+                font-size: inherit !important;
+                font-family: inherit !important;
+                font-weight: inherit !important;
+                line-height: inherit !important;
+            }
+
+            .im {
+                color: inherit !important;
+            }
+
+            .a6S {
+                display: none !important;
+                opacity: 0.01 !important;
+            }
+
+            img.g-img + div {
+                display: none !important;
+            }
+
+            @media only screen and (min-device-width: 320px) and (max-device-width: 374px) {
+                u ~ div .email-container {
+                    min-width: 320px !important;
+                }
+            }
+
+            @media only screen and (min-device-width: 375px) and (max-device-width: 413px) {
+                u ~ div .email-container {
+                    min-width: 375px !important;
+                }
+            }
+
+            @media only screen and (min-device-width: 414px) {
+                u ~ div .email-container {
+                    min-width: 414px !important;
+                }
+            }
+        </style>
+        <!-- CSS Reset : END -->
+
+        <!-- Progressive Enhancements : BEGIN -->
+        <style>
+            .button-td,
+            .button-a {
+                transition: all 100ms ease-in;
+            }
+
+            .button-td-primary:hover,
+            .button-a-primary:hover {
+                background: {{ theme.primary }} !important;
+                border-color: {{ theme.primary }} !important;
+            }
+
+            @media screen and (max-width: 600px) {
+                .email-container {
+                    width: 100% !important;
+                    margin: auto !important;
+                }
+
+                .stack-column,
+                .stack-column-center {
+                    display: block !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    direction: ltr !important;
+                }
+
+                .stack-column-center {
+                    text-align: center !important;
+                }
+
+                .center-on-narrow {
+                    text-align: center !important;
+                    display: block !important;
+                    margin-left: auto !important;
+                    margin-right: auto !important;
+                    float: none !important;
+                }
+
+                table.center-on-narrow {
+                    display: inline-block !important;
+                }
+
+                .email-container p {
+                    font-size: 17px !important;
+                }
+            }
+        </style>
+        <!-- Progressive Enhancements : END -->
+    </head>
+
+    <body
+        width="100%"
+        style="margin: 0; padding: 0 !important; mso-line-height-rule: exactly; background-color: {{ theme.background }};"
+        class="email-bg"
+    >
+        <center
+            role="article"
+            aria-roledescription="email"
+            lang="{{ 'HtmlLang' | t }}"
+            style="width: 100%; background-color: {{ theme.background }};"
+            class="email-bg"
+        >
+            <!--[if mso | IE]>
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: {{ theme.background }};" class="email-bg">
+                <tr>
+                <td>
+            <![endif]-->
+
+            <!-- Preheader : BEGIN -->
+            <div style="max-height:0; overflow:hidden; mso-hide:all;" aria-hidden="true">
+                {{ subject }} — {{ orderDetails.orderNumber }}
+            </div>
+            <!-- Preheader : END -->
+
+            <!-- Email Body : BEGIN -->
+            <table
+                align="center"
+                role="presentation"
+                cellspacing="0"
+                cellpadding="0"
+                border="0"
+                width="600"
+                style="margin: auto;"
+                class="email-container"
+            >
+                {% include 'partials/email-header' %}
+
+                <!-- ConfirmationAlert : BEGIN -->
+                <tr>
+                    <td style="background-color: {{ theme.surface }}; padding: 32px 40px; text-align: center;">
+                        <h1 style="margin: 0 0 12px; font-family: {{ theme.fontFamily }}; font-size: 18px; line-height: 1.35; font-weight: 700; color: {{ theme.primary }};">
+                            {{ 'OrderConfirmed_Title' | t }}
+                        </h1>
+                        <p style="margin: 0; font-family: {{ theme.fontFamily }}; font-size: 14px; line-height: 1.5; color: {{ theme.secondary }};">
+                            {{ 'OrderConfirmed_Subtitle' | t }}
+                        </p>
+                    </td>
+                </tr>
+                <!-- ConfirmationAlert : END -->
+
+                <!-- EventHero : BEGIN -->
+                <tr>
+                    <td style="padding: 24px 24px 0; background-color: {{ theme.surface }};">
+                        <img
+                            src="{{ eventImageUrl }}"
+                            width="552"
+                            height=""
+                            alt="{{ eventTitle }}"
+                            border="0"
+                            style="width: 100%; max-width: 552px; height: auto; display: block; border-radius: 12px; font-family: {{ theme.fontFamily }}; font-size: 15px; line-height: 15px; color: {{ theme.secondary }};"
+                            class="g-img"
+                        >
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 20px 40px; text-align: center; background-color: {{ theme.surface }};">
+                        <h2 style="margin: 0; font-family: {{ theme.fontFamily }}; font-size: 22px; line-height: 1.35; font-weight: 700; color: {{ theme.primary }};">
+                            {{ eventTitle }}
+                        </h2>
+                    </td>
+                </tr>
+                <!-- EventHero : END -->
+
+                <!-- OrderDetails : BEGIN -->
+                <tr>
+                    <td style="padding: 16px 40px; background-color: {{ theme.surface }};">
+                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                            <tr>
+                                <td style="padding: 0 0 8px; font-family: {{ theme.fontFamily }}; font-size: 12px; line-height: 1.4; color: {{ theme.secondary }}; text-transform: uppercase; letter-spacing: .08333em; text-align: center;">
+                                    {{ 'OrderNumber' | t }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0 0 32px; font-family: {{ theme.fontFamily }}; font-size: 20px; line-height: 1.35; font-weight: 700; color: {{ theme.secondary }}; text-align: center;">
+                                    {{ orderDetails.orderNumber }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="padding: 0 0 8px; font-family: {{ theme.fontFamily }}; font-size: 12px; line-height: 1.4; color: {{ theme.secondary }}; text-transform: uppercase; letter-spacing: .08333em; text-align: center;">
+                                    {{ 'Date' | t }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0 0 32px; font-family: {{ theme.fontFamily }}; font-size: 16px; line-height: 1.38; font-weight: 600; color: {{ theme.secondary }}; text-align: center;">
+                                    {{ orderDetails.date }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="padding: 0 0 8px; font-family: {{ theme.fontFamily }}; font-size: 12px; line-height: 1.4; color: {{ theme.secondary }}; text-transform: uppercase; letter-spacing: .08333em; text-align: center;">
+                                    {{ 'AccessTime' | t }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0 0 32px; font-family: {{ theme.fontFamily }}; font-size: 16px; line-height: 1.38; font-weight: 600; color: {{ theme.secondary }}; text-align: center;">
+                                    {{ orderDetails.time }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="padding: 0 0 8px; font-family: {{ theme.fontFamily }}; font-size: 12px; line-height: 1.4; color: {{ theme.secondary }}; text-transform: uppercase; letter-spacing: .08333em; text-align: center;">
+                                    {{ 'Venue' | t }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0 0 4px; font-family: {{ theme.fontFamily }}; font-size: 16px; line-height: 1.38; font-weight: 600; color: {{ theme.primary }}; text-align: center;">
+                                    {{ orderDetails.venue.name }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0 0 8px; font-family: {{ theme.fontFamily }}; font-size: 13px; line-height: 1.4; color: {{ theme.secondary }}; text-align: center;">
+                                    {{ orderDetails.venue.address }}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <!-- OrderDetails : END -->
+
+                <!-- SeatList : BEGIN -->
+                <tr>
+                    <td style="padding: 18px 40px 28px; background-color: {{ theme.surface }};">
+                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                            <tr>
+                                <td style="padding: 0 0 8px; font-family: {{ theme.fontFamily }}; font-size: 12px; line-height: 1.4; color: {{ theme.secondary }}; text-transform: uppercase; letter-spacing: .08333em; text-align: center;">
+                                    {{ 'Seats' | t }}
+                                </td>
+                            </tr>
+                            {% for seat in seats %}
+                                <tr>
+                                    <td style="padding: 8px 0; font-family: {{ theme.fontFamily }}; font-size: 16px; line-height: 1.38; font-weight: 600; color: {{ theme.secondary }}; text-align: center;">
+                                        {{ 'SeatFormat' | t_format: seat.zone, seat.row, seat.seat }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+                </tr>
+                <!-- SeatList : END -->
+
+                {% include 'partials/wallet-cta' %}
+
+                {% include 'partials/entry-instructions' %}
+
+                <!-- PromoBanner : BEGIN -->
+                {% if promoBannerImageUrl %}
+                    <tr>
+                        <td style="padding: 0; background-color: {{ theme.surface }}">
+                            <a href="{{ promoBannerLinkUrl }}" target="_blank">
+                                <img
+                                    src="{{ promoBannerImageUrl }}"
+                                    width="600"
+                                    height=""
+                                    alt="Descubre el mercado secundario"
+                                    border="0"
+                                    style="width: 100%; max-width: 600px; height: auto; display: block; font-family: {{ theme.fontFamily }}; font-size: 15px; line-height: 15px; color: {{ theme.secondary }};"
+                                    class="g-img"
+                                >
+                            </a>
+                        </td>
+                    </tr>
+                {% endif %}
+                <!-- PromoBanner : END -->
+
+                {% include 'partials/email-footer' %}
+            </table>
+            <!-- Email Body : END -->
+
+            <!--[if mso | IE]>
+                </td>
+                </tr>
+                </table>
+            <![endif]-->
+        </center>
+    </body>
+</html>

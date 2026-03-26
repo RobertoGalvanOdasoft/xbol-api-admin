@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="HtmlLang" xml:space="preserve">
+    <value>es</value>
+  </data>
+  <data name="OrderConfirmed_Title" xml:space="preserve">
+    <value>&#161;Compra confirmada!</value>
+  </data>
+  <data name="OrderConfirmed_Subtitle" xml:space="preserve">
+    <value>A continuaci&#243;n, encontrar&#225;s los detalles de tu acceso. Aseg&#250;rate de tener tus boletos al llegar al recinto.</value>
+  </data>
+  <data name="OrderConfirmed_Subject" xml:space="preserve">
+    <value>&#161;Tu compra ha sido confirmada! &#8212; {0}</value>
+  </data>
+  <data name="OrderNumber" xml:space="preserve">
+    <value>Numero de orden</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>Fecha</value>
+  </data>
+  <data name="DateFormat" xml:space="preserve">
+    <value>dddd d 'de' MMMM, yyyy</value>
+  </data>
+  <data name="AccessTime" xml:space="preserve">
+    <value>Hora de acceso</value>
+  </data>
+  <data name="Venue" xml:space="preserve">
+    <value>Lugar</value>
+  </data>
+  <data name="Seats" xml:space="preserve">
+    <value>Asientos</value>
+  </data>
+  <data name="SeatFormat" xml:space="preserve">
+    <value>{0} - Fila {1} - Asiento {2}</value>
+  </data>
+  <data name="Footer_NeedHelp" xml:space="preserve">
+    <value>&#191;Necesitas ayuda?</value>
+  </data>
+  <data name="Footer_HelpPrefix" xml:space="preserve">
+    <value>Consulta nuestra</value>
+  </data>
+  <data name="Footer_HelpLink" xml:space="preserve">
+    <value>Secci&#243;n de Ayuda</value>
+  </data>
+  <data name="Footer_ContactPrefix" xml:space="preserve">
+    <value>o contacta a soporte en</value>
+  </data>
+  <data name="Wallet_GoogleAlt" xml:space="preserve">
+    <value>A&#241;adir a Google Wallet</value>
+  </data>
+  <data name="Wallet_AppleAlt" xml:space="preserve">
+    <value>A&#241;adir a Apple Wallet</value>
+  </data>
+  <data name="Wallet_GoogleBadgePath" xml:space="preserve">
+    <value>Assets/badges/google_wallet/es419_add_to_google_wallet_add-wallet-badge.svg</value>
+  </data>
+  <data name="Wallet_AppleBadgePath" xml:space="preserve">
+    <value>Assets/badges/apple_wallet/ESMX/RGB/ESMX_Add_to_Apple_Wallet_RGB_101821.svg</value>
+  </data>
+  <data name="EntryInstructions_Title" xml:space="preserve">
+    <value>Instrucciones para el ingreso:</value>
+  </data>
+  <data name="EntryInstruction_1" xml:space="preserve">
+    <value>Para un acceso &#225;gil, te recomendamos a&#241;adir tus boletos a Google Wallet o Apple Wallet con los botones de arriba.</value>
+  </data>
+  <data name="EntryInstruction_2" xml:space="preserve">
+    <value>Tu c&#243;digo QR es din&#225;mico y cambia constantemente por seguridad. No utilices capturas de pantalla ni impresiones.</value>
+  </data>
+  <data name="EntryInstruction_3" xml:space="preserve">
+    <value>Aseg&#250;rate de tener tus boletos en tu Wallet o contar con conexi&#243;n a internet para mostrarlos desde 'Mis Tickets' al llegar.</value>
+  </data>
+  <data name="EntryInstruction_4" xml:space="preserve">
+    <value>Recuerda traer una identificaci&#243;n oficial y seguir las normas de seguridad del recinto.</value>
+  </data>
+</root>

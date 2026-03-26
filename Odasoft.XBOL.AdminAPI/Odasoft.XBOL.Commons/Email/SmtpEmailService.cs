@@ -18,13 +18,38 @@ public class SmtpEmailService(
         string toName,
         string subject,
         string htmlBody,
+        IEnumerable<EmailAttachment>? attachments = null,
         CancellationToken cancellationToken = default)
     {
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(_options.FromName, _options.FromAddress));
         message.To.Add(new MailboxAddress(toName, toAddress));
         message.Subject = subject;
-        message.Body = new TextPart("html") { Text = htmlBody };
+
+        var builder = new BodyBuilder { HtmlBody = htmlBody };
+        if (attachments != null)
+        {
+            foreach (var attachment in attachments)
+            {
+                if (attachment.IsInline)
+                {
+                    var resource = builder.LinkedResources.Add(
+                        attachment.FileName ?? attachment.ContentId,
+                        attachment.Content,
+                        ContentType.Parse(attachment.ContentType));
+
+                    resource.ContentId = attachment.ContentId;
+                }
+                else
+                {
+                    builder.Attachments.Add(
+                        attachment.FileName ?? attachment.ContentId,
+                        attachment.Content,
+                        ContentType.Parse(attachment.ContentType));
+                }
+            }
+        }
+        message.Body = builder.ToMessageBody();
 
         await SendAsync(message, cancellationToken);
     }

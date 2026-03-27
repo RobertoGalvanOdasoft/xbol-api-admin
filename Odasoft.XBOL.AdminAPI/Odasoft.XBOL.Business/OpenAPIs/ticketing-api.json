@@ -1047,6 +1047,10 @@
           "holdToken": {
             "type": "string"
           },
+          "eventScheduleId": {
+            "type": "integer",
+            "format": "int64"
+          },
           "ticketType": {
             "allOf": [
               {
@@ -1067,6 +1071,10 @@
                 "$ref": "#/components/schemas/PaymentInfoRequest"
               }
             ]
+          },
+          "localizer": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -1180,6 +1188,7 @@
       "HoldSeatsRequest": {
         "required": [
           "eventId",
+          "saleType",
           "seats"
         ],
         "type": "object",
@@ -1193,6 +1202,13 @@
             "items": {
               "type": "string"
             }
+          },
+          "saleType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SaleType"
+              }
+            ]
           }
         },
         "additionalProperties": false
@@ -1346,6 +1362,14 @@
         },
         "additionalProperties": { }
       },
+      "SaleType": {
+        "enum": [
+          "Event",
+          "SeasonPass",
+          "EventGroup"
+        ],
+        "type": "string"
+      },
       "SeasonBookingRequest": {
         "required": [
           "clientContact",
@@ -1372,6 +1396,10 @@
           "holdToken": {
             "type": "string"
           },
+          "eventScheduleId": {
+            "type": "integer",
+            "format": "int64"
+          },
           "ticketType": {
             "allOf": [
               {
@@ -1392,6 +1420,10 @@
                 "$ref": "#/components/schemas/PaymentInfoRequest"
               }
             ]
+          },
+          "localizer": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

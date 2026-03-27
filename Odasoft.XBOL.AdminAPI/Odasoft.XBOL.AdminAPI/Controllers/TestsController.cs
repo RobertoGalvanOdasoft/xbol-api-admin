@@ -27,7 +27,9 @@ public class TestsController(
     public IActionResult TestEmail()
     {
         if (!environment.IsDevelopment())
+        {
             return NotFound();
+        }
 
         var model = new TestEmailModel
         {
@@ -52,7 +54,9 @@ public class TestsController(
     public async Task<IActionResult> TestOrderConfirmationEmail(long orderId, [FromQuery] string culture = "es-MX")
     {
         if (!environment.IsDevelopment())
+        {
             return NotFound();
+        }
 
         var model = await orderService.BuildOrderConfirmationAsync(orderId, "test@example.com", "Test User", culture);
         var jobId = backgroundJobClient.Enqueue<IEmailJob>(x => x.SendOrderConfirmationAsync(model));
@@ -70,7 +74,9 @@ public class TestsController(
     public async Task<IActionResult> PreviewOrderConfirmationEmail(long orderId, [FromQuery] string culture = "es-MX")
     {
         if (!environment.IsDevelopment())
+        {
             return NotFound();
+        }
 
         templateService.ClearCache();
         var model = await orderService.BuildOrderConfirmationAsync(orderId, "test@example.com", "Test User", culture);

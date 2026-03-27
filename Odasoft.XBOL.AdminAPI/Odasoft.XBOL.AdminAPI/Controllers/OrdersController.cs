@@ -62,6 +62,11 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Retrieves the information of the order to be renewed and to display the information that order.
+        /// </summary>
+        /// <param name="orderReference">The unique reference identifier of the order.</param>
+        /// <returns>An ActionResult containing the order details for renovation or display.</returns>
         [HttpGet("renewal-info/{orderReference}")]
         [EndpointName("GetOrderDetailsByReferenceAsync")]
         [ProducesResponseType(typeof(OrderRenewalInfoResponse), StatusCodes.Status200OK)]
@@ -76,6 +81,27 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
             }
 
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Evaluates whether a specific order is eligible for renewal.
+        /// </summary>
+        /// <param name="orderReference">The unique reference identifier of the order.</param>
+        /// <returns>An ActionResult containing order information indicating whether the order can be renewed.</returns>
+        [HttpGet("{orderReference}/can-renew")]
+        [EndpointName("CanOrderBeRenewedAsync")]
+        [ProducesResponseType(typeof(CanRenewOrderResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<CanRenewOrderResponse>> CanOrderBeRenewedAsync([FromRoute] string orderReference)
+        {
+            CanRenewOrderResponse canRenew = await _orderService.CanOrderBeRenewedAsync(orderReference);
+
+            if (canRenew == null || canRenew.OrderId == null || canRenew.OrderId == 0)
+            {
+                return NotFound($"There is no information for Order '{orderReference}'.");
+            }
+
+            return Ok(canRenew);
         }
     }
 }

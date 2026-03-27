@@ -401,7 +401,7 @@ namespace Odasoft.XBOL.Business.Services
                     && ((phoneRegionCodeId.HasValue
                             ? (c.PhoneNumber == phoneNumber && c.PhoneRegionCodeId == phoneRegionCodeId.Value)
                             : c.PhoneNumber == phoneNumber)
-                        || c.Email == email)
+                        || (email != null && c.Email == email))
                         )
                 .Select(c => new ClientContactResponse
                 {

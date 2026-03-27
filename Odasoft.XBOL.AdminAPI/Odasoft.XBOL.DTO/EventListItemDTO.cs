@@ -11,5 +11,8 @@ namespace Odasoft.XBOL.DTO
         public string? ExternalEventKey { get; set; }
         public required int AvailableSeats { get; set; }
         public required int TotalSeats { get; set; }
+        public string? PosterImageUrl { get; set; }
+        // TODO: Change this to an enum or a more robust type if needed to represent different types of events (e.g., regular event, season, etc.)
+        public bool IsSeason { get; set; }
     }
 }

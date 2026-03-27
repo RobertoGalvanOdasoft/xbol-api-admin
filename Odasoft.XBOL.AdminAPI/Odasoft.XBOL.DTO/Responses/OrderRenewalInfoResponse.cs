@@ -20,6 +20,7 @@ namespace Odasoft.XBOL.DTO.Responses
         public string Neighbourhood { get; set; } = "";
         public string Gender { get; set; } = "";
         public DateTimeOffset? DOB { get; set; }
+        public string Reference { get; set; } = "";
 
         public bool PendingRenewal
         {

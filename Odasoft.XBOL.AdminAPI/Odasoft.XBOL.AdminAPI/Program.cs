@@ -3,7 +3,6 @@ using Microsoft.Extensions.Options;
 using Odasoft.XBOL.AdminAPI.Extensions;
 using Odasoft.XBOL.AdminAPI.Schema;
 using Odasoft.XBOL.Business.Extensions;
-using Odasoft.XBOL.Commons.Email;
 using Odasoft.XBOL.Data.Extensions;
 using System.Globalization;
 using LocalizationOptions = Odasoft.XBOL.Commons.Options.LocalizationOptions;

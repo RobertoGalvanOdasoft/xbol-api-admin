@@ -10,5 +10,7 @@ namespace Odasoft.XBOL.DTO.Responses
         public string Row { get; set; } = "";
         public string Seat { get; set; } = "";
         public bool IsSold { get; set; }
+        public decimal Price { get; set; }
+        public decimal RenewalPrice { get; set; }
     }
 }

@@ -13,8 +13,8 @@ namespace Odasoft.XBOL.Models
         public Guid? UserId { get; set; }
         public User? User { get; set; }
 
-        public long? BaseSeatId { get; set; }
-        public BaseSeat? BaseSeat { get; set; }
+        public long? SeasonSeatId { get; set; }
+        public SeasonSeat? SeasonSeat { get; set; }
 
         public string TrackingCode { get; set; } = null!;
         public string PrivateToken { get; set; } = null!;

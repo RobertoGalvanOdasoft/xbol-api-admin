@@ -1,9 +1,11 @@
+using Microsoft.EntityFrameworkCore;
 using Odasoft.XBOL.Commons.Enums;
 using Odasoft.XBOL.Data.Repositories.Season;
 using Odasoft.XBOL.DTO.QueryParams;
 using Odasoft.XBOL.DTO.Requests;
 using Odasoft.XBOL.DTO.Response;
 using Odasoft.XBOL.DTO.Results;
+using Odasoft.XBOL.Models;
 
 namespace Odasoft.XBOL.Business.Services
 {
@@ -177,6 +179,29 @@ namespace Odasoft.XBOL.Business.Services
             }
 
             return true;
+        }
+
+        public async Task<Season?> GetLatestSeasonAsync(long originSeasonId)
+        {
+            var seasonChainData = await repository.Get()
+                                        .AsNoTracking()
+                                        .Where(s => s.DeletedAt == null && s.PreviousSeasonId.HasValue)
+                                        .Select(s => new { Id = s.Id, PreviousSeasonId = s.PreviousSeasonId.Value })
+                                        .ToListAsync();
+
+            var nextSeasonLookup = seasonChainData.ToDictionary(s => s.PreviousSeasonId, s => s.Id);
+
+            long latestSeasonId = originSeasonId;
+
+            while (nextSeasonLookup.TryGetValue(latestSeasonId, out long nextSeasonId))
+            {
+                latestSeasonId = nextSeasonId;
+            }
+
+            return await repository
+                            .Get()
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(s => s.Id == latestSeasonId && s.DeletedAt == null);
         }
     }
 }

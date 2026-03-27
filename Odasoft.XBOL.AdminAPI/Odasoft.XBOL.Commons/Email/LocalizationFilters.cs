@@ -29,7 +29,10 @@ public static class LocalizationFilters
         var key = input.ToStringValue();
         var args = new object[arguments.Count];
         for (var i = 0; i < arguments.Count; i++)
+        {
             args[i] = arguments.At(i).ToStringValue();
+        }
+
         return new ValueTask<FluidValue>(new StringValue(localizer[key, args].Value));
     }
 }

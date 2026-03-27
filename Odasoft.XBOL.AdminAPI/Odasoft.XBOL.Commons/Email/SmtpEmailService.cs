@@ -67,7 +67,9 @@ public class SmtpEmailService(
             await client.ConnectAsync(_options.Host, _options.Port, secureSocketOptions, cancellationToken);
 
             if (!string.IsNullOrEmpty(_options.Username))
+            {
                 await client.AuthenticateAsync(_options.Username, _options.Password ?? "", cancellationToken);
+            }
 
             await client.SendAsync(message, cancellationToken);
 
@@ -83,7 +85,9 @@ public class SmtpEmailService(
         finally
         {
             if (client.IsConnected)
+            {
                 await client.DisconnectAsync(quit: true, cancellationToken);
+            }
         }
     }
 }

@@ -19,7 +19,8 @@ namespace Odasoft.XBOL.Data.Repositories
             int page,
             int pageSize,
             long? seasonId = null,
-            EventStatus? status = null)
+            EventStatus? status = null,
+            bool? onSale = null)
         {
             var venueNames = string.IsNullOrEmpty(venues)
                 ? []
@@ -47,6 +48,19 @@ namespace Odasoft.XBOL.Data.Repositories
             if (status.HasValue)
             {
                 query = query.Where(x => x.Event.Status == status);
+            }
+
+            // TODO: Check if any schedule in an event is On Sale and return list of schedules
+            if (onSale.HasValue)
+            {
+                if (onSale.Value)
+                {
+                    query = query.Where(x => x.Schedule.OnSaleDate <= DateTimeOffset.UtcNow && x.Schedule.OffSaleDate >= DateTimeOffset.UtcNow);
+                }
+                else
+                {
+                    query = query.Where(x => x.Schedule.OffSaleDate <= DateTimeOffset.UtcNow);
+                }
             }
 
             if (venueNames.Count > 0)
@@ -110,7 +124,9 @@ namespace Odasoft.XBOL.Data.Repositories
                     VenueName = x.Event.VenueMap.Venue.Name,
                     ExternalEventKey = x.Schedule.ExternalEventKey,
                     TotalSeats = x.Schedule.Sections.Sum(s => s.TotalSeats),
-                    AvailableSeats = x.Schedule.Sections.Sum(s => s.AvailableSeats)
+                    AvailableSeats = x.Schedule.Sections.Sum(s => s.AvailableSeats),
+                    PosterImageUrl = x.Event.PosterImageUrl,
+                    IsSeason = false
                 })
                 .ToListAsync();
 

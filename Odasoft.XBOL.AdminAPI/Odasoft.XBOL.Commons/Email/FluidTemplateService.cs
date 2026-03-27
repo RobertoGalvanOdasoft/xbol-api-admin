@@ -1,9 +1,9 @@
-using System.Collections.Concurrent;
-using System.Reflection;
 using Fluid;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
+using System.Reflection;
 
 namespace Odasoft.XBOL.Commons.Email;
 
@@ -36,7 +36,9 @@ public partial class FluidTemplateService(
         {
             var fileInfo = _options.FileProvider.GetFileInfo($"{name}.liquid");
             if (!fileInfo.Exists)
+            {
                 throw new FileNotFoundException($"Template '{name}.liquid' not found");
+            }
 
             using var stream = fileInfo.CreateReadStream();
             using var reader = new StreamReader(stream);
@@ -55,7 +57,9 @@ public partial class FluidTemplateService(
     private void EnsureTypeRegistered(Type type)
     {
         if (!_registeredTypes.TryAdd(type, 0))
+        {
             return;
+        }
 
         lock (_options)
         {
@@ -67,7 +71,9 @@ public partial class FluidTemplateService(
             var propertyType = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
 
             if (IsFluidNativeType(propertyType))
+            {
                 continue;
+            }
 
             var enumerableType = propertyType.GetInterfaces()
                 .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>));
@@ -76,7 +82,9 @@ public partial class FluidTemplateService(
             {
                 var elementType = enumerableType.GetGenericArguments()[0];
                 if (!IsFluidNativeType(elementType))
+                {
                     EnsureTypeRegistered(elementType);
+                }
             }
             else if (propertyType.IsClass || (propertyType.IsValueType && !propertyType.IsPrimitive))
             {

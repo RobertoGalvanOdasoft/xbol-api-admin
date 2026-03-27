@@ -1,7 +1,7 @@
-using System.Globalization;
 using Microsoft.Extensions.Localization;
 using Odasoft.XBOL.Commons.Email;
 using Odasoft.XBOL.Commons.Requests;
+using System.Globalization;
 
 namespace Odasoft.XBOL.WorkerService.Jobs;
 
@@ -80,7 +80,10 @@ public partial class EmailJob(
         try
         {
             var fullPath = Path.Combine(BasePath, relativePath);
-            if (!File.Exists(fullPath)) return false;
+            if (!File.Exists(fullPath))
+            {
+                return false;
+            }
 
             var content = File.ReadAllBytes(fullPath);
             var extension = Path.GetExtension(fullPath).ToLowerInvariant();

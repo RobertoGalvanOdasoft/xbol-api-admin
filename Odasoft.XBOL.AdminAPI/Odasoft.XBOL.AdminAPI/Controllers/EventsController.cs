@@ -34,6 +34,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// <param name="seasonId">The identifier of the season to filter events by. If null, events from all seasons are included.</param>
         /// <param name="status">The status value used to filter events (such as Active, Cancelled, etc.). If null, events of all statuses
         /// are included.</param>
+        /// <param name="onSale">Indicates whether to filter for events that have an schedule currently on sale. If null, all events are included</param>
         /// <returns>An ActionResult containing a paged response of event list items that match the specified filters and sorting
         /// options. The response includes pagination metadata and the filtered event data.</returns>
         [HttpGet]
@@ -50,11 +51,12 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
             [FromQuery] int? page,
             [FromQuery] int? pageSize,
             [FromQuery] long? seasonId,
-            [FromQuery] EventStatus? status)
+            [FromQuery] EventStatus? status,
+            [FromQuery] bool? onSale)
         {
             var result = await eventService.GetEventListAsync(
                 venues, categories, startDate, endDate, search, sortBy, descending, page, pageSize,
-                seasonId, status);
+                seasonId, status, onSale);
 
             return Ok(result);
         }

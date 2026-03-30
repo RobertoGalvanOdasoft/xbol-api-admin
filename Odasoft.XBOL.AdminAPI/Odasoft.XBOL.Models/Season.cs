@@ -26,6 +26,7 @@ namespace Odasoft.XBOL.Models
         public DateTimeOffset EndDate { get; set; }
 
         public IList<SeasonPass> SeasonPasses { get; set; } = [];
+        public IList<SeasonSection> SeasonSections { get; set; } = [];
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
         public Guid CreatedBy { get; set; }

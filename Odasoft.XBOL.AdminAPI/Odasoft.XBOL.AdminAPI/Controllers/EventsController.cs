@@ -61,6 +61,51 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
             return Ok(result);
         }
 
+
+        /// <summary>
+        /// Retrieves a paginated list of events that are currently available for sale that match the specified filter and sorting criteria.
+        /// </summary>
+        /// <param name="venues">A comma-separated list of venue identifiers used to filter events by their associated venues. If null or
+        /// empty, events from all venues are included.</param>
+        /// <param name="categories">A comma-separated list of category identifiers used to filter events by their associated categories. If null
+        /// or empty, events from all categories are included.</param>
+        /// <param name="startDate">The start date and time for filtering events. Only events occurring on or after this date are included. If
+        /// null, no lower date bound is applied.</param>
+        /// <param name="endDate">The end date and time for filtering events. Only events occurring on or before this date are included. If
+        /// null, no upper date bound is applied.</param>
+        /// <param name="search">A search term used to filter events by their title or description. If null or empty, no search filtering is
+        /// applied.</param>
+        /// <param name="sortBy">The property name by which to sort the events. Valid options include 'date', 'name', and others supported by
+        /// the API. If null or empty, a default sort order is applied.</param>
+        /// <param name="descending">Indicates whether the sorting should be in descending order. If true, results are sorted in descending
+        /// order; otherwise, ascending order is used. If null, the default sort direction is applied.</param>
+        /// <param name="page">The page number of results to retrieve. Must be a positive integer if specified. If null, the first page is
+        /// returned.</param>
+        /// <param name="pageSize">The number of events to include per page. Must be a positive integer if specified. If null, a default page
+        /// size is used.</param>
+        /// <returns>An ActionResult containing a paged response of event list items that are currently on sale that match
+        /// the specified filter and sorting criteria. The events are filtered based on the current date and time to include
+        /// only those with schedules that are actively on sale.
+        /// The results are sorted by scheduled start date in ascending order. If no events are currently on sale, an empty collection is returned.
+        ///The response includes pagination metadata and the filtered event data.</returns>
+        [HttpGet("on-sale")]
+        [EndpointName("GetEventsOnSaleAsync")]
+        [ProducesResponseType(typeof(PagedResponse<EventListItemDTO>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PagedResponse<EventListItemDTO>>> GetEventsOnSaleAsync(
+            [FromQuery] string? venues,
+            [FromQuery] string? categories,
+            [FromQuery] DateTimeOffset? startDate,
+            [FromQuery] DateTimeOffset? endDate,
+            [FromQuery] string? search,
+            [FromQuery] string? sortBy,
+            [FromQuery] bool? descending,
+            [FromQuery] int? page,
+            [FromQuery] int? pageSize)
+        {
+            return await eventService.GetEventsOnSaleAsync(
+                 venues, categories, startDate, endDate, search, sortBy, descending, page, pageSize);
+        }
+
         /// <summary>
         /// Retrieves the event details for the specified event identifier.
         /// </summary>

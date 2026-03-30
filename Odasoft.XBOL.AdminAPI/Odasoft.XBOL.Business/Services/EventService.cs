@@ -47,39 +47,30 @@ namespace Odasoft.XBOL.Business.Services
                 status,
                 onSale);
 
-            // TODO: Do a proper method to get all types of event
-            var seasons = _seasonRepository.Get(x => x.Status == SeasonStatus.Published);
+            return events;
+        }
 
-
-            if (onSale.HasValue)
-            {
-                if (onSale.Value)
-                {
-                    seasons = seasons.Where(x => x.OnSaleDate <= DateTimeOffset.UtcNow && x.OffSaleDate >= DateTimeOffset.UtcNow);
-                }
-                else
-                {
-                    seasons = seasons.Where(x => x.OffSaleDate <= DateTimeOffset.UtcNow);
-                }
-            }
-
-            var resultSeasons = seasons.Select(x => new EventListItemDTO
-            {
-                Id = x.Id,
-                Name = x.Name,
-                ScheduledStartDate = x.StartDate,
-                Category = "Season",
-                VenueMapId = 0, // Seasons may not have a venue, set to 0 or handle accordingly
-                VenueName = null,
-                ExternalEventKey = x.ExternalSeasonKey,
-                AvailableSeats = 0, // Seasons may not have seat information, set to 0 or handle accordingly
-                TotalSeats = 0, // Seasons may not have seat information, set to 0 or handle accordingly
-                PosterImageUrl = x.PosterImageUrl,
-                IsSeason = true
-            });
-
-            events.Items.AddRange(resultSeasons);
-
+        public async Task<PagedResponse<EventListItemDTO>> GetEventsOnSaleAsync(
+            string? venues,
+            string? categories,
+            DateTimeOffset? startDate,
+            DateTimeOffset? endDate,
+            string? search,
+            string? sortBy,
+            bool? descending,
+            int? page,
+            int? pageSize)
+        {
+            var events = await _eventRepository.GetEventsOnSaleAsync(
+                venues,
+                categories,
+                startDate,
+                endDate,
+                search,
+                sortBy,
+                descending ?? false,
+                page ?? 1,
+                pageSize ?? 10);
             return events;
         }
 

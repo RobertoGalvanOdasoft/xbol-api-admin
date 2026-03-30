@@ -139,6 +139,109 @@ namespace Odasoft.XBOL.Data.Repositories
             };
         }
 
+        public async Task<PagedResponse<EventListItemDTO>> GetEventsOnSaleAsync(
+            string? venues,
+            string? categories,
+            DateTimeOffset? startDate,
+            DateTimeOffset? endDate,
+            string? searchTerm,
+            string? sortBy,
+            bool descending,
+            int page,
+            int pageSize)
+        {
+            var eventsQuery = DbSet
+                .AsNoTracking()
+                .Where(e => e.Status != EventStatus.Cancelled)
+                .Select(e => new EventAggregationDTO
+                {
+                    Id = e.Id,
+                    ScheduledStartDate = e.Schedules.Min(s => s.StartDateTime),
+                    OnSaleDate = e.Schedules.Min(s => s.OnSaleDate),
+                    OffSaleDate = e.Schedules.Max(s => s.OffSaleDate),
+                    Name = e.Name,
+                    Category = e.Category.ToString(),
+                    VenueMapId = e.VenueMapId,
+                    VenueName = e.VenueMap.Venue.Name,
+                    ExternalEventKey = e.Schedules.First(s => s.ExternalEventKey != null).ExternalEventKey,
+                    TotalSeats = e.Schedules.Sum(s => s.Sections.Sum(sec => sec.TotalSeats)),
+                    AvailableSeats = e.Schedules.Sum(s => s.Sections.Sum(sec => sec.AvailableSeats)),
+                    PosterImageUrl = e.PosterImageUrl,
+                    SeasonId = e.SeasonId,
+                    IsSeason = false
+                });
+
+            var seasonsQuery = DbContext.Set<Models.Season>()
+                .AsNoTracking()
+                .Where(s => s.Status == SeasonStatus.Published)
+                .Select(s => new EventAggregationDTO
+                {
+                    Id = s.Id,
+                    ScheduledStartDate = s.StartDate,
+                    OnSaleDate = s.OnSaleDate,
+                    OffSaleDate = s.OffSaleDate,
+                    Name = s.Name,
+                    Category = "Season",
+                    VenueMapId = 0,
+                    VenueName = null,
+                    ExternalEventKey = s.ExternalSeasonKey,
+                    TotalSeats = s.SeasonSections.Sum(x => x.TotalSeats),
+                    AvailableSeats = s.SeasonSections.Sum(x => x.AvailableSeats),
+                    PosterImageUrl = s.PosterImageUrl,
+                    SeasonId = s.Id,
+                    IsSeason = true
+                });
+
+            var query = eventsQuery.Union(seasonsQuery);
+
+            query = query.Where(x => x.OnSaleDate <= DateTimeOffset.UtcNow && x.OffSaleDate >= DateTimeOffset.UtcNow);
+
+            var totalCount = await query.CountAsync();
+
+            query = sortBy?.ToLowerInvariant() switch
+            {
+                "name" => descending
+                    ? query.OrderByDescending(x => x.Name).ThenByDescending(x => x.Id)
+                    : query.OrderBy(x => x.Name).ThenByDescending(x => x.Id),
+                "category" => descending
+                    ? query.OrderByDescending(x => x.Category).ThenByDescending(x => x.Id)
+                    : query.OrderBy(x => x.Category).ThenByDescending(x => x.Id),
+                "venue" => descending
+                    ? query.OrderByDescending(x => x.VenueName).ThenByDescending(x => x.Id)
+                    : query.OrderBy(x => x.VenueName).ThenByDescending(x => x.Id),
+                _ => descending
+                    ? query.OrderByDescending(x => x.ScheduledStartDate).ThenByDescending(x => x.Id)
+                    : query.OrderBy(x => x.ScheduledStartDate).ThenByDescending(x => x.Id)
+            };
+
+            var items = await query
+               .Skip((page - 1) * pageSize)
+               .Take(pageSize)
+               .Select(x => new EventListItemDTO
+               {
+                   Id = x.Id,
+                   ScheduledStartDate = x.ScheduledStartDate,
+                   Name = x.Name,
+                   Category = x.Category,
+                   VenueMapId = x.VenueMapId,
+                   VenueName = x.VenueName,
+                   ExternalEventKey = x.ExternalEventKey,
+                   TotalSeats = x.TotalSeats,
+                   AvailableSeats = x.AvailableSeats,
+                   PosterImageUrl = x.PosterImageUrl,
+                   IsSeason = x.IsSeason
+               })
+               .ToListAsync();
+
+            return new PagedResponse<EventListItemDTO>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
+        }
+
         public async Task<EventInfoDTO?> GetEventByIdAsync(long eventId)
         {
             var seatsPrice = await dbContext.EventSeats

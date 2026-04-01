@@ -2,7 +2,7 @@ using Odasoft.XBOL.Commons.Email;
 
 namespace Odasoft.XBOL.Commons.Requests;
 
-public class OrderConfirmationModel : EmailModelBase
+public class OrderEmailModel : EmailModelBase
 {
     public required string EventTitle { get; set; }
     public required string EventImageUrl { get; set; }
@@ -32,6 +32,7 @@ public class VenueInfo
 
 public class SeatInfo
 {
+    public required string SeatKey { get; set; }
     public required string Zone { get; set; }
     public required string Row { get; set; }
     public required string Seat { get; set; }

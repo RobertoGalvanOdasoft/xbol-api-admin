@@ -22,6 +22,8 @@ namespace Odasoft.XBOL.DTO.Requests
         public long? PhoneRegionCodeId { get; set; }
         public string? PhoneNumber { get; set; }
         public string? Email { get; set; }
+        public Gender? Gender { get; set; }
+        public DateTimeOffset? DateOfBirth { get; set; }
 
         public bool HasCredit { get; set; }
 

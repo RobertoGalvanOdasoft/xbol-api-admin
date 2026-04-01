@@ -39,6 +39,7 @@ namespace Odasoft.XBOL.Data
         public DbSet<SequenceTracker> SequenceTrackers => Set<SequenceTracker>();
         public DbSet<PhoneRegionCode> PhoneRegionCodes => Set<PhoneRegionCode>();
         public DbSet<VenueImage> VenueImages => Set<VenueImage>();
+        public DbSet<OrderActionLog> OrderActionLogs => Set<OrderActionLog>();
 
         public XBOLDbContext(DbContextOptions<XBOLDbContext> options)
            : base(options)

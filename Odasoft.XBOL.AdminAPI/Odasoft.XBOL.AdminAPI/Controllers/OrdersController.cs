@@ -68,12 +68,34 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// <param name="orderReference">The unique reference identifier of the order.</param>
         /// <returns>An ActionResult containing the order details for renovation or display.</returns>
         [HttpGet("renewal-info/{orderReference}")]
-        [EndpointName("GetOrderDetailsByReferenceAsync")]
+        [EndpointName("GetOrderRenawalInfoByReferenceAsync")]
         [ProducesResponseType(typeof(OrderRenewalInfoResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<OrderRenewalInfoResponse>> GetOrderDetailsByReferenceAsync([FromRoute] string orderReference)
+        public async Task<ActionResult<OrderRenewalInfoResponse>> GetOrderRenawalInfoByReferenceAsync([FromRoute] string orderReference)
         {
             OrderRenewalInfoResponse? result = await _orderService.GetOrderRenawalInfoByReferenceAsync(orderReference);
+
+            if (result == null)
+            {
+                return NotFound($"There is no information for Order '{orderReference}'.");
+            }
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Retrieves detailed information about an order using the specified order reference.
+        /// </summary>
+        /// <param name="orderReference">The unique reference identifier of the order to retrieve information for. Cannot be null or empty.</param>
+        /// <returns>An ActionResult containing the order information if found; otherwise, a 404 Not Found response with an error
+        /// message.</returns>
+        [HttpGet("info/{orderReference}")]
+        [EndpointName("GetOrderInfoByReferenceAsync")]
+        [ProducesResponseType(typeof(OrderInfoResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<OrderInfoResponse>> GetOrderInfoByReferenceAsync([FromRoute] string orderReference)
+        {
+            OrderInfoResponse? result = await _orderService.GetOrderInfoByReferenceAsync(orderReference);
 
             if (result == null)
             {

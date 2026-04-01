@@ -58,7 +58,7 @@ public class TestsController(
             return NotFound();
         }
 
-        var model = await orderService.BuildOrderConfirmationAsync(orderId, "test@example.com", "Test User", culture);
+        var model = await orderService.BuildOrderEmailModelAsync(orderId, "test@example.com", "Test User", culture);
         var jobId = backgroundJobClient.Enqueue<IEmailJob>(x => x.SendOrderConfirmationAsync(model));
 
         return Ok(new { message = "Order confirmation email enqueued.", jobId });
@@ -79,7 +79,7 @@ public class TestsController(
         }
 
         templateService.ClearCache();
-        var model = await orderService.BuildOrderConfirmationAsync(orderId, "test@example.com", "Test User", culture);
+        var model = await orderService.BuildOrderEmailModelAsync(orderId, "test@example.com", "Test User", culture);
         var html = await templateService.RenderAsync("OrderConfirmation", model);
 
         return Content(html, "text/html");

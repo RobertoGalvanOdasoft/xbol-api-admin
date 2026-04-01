@@ -289,82 +289,47 @@ namespace Odasoft.XBOL.Business.Services
                 return await GetSeasonOrderRenewalInfoAsync(order, latestSeason, seatsSold);
             }
 
-            return await GetOrderRenewalInfo(order);
+            return await GetOrderRenewalInfoAsync(order);
         }
 
-        public async Task<OrderConfirmationModel> BuildOrderConfirmationAsync(long orderId, string toAddress, string toName, string culture = "es-MX")
+        public async Task<OrderInfoResponse?> GetOrderInfoByReferenceAsync(string referenceId)
         {
-            var cultureInfo = new CultureInfo(culture);
-            CultureInfo.CurrentCulture = cultureInfo;
-            CultureInfo.CurrentUICulture = cultureInfo;
+            Order? order = await _orderRepository
+                                    .Get()
+                                    .Include(x => x.Items)
+                                    .Include(x => x.Client)
+                                        .ThenInclude(c => c.PhoneRegionCode)
+                                    .AsNoTracking()
+                                    .Where(o => o.Reference.Trim().ToLower() == referenceId.Trim().ToLower())
+                                    .SingleOrDefaultAsync();
 
-            var order = await _orderRepository.Get(x => x.Id == orderId)
-                .Include(o => o.Items)
-                .FirstOrDefaultAsync()
-                ?? throw new InvalidOperationException($"Order {orderId} not found");
-
-            var ticketIds = order.Items
-                .Where(i => i.ItemType == Enums.ItemType.Ticket)
-                .Select(i => i.ItemReferenceId)
-                .ToList();
-
-            if (ticketIds.Count == 0)
+            if (order == null)
             {
-                throw new InvalidOperationException($"Order {orderId} has no tickets");
+                return null;
             }
 
-            var tickets = await _ticketRepository.Get(t => ticketIds.Contains(t.Id))
-                .Include(t => t.EventSchedule)
-                    .ThenInclude(es => es.Event)
-                        .ThenInclude(e => e.VenueMap)
-                            .ThenInclude(vm => vm.Venue)
-                .Include(t => t.EventSeat)
-                    .ThenInclude(es => es.BaseSeat)
-                        .ThenInclude(bs => bs.BaseRow)
-                .ToListAsync();
-
-            var firstTicket = tickets[0];
-            var schedule = firstTicket.EventSchedule;
-            var @event = schedule.Event;
-            var venue = @event.VenueMap.Venue;
-
-            return new OrderConfirmationModel
+            if (order.OrderType == Enums.OrderType.SeasonPass)
             {
-                ToAddress = toAddress,
-                ToName = toName,
-                Culture = culture,
-                Subject = string.Format(_emailLocalizer["OrderConfirmed_Subject"].Value, order.Reference),
-                EventTitle = @event.Name,
-                EventImageUrl = @event.PosterImageUrl,
-                OrderDetails = new OrderDetailsInfo
-                {
-                    OrderNumber = order.Reference,
-                    Date = schedule.StartDateTime.ToString(_emailLocalizer["DateFormat"].Value, cultureInfo),
-                    Time = schedule.StartDateTime.ToString("h:mm tt", cultureInfo),
-                    Venue = new VenueInfo
-                    {
-                        Name = venue.Name,
-                        Address = $"{venue.StreetAddress}, {venue.City}, {venue.State}"
-                    }
-                },
-                Seats = [.. tickets.Select(t => new SeatInfo
-                {
-                    Zone = t.SectionLabelSnapshot,
-                    Row = t.EventSeat.BaseSeat.BaseRow.RowLabel,
-                    Seat = t.EventSeat.BaseSeat.SeatNumber
-                })],
-                GoogleWalletUrl = "#",
-                AppleWalletUrl = "#",
-                EntryInstructions =
-                [
-                    _emailLocalizer["EntryInstruction_1"].Value,
-                    _emailLocalizer["EntryInstruction_2"].Value,
-                    _emailLocalizer["EntryInstruction_3"].Value,
-                    _emailLocalizer["EntryInstruction_4"].Value,
-                ],
-                PromoBannerImageUrl = @event.BannerImageUrl,
-                PromoBannerLinkUrl = @event.LandingUrl
-            };
+                return await GetSeasonOrderInfoAsync(order);
+            }
+
+            return await GetOrderInfoAsync(order);
+        }
+
+        public async Task<OrderEmailModel> BuildOrderEmailModelAsync(long orderId, string toAddress, string toName, string culture = "es-MX")
+        {
+            var order = await _orderRepository.Get(x => x.Id == orderId)
+                                .Include(o => o.Items)
+                                .AsNoTracking()
+                                .FirstOrDefaultAsync()
+                                ?? throw new InvalidOperationException($"Order {orderId} not found");
+
+            if (order.OrderType == Enums.OrderType.SeasonPass)
+            {
+                return await BuildSeasonEmailModelAsync(order, toAddress, toName, culture);
+            }
+
+            return await BuildEventEmailModelAsync(order, toAddress, toName, culture);
         }
 
         public async Task<CanRenewOrderResponse> CanOrderBeRenewedAsync(string referenceId)
@@ -625,7 +590,7 @@ namespace Odasoft.XBOL.Business.Services
             };
         }
 
-        private async Task<OrderRenewalInfoResponse?> GetOrderRenewalInfo(Order order)
+        private async Task<OrderRenewalInfoResponse?> GetOrderRenewalInfoAsync(Order order)
         {
             List<long> ticketIds = order.Items.Select(oi => oi.ItemReferenceId).ToList();
 
@@ -672,6 +637,272 @@ namespace Odasoft.XBOL.Business.Services
                 Email = order.Client?.Email ?? "",
                 Neighbourhood = order.Client?.Neighborhood ?? "",
                 Reference = order.Reference
+            };
+        }
+
+        private async Task<OrderInfoResponse?> GetSeasonOrderInfoAsync(Order order)
+        {
+            List<long> seasonPassIds = order.Items.Select(oi => oi.ItemReferenceId).ToList();
+
+            Dictionary<long, SeasonPass> seasonPasses = await _seasonPassRepository
+                                                    .Get()
+                                                    .Include(sp => sp.Season)
+                                                    .Include(sp => sp.SeasonSeat)
+                                                        .ThenInclude(sp => sp.BaseSeat)
+                                                        .ThenInclude(bs => bs.BaseRow)
+                                                        .ThenInclude(br => br.BaseSection)
+                                                        .ThenInclude(s => s.BaseZone)
+                                                    .AsNoTracking()
+                                                    .Where(sp => seasonPassIds.Contains(sp.Id))
+                                                    .ToDictionaryAsync(sp => sp.Id);
+
+            List<OrderItemResponse> orderItems = order.Items.Select(oi =>
+            {
+                seasonPasses.TryGetValue(oi.ItemReferenceId, out SeasonPass? seasonPass);
+
+                return new OrderItemResponse
+                {
+                    Id = oi.Id,
+                    IsSeasonItem = oi.ItemType == Enums.ItemType.SeasonPass,
+                    SeatObjectKey = seasonPass?.TrackingCode ?? "",
+                    Zone = seasonPass?.SeasonSeat?.BaseSeat?.BaseRow.BaseSection.BaseZone.Name ?? "",
+                    Section = seasonPass?.SeasonSeat?.BaseSeat?.BaseRow.BaseSection.Name ?? "",
+                    Row = seasonPass?.SeasonSeat?.BaseSeat?.BaseRow.RowLabel ?? "",
+                    Seat = seasonPass?.SeasonSeat?.BaseSeat?.SeatNumber ?? "",
+                    IsDigital = seasonPass?.IsDigital ?? true,
+                    Price = seasonPass?.Price ?? 0,
+                    IsCourtesy = oi.IsCourtesy,
+                    IsCancelled = seasonPass?.Status == Enums.SeasonPassStatus.Cancelled
+                };
+            }).ToList();
+
+            return new OrderInfoResponse
+            {
+                OrderId = order.Id,
+                Type = order.OrderType,
+                Reference = order.Reference,
+                OrderDateTime = order.CreatedAt,
+                ItemQuantity = orderItems?.Count ?? 0,
+                Items = orderItems ?? [],
+                Event = seasonPasses.Values.FirstOrDefault()?.Season.Name ?? "",
+                ClientId = order.ClientId ?? 0,
+                ClientName = order.Client?.FullName ?? "",
+                DialCode = order.Client?.PhoneRegionCode?.DialCode ?? "",
+                PhoneNumber = order.Client?.PhoneNumber ?? "",
+                Email = order.Client?.Email ?? "",
+                Status = order.Status,
+                Total = order.Total,
+                Seller = "John Doe", // TODO: Get the info from the user who made the sale
+                Channel = order.PayformType,
+                PaymentMethod = Enums.PaymentType.Cash // TODO: Get the info from the order's payment method
+            };
+        }
+
+        private async Task<OrderInfoResponse?> GetOrderInfoAsync(Order order)
+        {
+            List<long> ticketIds = order.Items.Select(oi => oi.ItemReferenceId).ToList();
+
+            Dictionary<long, Ticket> tickets = await _ticketRepository
+                                            .Get()
+                                            .Include(t => t.EventSchedule)
+                                                .ThenInclude(tes => tes.Event)
+                                            .Include(t => t.EventSection)
+                                                .ThenInclude(es => es.BaseSection)
+                                                .ThenInclude(bs => bs.BaseZone)
+                                            .Include(t => t.EventSeat)
+                                                .ThenInclude(es => es.BaseSeat)
+                                                .ThenInclude(s => s.BaseRow)
+                                            .AsNoTracking()
+                                            .Where(t => ticketIds.Contains(t.Id))
+                                            .ToDictionaryAsync(t => t.Id);
+
+            List<OrderItemResponse> orderItems = order.Items.Select(oi =>
+            {
+                tickets.TryGetValue(oi.ItemReferenceId, out Ticket? ticket);
+
+                return new OrderItemResponse
+                {
+                    Id = oi.Id,
+                    IsSeasonItem = oi.ItemType == Enums.ItemType.SeasonPass,
+                    SeatObjectKey = ticket?.TicketCode ?? "",
+                    Zone = ticket?.EventSection.BaseSection.BaseZone.Name ?? "",
+                    Section = ticket?.EventSection.BaseSection.Name ?? "",
+                    Row = ticket?.EventSeat.BaseSeat.BaseRow.RowLabel ?? "",
+                    Seat = ticket?.EventSeat.BaseSeat.SeatNumber ?? "",
+                    IsDigital = ticket?.IsDigital ?? true,
+                    Price = ticket?.PricePaid ?? 0,
+                    IsCourtesy = oi.IsCourtesy,
+                    IsCancelled = ticket?.Status == Enums.TicketStatus.Cancelled
+                };
+            }).ToList();
+
+            return new OrderInfoResponse
+            {
+                OrderId = order.Id,
+                Type = order.OrderType,
+                Reference = order.Reference,
+                OrderDateTime = order.CreatedAt,
+                ItemQuantity = orderItems?.Count ?? 0,
+                Items = orderItems ?? [],
+                Event = tickets.Values.FirstOrDefault()?.EventSchedule.Event.Name ?? "",
+                ClientId = order.ClientId ?? 0,
+                ClientName = order.Client?.FullName ?? "",
+                DialCode = order.Client?.PhoneRegionCode?.DialCode ?? "",
+                PhoneNumber = order.Client?.PhoneNumber ?? "",
+                Email = order.Client?.Email ?? "",
+                Status = order.Status,
+                Total = order.Total,
+                Seller = "Jane Doe", // TODO: Get the info from the user who made the sale
+                Channel = order.PayformType,
+                PaymentMethod = Enums.PaymentType.Cash // TODO: Get the info from the order's payment method
+            };
+        }
+
+        public async Task<OrderEmailModel> BuildEventEmailModelAsync(Order order, string toAddress, string toName, string culture = "es-MX")
+        {
+            var cultureInfo = new CultureInfo(culture);
+            CultureInfo.CurrentCulture = cultureInfo;
+            CultureInfo.CurrentUICulture = cultureInfo;
+
+            var ticketIds = order.Items
+                .Where(i => i.ItemType == Enums.ItemType.Ticket)
+                .Select(i => i.ItemReferenceId)
+                .ToList();
+
+            if (ticketIds.Count == 0)
+            {
+                throw new InvalidOperationException($"Order {order.Id} has no tickets");
+            }
+
+            var tickets = await _ticketRepository
+                                .Get(t => ticketIds.Contains(t.Id))
+                                .Include(t => t.EventSchedule)
+                                    .ThenInclude(es => es.Event)
+                                        .ThenInclude(e => e.VenueMap)
+                                            .ThenInclude(vm => vm.Venue)
+                                .Include(t => t.EventSeat)
+                                    .ThenInclude(es => es.BaseSeat)
+                                        .ThenInclude(bs => bs.BaseRow)
+                                .AsNoTracking()
+                                .ToListAsync();
+
+            var firstTicket = tickets[0];
+            var schedule = firstTicket.EventSchedule;
+            var @event = schedule.Event;
+            var venue = @event.VenueMap.Venue;
+
+            return new OrderEmailModel
+            {
+                ToAddress = toAddress,
+                ToName = toName,
+                Culture = culture,
+                Subject = string.Format(_emailLocalizer["OrderConfirmed_Subject"].Value, order.Reference),
+                EventTitle = @event.Name,
+                EventImageUrl = @event.PosterImageUrl,
+                OrderDetails = new OrderDetailsInfo
+                {
+                    OrderNumber = order.Reference,
+                    Date = schedule.StartDateTime.ToString(_emailLocalizer["DateFormat"].Value, cultureInfo),
+                    Time = schedule.StartDateTime.ToString("h:mm tt", cultureInfo),
+                    Venue = new VenueInfo
+                    {
+                        Name = venue.Name,
+                        Address = $"{venue.StreetAddress}, {venue.City}, {venue.State}"
+                    }
+                },
+                Seats = [.. tickets.Select(t => new SeatInfo
+                {
+                    SeatKey = t.TicketCode,
+                    Zone = t.SectionLabelSnapshot,
+                    Row = t.EventSeat.BaseSeat.BaseRow.RowLabel,
+                    Seat = t.EventSeat.BaseSeat.SeatNumber
+                })],
+                GoogleWalletUrl = "#",
+                AppleWalletUrl = "#",
+                EntryInstructions =
+                [
+                    _emailLocalizer["EntryInstruction_1"].Value,
+                    _emailLocalizer["EntryInstruction_2"].Value,
+                    _emailLocalizer["EntryInstruction_3"].Value,
+                    _emailLocalizer["EntryInstruction_4"].Value,
+                ],
+                PromoBannerImageUrl = @event.BannerImageUrl,
+                PromoBannerLinkUrl = @event.LandingUrl
+            };
+        }
+
+        public async Task<OrderEmailModel> BuildSeasonEmailModelAsync(Order order, string toAddress, string toName, string culture = "es-MX")
+        {
+            var cultureInfo = new CultureInfo(culture);
+            CultureInfo.CurrentCulture = cultureInfo;
+            CultureInfo.CurrentUICulture = cultureInfo;
+
+            var itemIds = order.Items
+                            .Where(i => i.ItemType == Enums.ItemType.SeasonPass)
+                            .Select(i => i.ItemReferenceId)
+                            .ToList();
+
+            if (itemIds.Count == 0)
+            {
+                throw new InvalidOperationException($"Order {order.Id} has no season pass");
+            }
+
+            var seasonPasses = await _seasonPassRepository.Get(sp => itemIds.Contains(sp.Id))
+                                        .Include(sp => sp.SeasonSeat)
+                                            .ThenInclude(ss => ss.BaseSeat)
+                                            .ThenInclude(bs => bs.BaseRow)
+                                            .ThenInclude(br => br.BaseSection)
+                                        .Include(sp => sp.Season)
+                                        .AsNoTracking()
+                                        .ToListAsync();
+
+            var seasonFirstEventSchedule = await _eventScheduleRepository.Get()
+                                                    .Include(es => es.Event)
+                                                        .ThenInclude(e => e.VenueMap)
+                                                            .ThenInclude(vm => vm.Venue)
+                                                    .AsNoTracking()
+                                                    .Where(es => es.Event.SeasonId == seasonPasses[0].SeasonId)
+                                                    .FirstAsync();
+
+            var firstPass = seasonPasses[0];
+
+            return new OrderEmailModel
+            {
+                ToAddress = toAddress,
+                ToName = toName,
+                Culture = culture,
+                Subject = string.Format(_emailLocalizer["OrderConfirmed_Subject"].Value, order.Reference),
+                EventTitle = firstPass.Season.Name,
+                EventImageUrl = firstPass.Season.PosterImageUrl,
+                OrderDetails = new OrderDetailsInfo
+                {
+                    OrderNumber = order.Reference,
+                    Date = firstPass.Season.StartDate.ToString(_emailLocalizer["DateFormat"].Value, cultureInfo),
+                    Time = firstPass.Season.StartDate.ToString("h:mm tt", cultureInfo),
+                    Venue = new VenueInfo
+                    {
+                        Name = seasonFirstEventSchedule.Event.VenueMap.Venue.Name,
+                        Address = $"{seasonFirstEventSchedule.Event.VenueMap.Venue.StreetAddress}, {seasonFirstEventSchedule.Event.VenueMap.Venue.City}, {seasonFirstEventSchedule.Event.VenueMap.Venue.State}"
+                    }
+                },
+                Seats = [.. seasonPasses.Select(sp => new SeatInfo
+                {
+                    SeatKey = sp.TrackingCode,
+                    Zone = sp.SeasonSeat.BaseSeat.BaseRow.BaseSection.Name,
+                    Row = sp.SeasonSeat.BaseSeat.BaseRow.RowLabel,
+                    Seat = sp.SeasonSeat.BaseSeat.SeatNumber
+                })],
+                GoogleWalletUrl = "#",
+                AppleWalletUrl = "#",
+                EntryInstructions =
+                [
+                    _emailLocalizer["EntryInstruction_1"].Value,
+                    _emailLocalizer["EntryInstruction_2"].Value,
+                    _emailLocalizer["EntryInstruction_3"].Value,
+                    _emailLocalizer["EntryInstruction_4"].Value,
+                ],
+                PromoBannerImageUrl = firstPass.Season.BannerImageUrl,
+                PromoBannerLinkUrl = firstPass.Season.LandingUrl
             };
         }
     }

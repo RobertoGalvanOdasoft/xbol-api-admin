@@ -3,10 +3,9 @@ using System.Text.Json.Serialization;
 namespace Odasoft.XBOL.Commons.Enums
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum SeasonPassStatus
+    public enum Gender
     {
-        Active,
-        Suspended,
-        Cancelled
+        Female,
+        Male
     }
 }

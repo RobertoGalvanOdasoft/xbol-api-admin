@@ -1,16 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
   <data name="HtmlLang" xml:space="preserve">
     <value>es</value>
   </data>
   <data name="OrderConfirmed_Title" xml:space="preserve">
-    <value>&#161;Compra confirmada!</value>
+    <value>¡Compra confirmada!</value>
   </data>
   <data name="OrderConfirmed_Subtitle" xml:space="preserve">
-    <value>A continuaci&#243;n, encontrar&#225;s los detalles de tu acceso. Aseg&#250;rate de tener tus boletos al llegar al recinto.</value>
+    <value>A continuación, encontrarás los detalles de tu acceso. Asegúrate de tener tus boletos al llegar al recinto.</value>
   </data>
   <data name="OrderConfirmed_Subject" xml:space="preserve">
-    <value>&#161;Tu compra ha sido confirmada! &#8212; {0}</value>
+    <value>¡Tu compra ha sido confirmada! — {0}</value>
   </data>
   <data name="OrderNumber" xml:space="preserve">
     <value>Numero de orden</value>
@@ -34,22 +151,22 @@
     <value>{0} - Fila {1} - Asiento {2}</value>
   </data>
   <data name="Footer_NeedHelp" xml:space="preserve">
-    <value>&#191;Necesitas ayuda?</value>
+    <value>¿Necesitas ayuda?</value>
   </data>
   <data name="Footer_HelpPrefix" xml:space="preserve">
     <value>Consulta nuestra</value>
   </data>
   <data name="Footer_HelpLink" xml:space="preserve">
-    <value>Secci&#243;n de Ayuda</value>
+    <value>Sección de Ayuda</value>
   </data>
   <data name="Footer_ContactPrefix" xml:space="preserve">
     <value>o contacta a soporte en</value>
   </data>
   <data name="Wallet_GoogleAlt" xml:space="preserve">
-    <value>A&#241;adir a Google Wallet</value>
+    <value>Añadir a Google Wallet</value>
   </data>
   <data name="Wallet_AppleAlt" xml:space="preserve">
-    <value>A&#241;adir a Apple Wallet</value>
+    <value>Añadir a Apple Wallet</value>
   </data>
   <data name="Wallet_GoogleBadgePath" xml:space="preserve">
     <value>Assets/badges/google_wallet/es419_add_to_google_wallet_add-wallet-badge.svg</value>
@@ -61,15 +178,45 @@
     <value>Instrucciones para el ingreso:</value>
   </data>
   <data name="EntryInstruction_1" xml:space="preserve">
-    <value>Para un acceso &#225;gil, te recomendamos a&#241;adir tus boletos a Google Wallet o Apple Wallet con los botones de arriba.</value>
+    <value>Para un acceso ágil, te recomendamos añadir tus boletos a Google Wallet o Apple Wallet con los botones de arriba.</value>
   </data>
   <data name="EntryInstruction_2" xml:space="preserve">
-    <value>Tu c&#243;digo QR es din&#225;mico y cambia constantemente por seguridad. No utilices capturas de pantalla ni impresiones.</value>
+    <value>Tu código QR es dinámico y cambia constantemente por seguridad. No utilices capturas de pantalla ni impresiones.</value>
   </data>
   <data name="EntryInstruction_3" xml:space="preserve">
-    <value>Aseg&#250;rate de tener tus boletos en tu Wallet o contar con conexi&#243;n a internet para mostrarlos desde 'Mis Tickets' al llegar.</value>
+    <value>Asegúrate de tener tus boletos en tu Wallet o contar con conexión a internet para mostrarlos desde 'Mis Tickets' al llegar.</value>
   </data>
   <data name="EntryInstruction_4" xml:space="preserve">
-    <value>Recuerda traer una identificaci&#243;n oficial y seguir las normas de seguridad del recinto.</value>
+    <value>Recuerda traer una identificación oficial y seguir las normas de seguridad del recinto.</value>
+  </data>
+  <data name="Reissue_Title" xml:space="preserve">
+    <value>Sus entradas han sido reemitidas.</value>
+  </data>
+  <data name="Reissue_Subtitle" xml:space="preserve">
+    <value>Utilice las entradas actualizadas que aparecen a continuación. Si sus entradas son físicas, descargue el PDF adjunto.</value>
+  </data>
+  <data name="SendTicket_Title" xml:space="preserve">
+    <value>¡Alguien te envió entradas!</value>
+  </data>
+  <data name="SendTicket_Subtitle" xml:space="preserve">
+    <value>Se te han transferido entradas para el siguiente evento.</value>
+  </data>
+  <data name="SendCourtesies_Title" xml:space="preserve">
+    <value>Tus entradas de cortesía</value>
+  </data>
+  <data name="SendCourtesies_Subtitle" xml:space="preserve">
+    <value>¡Disfruta del evento!</value>
+  </data>
+  <data name="OrderCancelled_Title" xml:space="preserve">
+    <value>Pedido cancelado</value>
+  </data>
+  <data name="OrderCancelled_Subtitle" xml:space="preserve">
+    <value>Su pedido ha sido cancelado correctamente.</value>
+  </data>
+  <data name="TicketCancelled_Title" xml:space="preserve">
+    <value>Entradas canceladas</value>
+  </data>
+  <data name="TicketCancelled_Subtitle" xml:space="preserve">
+    <value>Las siguientes entradas de su pedido han sido canceladas y ya no son válidas para acceder al recinto.</value>
   </data>
 </root>

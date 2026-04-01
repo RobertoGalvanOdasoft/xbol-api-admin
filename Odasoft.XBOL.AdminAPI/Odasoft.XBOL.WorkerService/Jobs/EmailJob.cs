@@ -31,6 +31,22 @@ public partial class EmailJob(
         }
     }
 
+    public async Task SendOrderEmailAsync(OrderEmailModel model, string template)
+    {
+        try
+        {
+            LogProcessing(logger, model.ToAddress);
+            var htmlBody = await templateService.RenderAsync(template, model);
+            await emailService.SendAsync(model.ToAddress, model.ToName, model.Subject, htmlBody);
+            LogSent(logger, model.ToAddress);
+        }
+        catch (Exception ex)
+        {
+            LogFailed(logger, ex, model.ToAddress);
+            throw;
+        }
+    }
+
     [LoggerMessage(Level = LogLevel.Information, Message = "Processing test email to {ToAddress}")]
     private static partial void LogProcessing(ILogger logger, string toAddress);
 
@@ -40,7 +56,7 @@ public partial class EmailJob(
     [LoggerMessage(Level = LogLevel.Error, Message = "Failed to send test email to {ToAddress}")]
     private static partial void LogFailed(ILogger logger, Exception ex, string toAddress);
 
-    public async Task SendOrderConfirmationAsync(OrderConfirmationModel model)
+    public async Task SendOrderConfirmationAsync(OrderEmailModel model)
     {
         try
         {

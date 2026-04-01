@@ -24,6 +24,7 @@ namespace Odasoft.XBOL.Models
 
         public SeasonPassSuspendedReason? SuspendedReason { get; set; }
         public string? SuspendedOtherReason { get; set; }
+        public bool IsDigital { get; set; } = true;
         public decimal Price { get; set; }
 
         public DateTimeOffset PurchasedAt { get; set; }

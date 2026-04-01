@@ -30,6 +30,8 @@ namespace Odasoft.XBOL.Business.Services
             {
                 ClientType = request.PersonTypeId ?? ClientType.Business,
                 FullName = request.CompanyName,
+                Gender = request.Gender,
+                DateOfBirth = request.DateOfBirth?.ToUniversalTime(),
                 BusinessName = request.SocialReason ?? request.CompanyName,
                 Email = request.Email,
                 PhoneRegionCodeId = request.PhoneRegionCodeId,
@@ -111,6 +113,8 @@ namespace Odasoft.XBOL.Business.Services
             {
                 existingClient.ClientType = request.PersonTypeId ?? ClientType.Business;
                 existingClient.FullName = request.CompanyName;
+                existingClient.Gender = request.Gender;
+                existingClient.DateOfBirth = request.DateOfBirth?.ToUniversalTime();
                 existingClient.BusinessName = request.SocialReason;
                 existingClient.Email = request.Email;
                 existingClient.PhoneRegionCodeId = request.PhoneRegionCodeId;
@@ -154,6 +158,7 @@ namespace Odasoft.XBOL.Business.Services
                         };
 
                         await clientCreditRepository.InsertAsync(clientCreditAccount);
+                        await clientCreditRepository.CommitAsync();
                     }
                 }
                 else
@@ -171,36 +176,38 @@ namespace Odasoft.XBOL.Business.Services
                     }
 
                     await clientCreditRepository.UpdateAsync(clientCreditAccount);
+                    await clientCreditRepository.CommitAsync();
                 }
 
-                await clientCreditRepository.CommitAsync();
-
-                LegalRepresentative? legalRep = await legalRepRepository.GetByIdAsync(request.LegalRep.Id ?? 0);
-
-                if (legalRep is null)
+                if (request.LegalRep != null)
                 {
-                    legalRep = new()
+                    LegalRepresentative? legalRep = await legalRepRepository.GetByIdAsync(request.LegalRep.Id ?? 0);
+
+                    if (legalRep is null)
                     {
-                        ClientId = existingClient.Id,
-                        FullName = request.LegalRep.Name ?? "",
-                        DOB = (request.LegalRep.Birthday ?? DateTimeOffset.UnixEpoch).ToUniversalTime(),
-                        TaxId = request.LegalRep.RFC ?? "",
-                        CURP = request.LegalRep.CURP ?? ""
-                    };
+                        legalRep = new()
+                        {
+                            ClientId = existingClient.Id,
+                            FullName = request.LegalRep.Name ?? "",
+                            DOB = (request.LegalRep.Birthday ?? DateTimeOffset.UnixEpoch).ToUniversalTime(),
+                            TaxId = request.LegalRep.RFC ?? "",
+                            CURP = request.LegalRep.CURP ?? ""
+                        };
 
-                    await legalRepRepository.InsertAsync(legalRep);
+                        await legalRepRepository.InsertAsync(legalRep);
+                        await legalRepRepository.CommitAsync();
+                    }
+                    else
+                    {
+                        legalRep.FullName = request.LegalRep.Name ?? "";
+                        legalRep.DOB = (request.LegalRep.Birthday ?? DateTimeOffset.UnixEpoch).ToUniversalTime();
+                        legalRep.TaxId = request.LegalRep.RFC ?? "";
+                        legalRep.CURP = request.LegalRep.CURP ?? "";
+
+                        await legalRepRepository.UpdateAsync(legalRep);
+                        await legalRepRepository.CommitAsync();
+                    }
                 }
-                else
-                {
-                    legalRep.FullName = request.LegalRep.Name ?? "";
-                    legalRep.DOB = (request.LegalRep.Birthday ?? DateTimeOffset.UnixEpoch).ToUniversalTime();
-                    legalRep.TaxId = request.LegalRep.RFC ?? "";
-                    legalRep.CURP = request.LegalRep.CURP ?? "";
-
-                    await legalRepRepository.UpdateAsync(legalRep);
-                }
-
-                await legalRepRepository.CommitAsync();
             }
             catch (Exception ex)
             {
@@ -319,6 +326,8 @@ namespace Odasoft.XBOL.Business.Services
                     Id = c.Id,
                     ClientType = c.ClientType,
                     ClientName = c.FullName,
+                    Gender = c.Gender,
+                    DateOfBirth = c.DateOfBirth,
                     BusinessName = c.BusinessName,
                     Email = c.Email,
                     PhoneRegionCodeId = c.PhoneRegionCodeId,

@@ -8,6 +8,8 @@ namespace Odasoft.XBOL.DTO.Requests
         [Required]
         public string? CompanyName { get; set; }
 
+        public Gender? Gender { get; set; }
+        public DateTimeOffset? DateOfBirth { get; set; }
         public string? SocialReason { get; set; }
         public string? RFC { get; set; }
         public ClientType? PersonTypeId { get; set; }

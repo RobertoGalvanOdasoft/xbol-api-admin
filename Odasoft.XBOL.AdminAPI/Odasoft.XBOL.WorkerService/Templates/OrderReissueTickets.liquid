@@ -187,7 +187,7 @@
     </head>
 
     <body
-        style="width> 100%; margin: 0; padding: 0 !important; mso-line-height-rule: exactly; background-color: {{ theme.background }};"
+        style="width: 100%; margin: 0; padding: 0 !important; mso-line-height-rule: exactly; background-color: {{ theme.background }};"
         class="email-bg">
         <center
             role="article"
@@ -219,18 +219,18 @@
                 class="email-container">
                 {% include 'partials/email-header' %}
 
-                <!-- ConfirmationAlert : BEGIN -->
+                <!-- Alert : BEGIN -->
                 <tr>
                     <td style="background-color: {{ theme.surface }}; padding: 32px 40px; text-align: center;">
                         <h1 style="margin: 0 0 12px; font-family: {{ theme.fontFamily }}; font-size: 18px; line-height: 1.35; font-weight: 700; color: {{ theme.primary }};">
-                            {{ 'OrderConfirmed_Title' | t }}
+                            {{ 'Reissue_Title' | t }}
                         </h1>
                         <p style="margin: 0; font-family: {{ theme.fontFamily }}; font-size: 14px; line-height: 1.5; color: {{ theme.secondary }};">
-                            {{ 'OrderConfirmed_Subtitle' | t }}
+                            {{ 'Reissue_Subtitle' | t }}
                         </p>
                     </td>
                 </tr>
-                <!-- ConfirmationAlert : END -->
+                <!-- Alert : END -->
 
                 <!-- EventHero : BEGIN -->
                 <tr>

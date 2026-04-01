@@ -9,8 +9,11 @@ namespace Odasoft.XBOL.DTO.Responses
         public string Section { get; set; } = "";
         public string Row { get; set; } = "";
         public string Seat { get; set; } = "";
-        public bool IsSold { get; set; }
+        public bool IsDigital { get; set; }
+        public bool IsCancelled { get; set; }
         public decimal Price { get; set; }
+        public bool IsCourtesy { get; set; }
+        public bool IsSold { get; set; }
         public decimal RenewalPrice { get; set; }
     }
 }

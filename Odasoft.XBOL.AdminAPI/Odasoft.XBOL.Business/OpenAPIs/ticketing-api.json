@@ -227,6 +227,118 @@
         }
       }
     },
+    "/api/booking/release-seats": {
+      "post": {
+        "tags": [
+          "Booking"
+        ],
+        "summary": "Releases the specified seats for an event or season, making them available for booking.",
+        "operationId": "ReleaseBookedSeatsAsync",
+        "requestBody": {
+          "description": "The request containing the event or season key and the list of seat identifiers to release. The key cannot\r\n            be null or empty, and the list of seats must contain at least one item.",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ReleaseBookedSeatsRequest"
+                  }
+                ]
+              }
+            },
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ReleaseBookedSeatsRequest"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ReleaseBookedSeatsRequest"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ReleaseBookedSeatsRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeObjectStatusResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeObjectStatusResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeObjectStatusResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/categories/names": {
       "get": {
         "tags": [
@@ -759,6 +871,19 @@
         },
         "additionalProperties": false
       },
+      "ChangeObjectStatusResult": {
+        "type": "object",
+        "properties": {
+          "objects": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/EventObjectInfo"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "Channel": {
         "type": "object",
         "properties": {
@@ -1154,6 +1279,232 @@
         },
         "additionalProperties": false
       },
+      "EventObjectInfo": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "nullable": true
+          },
+          "labels": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Labels"
+              }
+            ],
+            "nullable": true
+          },
+          "iDs": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/IDs"
+              }
+            ],
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "categoryLabel": {
+            "type": "string",
+            "nullable": true
+          },
+          "categoryKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "ticketType": {
+            "type": "string",
+            "nullable": true
+          },
+          "objectType": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderId": {
+            "type": "string",
+            "nullable": true
+          },
+          "forSale": {
+            "type": "boolean"
+          },
+          "holdToken": {
+            "type": "string",
+            "nullable": true
+          },
+          "section": {
+            "type": "string",
+            "nullable": true
+          },
+          "entrance": {
+            "type": "string",
+            "nullable": true
+          },
+          "numBooked": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "numFree": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "numHeld": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "numNotForSale": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "capacity": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "bookAsAWhole": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "extraData": {
+            "type": "object",
+            "additionalProperties": {
+              "nullable": true
+            },
+            "nullable": true
+          },
+          "isAccessible": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "isCompanionSeat": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "hasLiftUpArmrests": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "isHearingImpaired": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "isSemiAmbulatorySeat": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "hasSignLanguageInterpretation": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "isPlusSize": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "hasRestrictedView": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "displayedObjectType": {
+            "type": "string",
+            "nullable": true
+          },
+          "parentDisplayedObjectType": {
+            "type": "string",
+            "nullable": true
+          },
+          "leftNeighbour": {
+            "type": "string",
+            "nullable": true
+          },
+          "rightNeighbour": {
+            "type": "string",
+            "nullable": true
+          },
+          "isAvailable": {
+            "type": "boolean"
+          },
+          "channel": {
+            "type": "string",
+            "nullable": true
+          },
+          "distanceToFocalPoint": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "holds": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "nullable": true
+            },
+            "nullable": true
+          },
+          "numSeats": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "variableOccupancy": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "minOccupancy": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "maxOccupancy": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "seasonStatusOverriddenQuantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "zone": {
+            "type": "string",
+            "nullable": true
+          },
+          "floor": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Floor"
+              }
+            ],
+            "nullable": true
+          },
+          "resaleListingId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Floor": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "displayName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "ForSaleConfig": {
         "type": "object",
         "properties": {
@@ -1235,12 +1586,70 @@
         },
         "additionalProperties": false
       },
+      "IDs": {
+        "type": "object",
+        "properties": {
+          "own": {
+            "type": "string",
+            "nullable": true
+          },
+          "parent": {
+            "type": "string",
+            "nullable": true
+          },
+          "section": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "ItemType": {
         "enum": [
           "Ticket",
           "SeasonPass"
         ],
         "type": "string"
+      },
+      "LabelAndType": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Labels": {
+        "type": "object",
+        "properties": {
+          "own": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LabelAndType"
+              }
+            ],
+            "nullable": true
+          },
+          "parent": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LabelAndType"
+              }
+            ],
+            "nullable": true
+          },
+          "section": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "ModelError": {
         "type": "object",
@@ -1361,6 +1770,21 @@
           }
         },
         "additionalProperties": { }
+      },
+      "ReleaseBookedSeatsRequest": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "seats": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
       },
       "SaleType": {
         "enum": [

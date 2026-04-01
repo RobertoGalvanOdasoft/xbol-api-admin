@@ -27,6 +27,7 @@ namespace Odasoft.XBOL.Data.Extensions
             services.AddScoped<EventSeatRepository>();
             services.AddScoped<EventSectionRepository>();
             services.AddScoped<LegalRepresentativeRepository>();
+            services.AddScoped<OrderActionLogRepository>();
             services.AddScoped<PhoneRegionCodeRepository>();
             services.AddScoped<RoleRepository>();
             services.AddScoped<SequenceTrackerRepository>();

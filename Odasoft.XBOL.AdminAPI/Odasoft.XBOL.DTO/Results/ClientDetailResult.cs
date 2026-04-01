@@ -8,6 +8,8 @@ namespace Odasoft.XBOL.DTO.Results
         public ClientType ClientType { get; set; }
         public string? ClientName { get; set; }
         public string? BusinessName { get; set; }
+        public Gender? Gender { get; set; }
+        public DateTimeOffset? DateOfBirth { get; set; }
         public string? Email { get; set; }
         public long? PhoneRegionCodeId { get; set; }
         public string? DialCode { get; set; }

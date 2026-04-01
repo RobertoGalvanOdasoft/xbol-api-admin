@@ -34,6 +34,7 @@ namespace Odasoft.XBOL.Models
 
         public string SectionLabelSnapshot { get; set; } = null!;
         public string SeatLabelSnapshot { get; set; } = null!;
+        public bool IsDigital { get; set; } = true;
 
         public decimal PricePaid { get; set; }
 

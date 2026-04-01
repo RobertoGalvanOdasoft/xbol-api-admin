@@ -1,21 +1,20 @@
 using Microsoft.EntityFrameworkCore;
 using Odasoft.XBOL.Commons.Enums;
 using Odasoft.XBOL.Data.Repositories;
-using Odasoft.XBOL.Data.Repositories.Season;
 using Odasoft.XBOL.DTO;
+using Odasoft.XBOL.DTO.Requests;
 using Odasoft.XBOL.DTO.Response;
+using Odasoft.XBOL.DTO.Results;
 
 namespace Odasoft.XBOL.Business.Services
 {
     public class EventService
     {
         private readonly EventRepository _eventRepository;
-        private readonly SeasonRepository _seasonRepository;
 
-        public EventService(EventRepository eventRepository, SeasonRepository seasonRepository)
+        public EventService(EventRepository eventRepository)
         {
             _eventRepository = eventRepository;
-            _seasonRepository = seasonRepository;
         }
 
         public async Task<PagedResponse<EventListItemDTO>> GetEventListAsync(
@@ -30,7 +29,7 @@ namespace Odasoft.XBOL.Business.Services
             int? pageSize,
             long? seasonId = null,
             EventStatus? status = null,
-            bool? onSale = null)
+            bool? upcoming = null)
         {
 
             var events = await _eventRepository.GetEventListAsync(
@@ -45,7 +44,7 @@ namespace Odasoft.XBOL.Business.Services
                 pageSize ?? 10,
                 seasonId,
                 status,
-                onSale);
+                upcoming);
 
             return events;
         }
@@ -92,6 +91,106 @@ namespace Odasoft.XBOL.Business.Services
                                 Id = x.Id,
                                 Name = x.Name
                             }).ToListAsync();
+        }
+
+        public async Task<EventResult?> CreateEventAsync(CreateEventRequest request)
+        {
+            Models.Event newEvent = new()
+            {
+                VenueMapId = request.VenueMapId,
+                Name = request.Name,
+                Subtitle = request.Subtitle,
+                ShortDescription = request.ShortDescription,
+                LongDescription = request.LongDescription,
+                Category = request.Category,
+                Status = EventStatus.Draft,
+                CreatedAt = DateTimeOffset.UtcNow,
+                CreatedBy = Guid.Empty, // TODO: Replace with actual user ID from context
+                UpdatedAt = DateTimeOffset.UtcNow,
+                UpdatedBy = Guid.Empty
+            };
+            try
+            {
+                await _eventRepository.InsertAsync(newEvent);
+                await _eventRepository.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating Event: {ex.Message}");
+                return null;
+            }
+            return new EventResult
+            {
+                Id = newEvent.Id,
+                VenueMapId = newEvent.VenueMapId,
+                Name = newEvent.Name,
+                Subtitle = newEvent.Subtitle,
+                ShortDescription = newEvent.ShortDescription,
+                LongDescription = newEvent.LongDescription,
+                Category = newEvent.Category,
+                Status = newEvent.Status
+            };
+        }
+
+        public async Task<bool> UpdateEventAsync(long eventId, UpdateEventRequest request)
+        {
+            Models.Event? existingEvent = await _eventRepository.GetByIdAsync(eventId);
+            if (existingEvent == null)
+            {
+                Console.WriteLine($"Event with ID {eventId} not found.");
+                return false;
+            }
+            existingEvent.VenueMapId = request.VenueMapId;
+            existingEvent.Name = request.Name;
+            existingEvent.Subtitle = request.Subtitle;
+            existingEvent.ShortDescription = request.ShortDescription;
+            existingEvent.LongDescription = request.LongDescription;
+            existingEvent.Category = request.Category;
+            existingEvent.UpdatedAt = DateTimeOffset.UtcNow;
+            existingEvent.UpdatedBy = Guid.Empty; // TODO: Replace with actual user ID from context
+            try
+            {
+                await _eventRepository.UpdateAsync(existingEvent);
+                await _eventRepository.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating Event: {ex.Message}");
+                return false;
+            }
+            return true;
+        }
+
+        public async Task<bool> DeleteEventAsync(long eventId)
+        {
+            Models.Event? existingEvent = await _eventRepository.GetByIdAsync(eventId);
+            if (existingEvent == null)
+            {
+                Console.WriteLine($"Event with ID {eventId} not found.");
+                return false;
+            }
+
+            if (existingEvent.Schedules.Count > 0)
+            {
+                Console.WriteLine($"Cannot delete Event with ID {eventId} because it has associated schedules.");
+                return false;
+            }
+
+            existingEvent.DeletedAt = DateTimeOffset.UtcNow;
+            existingEvent.UpdatedAt = DateTimeOffset.UtcNow;
+            existingEvent.UpdatedBy = Guid.Empty; // TODO: Replace with actual user ID from context
+
+            try
+            {
+                await _eventRepository.UpdateAsync(existingEvent);
+                await _eventRepository.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting Event: {ex.Message}");
+                return false;
+            }
+            return true;
         }
     }
 }

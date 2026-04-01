@@ -23,6 +23,7 @@ namespace Odasoft.XBOL.Data.Extensions
             services.AddScoped<ClientCreditAccountRepository>();
             services.AddScoped<ClientCreditTransactionRepository>();
             services.AddScoped<EventRepository>();
+            services.AddScoped<EventImageRepository>();
             services.AddScoped<EventScheduleRepository>();
             services.AddScoped<EventSeatRepository>();
             services.AddScoped<EventSectionRepository>();

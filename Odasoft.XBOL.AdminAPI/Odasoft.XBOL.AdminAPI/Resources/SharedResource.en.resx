@@ -162,6 +162,9 @@
   <data name="Seats" xml:space="preserve">
     <value>Seats</value>
   </data>
+  <data name="Venue" xml:space="preserve">
+    <value>Venue</value>
+  </data>
   <data name="ValidationTitle" xml:space="preserve">
     <value>One or more validation errors occurred.</value>
   </data>

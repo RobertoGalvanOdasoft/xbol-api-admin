@@ -76,8 +76,6 @@ namespace Odasoft.XBOL.Business.Services
             {
                 EventSchedule schedule = await _eventScheduleRepository.Get(x => x.ExternalEventKey == request.EventKey).FirstAsync();
 
-                var localizer = await _sequenceTrackerService.GenerateLocalizerAsync(EVENT_ORDER_LOCALIZER_PREFIX, schedule.EventId);
-
                 Client client;
 
                 if (request.ClientContact.Id.HasValue)
@@ -99,7 +97,7 @@ namespace Odasoft.XBOL.Business.Services
                 {
                     ClientId = client.Id,
                     UserId = client.UserId,
-                    Reference = localizer,
+                    Reference = request.Localizer,
                     Status = Enums.OrderStatus.Paid,
                     SubTotal = 0,
                     TotalFees = 0,
@@ -145,7 +143,7 @@ namespace Odasoft.XBOL.Business.Services
             }
         }
 
-        public async Task CreateSeasonOrderAsync(SeasonBookingRequest request)
+        public async Task<long> CreateSeasonOrderAsync(SeasonBookingRequest request)
         {
             IDbContextTransaction transaction = await _orderRepository.BeginTransactionAsync();
 
@@ -155,8 +153,6 @@ namespace Odasoft.XBOL.Business.Services
                                     .Get()
                                     .Where(s => s.ExternalSeasonKey == request.SeasonKey)
                                     .SingleOrDefaultAsync();
-
-                var localizer = await _sequenceTrackerService.GenerateLocalizerAsync(SEASON_ORDER_LOCALIZER_PREFIX, season.Id);
 
                 Client client;
 
@@ -179,7 +175,7 @@ namespace Odasoft.XBOL.Business.Services
                 {
                     ClientId = client.Id,
                     UserId = client.UserId,
-                    Reference = localizer,
+                    Reference = request.Localizer,
                     Status = Enums.OrderStatus.Paid,
                     SubTotal = 0,
                     TotalFees = 0,
@@ -214,6 +210,8 @@ namespace Odasoft.XBOL.Business.Services
                 }
 
                 await transaction.CommitAsync();
+
+                return newOrder.Id;
             }
             catch (Exception ex)
             {

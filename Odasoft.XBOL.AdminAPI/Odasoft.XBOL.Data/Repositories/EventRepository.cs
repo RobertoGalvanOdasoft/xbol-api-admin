@@ -20,7 +20,7 @@ namespace Odasoft.XBOL.Data.Repositories
             int pageSize,
             long? seasonId = null,
             EventStatus? status = null,
-            bool? onSale = null)
+            bool? upcoming = null)
         {
             var venueNames = string.IsNullOrEmpty(venues)
                 ? []
@@ -51,15 +51,15 @@ namespace Odasoft.XBOL.Data.Repositories
             }
 
             // TODO: Check if any schedule in an event is On Sale and return list of schedules
-            if (onSale.HasValue)
+            if (upcoming.HasValue)
             {
-                if (onSale.Value)
+                if (upcoming.Value)
                 {
-                    query = query.Where(x => x.Schedule.OnSaleDate <= DateTimeOffset.UtcNow && x.Schedule.OffSaleDate >= DateTimeOffset.UtcNow);
+                    query = query.Where(x => x.Schedule.EndDateTime >= DateTimeOffset.UtcNow);
                 }
                 else
                 {
-                    query = query.Where(x => x.Schedule.OffSaleDate <= DateTimeOffset.UtcNow);
+                    query = query.Where(x => x.Schedule.EndDateTime <= DateTimeOffset.UtcNow);
                 }
             }
 
@@ -152,7 +152,7 @@ namespace Odasoft.XBOL.Data.Repositories
         {
             var eventsQuery = DbSet
                 .AsNoTracking()
-                .Where(e => e.Status != EventStatus.Cancelled)
+                .Where(e => e.Status == EventStatus.Published)
                 .Select(e => new EventAggregationDTO
                 {
                     Id = e.Id,

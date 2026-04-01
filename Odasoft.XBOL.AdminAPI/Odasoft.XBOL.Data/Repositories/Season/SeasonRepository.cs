@@ -88,6 +88,15 @@ namespace Odasoft.XBOL.Data.Repositories.Season
             };
         }
 
+        public async Task<long?> GetSeasonIdByExternalSeasonKeyAsync(string seasonKey)
+        {
+            var season = await DbContext.Set<Models.Season>()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.ExternalSeasonKey == seasonKey);
+
+            return season?.Id;
+        }
+
         public async Task<SeasonResult?> GetSeasonByIdAsync(long id)
         {
             var seatsPrice = await dbContext.SeasonSeats

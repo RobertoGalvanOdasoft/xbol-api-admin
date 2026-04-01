@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using Odasoft.XBOL.Business.Services;
 using Odasoft.XBOL.Commons.Enums;
 using Odasoft.XBOL.DTO;
+using Odasoft.XBOL.DTO.Requests;
 using Odasoft.XBOL.DTO.Response;
+using Odasoft.XBOL.DTO.Results;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
 {
@@ -34,7 +36,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// <param name="seasonId">The identifier of the season to filter events by. If null, events from all seasons are included.</param>
         /// <param name="status">The status value used to filter events (such as Active, Cancelled, etc.). If null, events of all statuses
         /// are included.</param>
-        /// <param name="onSale">Indicates whether to filter for events that have an schedule currently on sale. If null, all events are included</param>
+        /// <param name="upcoming">Indicates whether to filter for events that have an schedule currently on sale. If null, all events are included</param>
         /// <returns>An ActionResult containing a paged response of event list items that match the specified filters and sorting
         /// options. The response includes pagination metadata and the filtered event data.</returns>
         [HttpGet]
@@ -52,11 +54,11 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
             [FromQuery] int? pageSize,
             [FromQuery] long? seasonId,
             [FromQuery] EventStatus? status,
-            [FromQuery] bool? onSale)
+            [FromQuery] bool? upcoming)
         {
             var result = await eventService.GetEventListAsync(
                 venues, categories, startDate, endDate, search, sortBy, descending, page, pageSize,
-                seasonId, status, onSale);
+                seasonId, status, upcoming);
 
             return Ok(result);
         }
@@ -142,6 +144,90 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         {
             var result = await eventService.GetEventCatalogAsync();
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Creates a new event using the specified request data and returns the result of the operation.
+        /// </summary>
+        /// <remarks>If the model state is invalid, the method returns a 400 Bad Request response. On
+        /// successful creation, a 201 Created response is returned with the location of the newly created event. If
+        /// the creation fails, a 422 Unprocessable Entity response is returned.</remarks>
+        /// <param name="request">The request object containing the details required to create a new event. Must not be null and must satisfy
+        /// model validation requirements.</param>
+        /// <returns>An ActionResult containing the created EventResult if successful; otherwise, a BadRequest result if the
+        /// input is invalid, or an UnprocessableEntity result if the event could not be created.</returns>
+        [HttpPost]
+        [EndpointName("CreateEventAsync")]
+        [ProducesResponseType(typeof(EventResult), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        public async Task<ActionResult<EventResult>> CreateEventAsync([FromBody] CreateEventRequest request)
+        {
+            var result = await eventService.CreateEventAsync(request);
+
+            if (result != null)
+            {
+                return CreatedAtAction("GetEventById", new { eventId = result.Id }, result);
+            }
+
+            // TODO: Internationalization
+            return UnprocessableEntity("Unable to create Event");
+        }
+
+        /// <summary>
+        /// Updates the details of an existing event identified by its unique identifier.
+        /// </summary>
+        /// <remarks>The method validates the input model state before attempting to update the event. If
+        /// the model state is invalid, a BadRequest response is returned. If the update cannot be processed, an
+        /// UnprocessableEntity response is returned.</remarks>
+        /// <param name="id">The unique identifier of the event to update. Must be a positive long value.</param>
+        /// <param name="request">An object containing the updated event details. This parameter is required and cannot be null.</param>
+        /// <returns>An IActionResult that indicates the result of the update operation. Returns NoContent if the update is
+        /// successful; otherwise, returns BadRequest if the input is invalid or UnprocessableEntity if the update
+        /// fails.</returns>
+        [HttpPut]
+        [EndpointName("UpdateEventAsync")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateEventAsync([FromRoute] long id, [FromBody] UpdateEventRequest request)
+        {
+            var result = await eventService.UpdateEventAsync(id, request);
+
+            if (result)
+            {
+                return NoContent();
+            }
+
+            // TODO: Internationalization
+            return UnprocessableEntity("Unable to update Event");
+        }
+
+        /// <summary>
+        /// Deletes the event identified by the specified unique identifier.
+        /// </summary>
+        /// <remarks>This method does not delete a event if the specified identifier does not match any
+        /// existing event.</remarks>
+        /// <param name="id">The unique identifier of the event to delete. Must be a valid long integer corresponding to an existing
+        /// event.</param>
+        /// <returns>An IActionResult that indicates the result of the delete operation. Returns 204 No Content if the deletion
+        /// is successful; otherwise, returns 422 Unprocessable Entity with an error message.</returns>
+        [HttpDelete("{id:long}")]
+        [EndpointName("DeleteEventAsync")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        public async Task<IActionResult> DeleteEventAsync([FromRoute] long id)
+        {
+            var result = await eventService.DeleteEventAsync(id);
+
+            if (result)
+            {
+                return NoContent();
+            }
+
+            // TODO: Internationalization
+            return UnprocessableEntity("Unable to delete Event");
         }
     }
 }

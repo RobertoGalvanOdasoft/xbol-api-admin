@@ -135,5 +135,19 @@ namespace Odasoft.XBOL.Business.Services
                 return false;
             }
         }
+
+        public async Task<List<ListItem>> GetVenueMapCatalogByVenueIdAsync(long? venueId)
+        {
+            return await _venueMapRepository
+                            .Get()
+                            .AsNoTracking()
+                            .Where(vm => vm.IsDeleted == false)
+                            .Where(vm => venueId == null || vm.VenueId == venueId)
+                            .Select(vm => new ListItem
+                            {
+                                Id = vm.Id,
+                                Name = vm.Name
+                            }).ToListAsync();
+        }
     }
 }

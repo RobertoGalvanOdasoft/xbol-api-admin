@@ -52,6 +52,23 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         }
 
         /// <summary>
+        /// Retrieves a collection of venue map catalog items for use in selection lists or dropdowns.
+        /// </summary>
+        /// <remarks>Use this endpoint to obtain a list of venues formatted for display in UI components
+        /// such as dropdowns. The returned items typically include venue map identifiers and display names.</remarks>
+        /// <param name="venueId">The unique identifier of the venue id of the maps to retrieve. If null then returns all venue maps</param>
+        /// <returns>An ActionResult containing the collection of venue map catalog items.
+        /// Returns an empty collection if no venue maps are available.</returns>
+        [HttpGet("catalog/{venueId:long}")]
+        [EndpointName("GetVenueMapCatalogByVenueIdAsync")]
+        [ProducesResponseType(typeof(List<ListItem>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<ListItem>>> GetVenueMapCatalogByVenueIdAsync(long? venueId)
+        {
+            var result = await venueMapService.GetVenueMapCatalogByVenueIdAsync(venueId);
+            return Ok(result);
+        }
+
+        /// <summary>
         /// Creates a new Venue Map or Maps using the specified request data.
         /// </summary>
         /// <param name="requests">The list of details of the Venue Map or Maps to create.</param>

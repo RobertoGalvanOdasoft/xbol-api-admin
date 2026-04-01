@@ -162,6 +162,9 @@
   <data name="Seats" xml:space="preserve">
     <value>Asientos</value>
   </data>
+  <data name="Venue" xml:space="preserve">
+    <value>Recinto</value>
+  </data>
   <data name="ValidationTitle" xml:space="preserve">
     <value>Se produjeron uno o más errores de validación.</value>
   </data>

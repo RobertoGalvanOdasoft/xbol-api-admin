@@ -21,6 +21,11 @@ namespace Odasoft.XBOL.Business.Services
             return await repository.GetSeasonByIdAsync(id);
         }
 
+        public async Task<long?> GetSeasonIdByExternalKeyAsync(string externalSeasonKey)
+        {
+            return await repository.GetSeasonIdByExternalSeasonKeyAsync(externalSeasonKey);
+        }
+
         public async Task<SeasonResult?> CreateSeasonAsync(CreateSeasonRequest request)
         {
             var newSeason = new Models.Season

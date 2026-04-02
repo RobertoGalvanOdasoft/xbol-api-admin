@@ -168,4 +168,13 @@
   <data name="ValidationTitle" xml:space="preserve">
     <value>One or more validation errors occurred.</value>
   </data>
+  <data name="SeatKeys" xml:space="preserve">
+    <value>Seat Keys</value>
+  </data>
+  <data name="Reason" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="Color" xml:space="preserve">
+    <value>Color</value>
+  </data>
 </root>

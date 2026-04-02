@@ -4,3 +4,35 @@ variables:
     value: https://localhost:7241
   - name: venueId
     value: "1"
+  - name: eventId
+    value: "1"
+  - name: scheduleExternalKey
+    value: ae03b08a-aa51-4455-80d9-a36b94554312
+  - name: seasonExternalKey
+    value: 0aa470cd-8940-486b-a166-bfcb165f02b3
+  - name: blockSeat1
+    value: A-13-1
+  - name: blockSeat2
+    value: A-13-2
+  - name: blockSeat3
+    value: A-13-3
+  - name: schedSeat1
+    value: B-10-1
+  - name: schedSeat2
+    value: B-10-2
+  - name: schedSeatPrice
+    value: "50.00"
+  - name: seasonSeat1
+    value: B-8-1
+  - name: seasonSeat2
+    value: B-8-2
+  - name: seasonSeatPrice
+    value: "75.00"
+  - name: holdSeat1
+    value: B-7-1
+  - name: holdSeat2
+    value: B-7-2
+  - name: holdTokenSeat1
+    value: B-7-3
+  - name: holdTokenSeat2
+    value: B-7-4

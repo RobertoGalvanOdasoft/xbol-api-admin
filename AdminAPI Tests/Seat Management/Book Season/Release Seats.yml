@@ -1,0 +1,35 @@
+info:
+  name: Release Seats
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/seat-management/{{seasonExternalKey}}/release"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "seats": ["{{seasonSeat1}}", "{{seasonSeat2}}"]
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("returns 200", () => {
+          expect(res.status).to.equal(200);
+        });
+        test("released seats are returned", () => {
+          expect(res.body).to.be.an("array");
+          expect(res.body.length).to.equal(2);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

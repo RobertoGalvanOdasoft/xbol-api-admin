@@ -1,0 +1,53 @@
+info:
+  name: Book Seats
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/seat-management/{{seasonExternalKey}}/book"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "seats": { "{{seasonSeat1}}": {{seasonSeatPrice}}, "{{seasonSeat2}}": {{seasonSeatPrice}} },
+        "holdToken": "{{holdToken}}",
+        "ticketType": "SeasonPass",
+        "clientContact": {
+          "fullName": "Season Test User",
+          "email": "season-test@example.com"
+        },
+        "paymentInfoRequest": {
+          "cashAmount": 150.00
+        },
+        "localizer": null,
+        "referenceOrderId": null
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("returns 200", () => {
+          expect(res.status).to.equal(200);
+        });
+        test("response has localizer", () => {
+          expect(res.body.localizer).to.be.a("string");
+          expect(res.body.localizer.length).to.be.greaterThan(0);
+        });
+        test("response has tickets as array of seat keys", () => {
+          expect(res.body.tickets).to.be.an("array");
+          res.body.tickets.forEach((key) => {
+            expect(key).to.be.a("string");
+          });
+        });
+        bru.setVar("orderReference", res.body.localizer);
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

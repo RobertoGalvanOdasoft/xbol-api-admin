@@ -8,14 +8,8 @@ using Odasoft.XBOL.DTO.Results;
 
 namespace Odasoft.XBOL.Business.Services
 {
-    public class EventService
+    public class EventService(EventRepository eventRepository)
     {
-        private readonly EventRepository _eventRepository;
-
-        public EventService(EventRepository eventRepository)
-        {
-            _eventRepository = eventRepository;
-        }
 
         public async Task<PagedResponse<EventListItemDTO>> GetEventListAsync(
             string? venues,
@@ -32,7 +26,7 @@ namespace Odasoft.XBOL.Business.Services
             bool? upcoming = null)
         {
 
-            var events = await _eventRepository.GetEventListAsync(
+            var events = await eventRepository.GetEventListAsync(
                 venues,
                 categories,
                 startDate,
@@ -60,7 +54,7 @@ namespace Odasoft.XBOL.Business.Services
             int? page,
             int? pageSize)
         {
-            var events = await _eventRepository.GetEventsOnSaleAsync(
+            var events = await eventRepository.GetEventListAsync(
                 venues,
                 categories,
                 startDate,
@@ -69,13 +63,14 @@ namespace Odasoft.XBOL.Business.Services
                 sortBy,
                 descending ?? false,
                 page ?? 1,
-                pageSize ?? 10);
+                pageSize ?? 10,
+                upcoming: true);
             return events;
         }
 
         public async Task<EventInfoDTO?> GetEventByIdAsync(long eventId)
         {
-            var result = await _eventRepository.GetEventByIdAsync(eventId);
+            var result = await eventRepository.GetEventByIdAsync(eventId);
 
             // TODO: Handle null result (e.g., throw exception or return a default value)
             return result;
@@ -83,7 +78,7 @@ namespace Odasoft.XBOL.Business.Services
 
         public async Task<IList<ListItem>> GetEventCatalogAsync()
         {
-            return await _eventRepository
+            return await eventRepository
                             .Get()
                             .AsNoTracking()
                             .Select(x => new ListItem
@@ -111,8 +106,8 @@ namespace Odasoft.XBOL.Business.Services
             };
             try
             {
-                await _eventRepository.InsertAsync(newEvent);
-                await _eventRepository.CommitAsync();
+                await eventRepository.InsertAsync(newEvent);
+                await eventRepository.CommitAsync();
             }
             catch (Exception ex)
             {
@@ -134,7 +129,7 @@ namespace Odasoft.XBOL.Business.Services
 
         public async Task<bool> UpdateEventAsync(long eventId, UpdateEventRequest request)
         {
-            Models.Event? existingEvent = await _eventRepository.GetByIdAsync(eventId);
+            Models.Event? existingEvent = await eventRepository.GetByIdAsync(eventId);
             if (existingEvent == null)
             {
                 Console.WriteLine($"Event with ID {eventId} not found.");
@@ -150,8 +145,8 @@ namespace Odasoft.XBOL.Business.Services
             existingEvent.UpdatedBy = Guid.Empty; // TODO: Replace with actual user ID from context
             try
             {
-                await _eventRepository.UpdateAsync(existingEvent);
-                await _eventRepository.CommitAsync();
+                await eventRepository.UpdateAsync(existingEvent);
+                await eventRepository.CommitAsync();
             }
             catch (Exception ex)
             {
@@ -163,7 +158,7 @@ namespace Odasoft.XBOL.Business.Services
 
         public async Task<bool> DeleteEventAsync(long eventId)
         {
-            Models.Event? existingEvent = await _eventRepository.GetByIdAsync(eventId);
+            Models.Event? existingEvent = await eventRepository.GetByIdAsync(eventId);
             if (existingEvent == null)
             {
                 Console.WriteLine($"Event with ID {eventId} not found.");
@@ -182,8 +177,8 @@ namespace Odasoft.XBOL.Business.Services
 
             try
             {
-                await _eventRepository.UpdateAsync(existingEvent);
-                await _eventRepository.CommitAsync();
+                await eventRepository.UpdateAsync(existingEvent);
+                await eventRepository.CommitAsync();
             }
             catch (Exception ex)
             {

@@ -1,0 +1,40 @@
+info:
+  name: Release Hold
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/seat-management/{{scheduleExternalKey}}/release"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "seats": ["{{holdSeat1}}", "{{holdSeat2}}"]
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("returns 200", () => {
+          expect(res.status).to.equal(200);
+        });
+        test("content-type is application/json", () => {
+          expect(res.headers["content-type"]).to.contain("application/json");
+        });
+        test("response is an array of seat keys", () => {
+          expect(res.body).to.be.an("array");
+          res.body.forEach((key) => {
+            expect(key).to.be.a("string");
+          });
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

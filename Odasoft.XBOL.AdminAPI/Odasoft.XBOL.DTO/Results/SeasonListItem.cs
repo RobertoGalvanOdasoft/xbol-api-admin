@@ -9,5 +9,6 @@ namespace Odasoft.XBOL.DTO.Results
         public DateTimeOffset EndDate { get; set; }
         public string? BannerImageUrl { get; set; }
         public string? PosterImageUrl { get; set; }
+        public string? ExternalSeasonKey { get; set; }
     }
 }

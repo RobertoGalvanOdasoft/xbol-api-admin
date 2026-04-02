@@ -1,0 +1,35 @@
+info:
+  name: Hold Seats
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/seat-management/{{scheduleExternalKey}}/hold"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "seats": ["{{schedSeat1}}", "{{schedSeat2}}"]
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("returns 200", () => {
+          expect(res.status).to.equal(200);
+        });
+        test("response has token", () => {
+          expect(res.body.token).to.be.a("string");
+        });
+        bru.setVar("holdToken", res.body.token);
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

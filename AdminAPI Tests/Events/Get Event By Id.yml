@@ -1,0 +1,55 @@
+info:
+  name: Get Event By Id
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/events/{{eventId}}"
+  headers:
+    - name: Content-Type
+      value: application/json
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("returns 200", () => {
+          expect(res.status).to.equal(200);
+        });
+        test("content-type is application/json", () => {
+          expect(res.headers["content-type"]).to.contain("application/json");
+        });
+        test("response body has correct id", () => {
+          expect(res.body.id).to.be.a("number");
+        });
+        test("response body has name", () => {
+          expect(res.body.name).to.be.a("string");
+        });
+        test("response body has schedules array", () => {
+          expect(res.body.schedules).to.be.an("array");
+          expect(res.body.schedules.length).to.be.greaterThan(0);
+        });
+        test("each schedule has required fields", () => {
+          res.body.schedules.forEach((schedule) => {
+            expect(schedule.id).to.be.a("number");
+            expect(schedule.startDateTime).to.be.a("string");
+            expect(schedule.externalEventKey).to.be.a("string");
+            expect(schedule.totalSeats).to.be.a("number");
+            expect(schedule.availableSeats).to.be.a("number");
+            expect(schedule.status).to.be.a("string");
+          });
+        });
+        test("response does not have flattened schedule fields", () => {
+          expect(res.body).to.not.have.property("scheduledStartDate");
+          expect(res.body).to.not.have.property("scheduledEndDate");
+          expect(res.body).to.not.have.property("externalEventKey");
+          expect(res.body).to.not.have.property("totalSeats");
+          expect(res.body).to.not.have.property("availableSeats");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -562,7 +562,7 @@ namespace Odasoft.XBOL.Business.Services
                     Seat = pass?.SeasonSeat?.BaseSeat?.SeatNumber ?? "",
                     IsSold = seatsSold.Contains(trackingCode),
                     Price = oi.Price,
-                    RenewalPrice = seatPrices[trackingCode] ?? 0
+                    RenewalPrice = seatPrices.GetValueOrDefault(trackingCode) ?? 0
                 };
             }).ToList();
 

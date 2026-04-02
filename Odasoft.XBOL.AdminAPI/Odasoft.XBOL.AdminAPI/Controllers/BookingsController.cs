@@ -9,6 +9,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
 {
     [Route("api/bookings")]
     [ApiController]
+    [Obsolete("Use POST /api/seat-management/{externalKey}/book")]
     public class BookingsController(IMessageBus bus) : ControllerBase
     {
         /// <summary>

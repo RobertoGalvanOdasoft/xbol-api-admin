@@ -75,7 +75,8 @@ namespace Odasoft.XBOL.Data.Repositories.Season
                     StartDate = s.StartDate,
                     EndDate = s.EndDate,
                     BannerImageUrl = s.BannerImageUrl,
-                    PosterImageUrl = s.PosterImageUrl
+                    PosterImageUrl = s.PosterImageUrl,
+                    ExternalSeasonKey = s.ExternalSeasonKey
                 })
                 .ToListAsync();
 

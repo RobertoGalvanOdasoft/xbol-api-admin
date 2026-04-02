@@ -1,0 +1,51 @@
+info:
+  name: Get Detail Schedule
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/seat-management/{{scheduleExternalKey}}"
+  headers:
+    - name: Content-Type
+      value: application/json
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("returns 200", () => {
+          expect(res.status).to.equal(200);
+        });
+        test("content-type is application/json", () => {
+          expect(res.headers["content-type"]).to.contain("application/json");
+        });
+        test("type is Schedule", () => {
+          expect(res.body.type).to.equal("Schedule");
+        });
+        test("externalKey matches", () => {
+          expect(res.body.externalKey).to.be.a("string");
+        });
+        test("response has required fields", () => {
+          expect(res.body.name).to.be.a("string");
+          expect(res.body.startDate).to.be.a("string");
+          expect(res.body.totalSeats).to.be.a("number");
+          expect(res.body.availableSeats).to.be.a("number");
+          expect(res.body.prices).to.be.an("array");
+        });
+        test("each price has all shape fields", () => {
+          res.body.prices.forEach((p) => {
+            expect(p).to.have.property("price");
+            expect(p).to.have.property("objects");
+            expect(p).to.have.property("category");
+            expect(p).to.have.property("originalPrice");
+            expect(p).to.have.property("fee");
+            expect(p).to.have.property("ticketTypes");
+          });
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -17,6 +17,7 @@ public static class MvcConfiguration
         services.AddControllers(options =>
         {
             options.Filters.Add(new ValidationFilter());
+            options.Filters.Add(new ApiExceptionFilter());
             options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
         }).AddNewtonsoftJson(options =>
         {

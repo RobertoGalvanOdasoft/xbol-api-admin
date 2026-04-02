@@ -1,0 +1,46 @@
+info:
+  name: Block Seats Validation Error EN
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/seat-management/{{scheduleExternalKey}}/block"
+  headers:
+    - name: Content-Type
+      value: application/json
+    - name: Accept-Language
+      value: en
+  body:
+    type: json
+    data: "{}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("returns 400", () => {
+          expect(res.status).to.equal(400);
+        });
+        test("content-type is application/problem+json", () => {
+          expect(res.headers["content-type"]).to.contain("application/problem+json");
+        });
+        test("title is in English", () => {
+          expect(res.body.title).to.contain("validation errors");
+        });
+        test("has validation errors for required fields", () => {
+          expect(res.body.errors.SeatKeys).to.be.an("array");
+          expect(res.body.errors.Reason).to.be.an("array");
+          expect(res.body.errors.Color).to.be.an("array");
+        });
+        test("error messages are in English", () => {
+          expect(res.body.errors.SeatKeys[0]).to.contain("Seat Keys");
+          expect(res.body.errors.Reason[0]).to.contain("Reason");
+          expect(res.body.errors.Color[0]).to.contain("Color");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

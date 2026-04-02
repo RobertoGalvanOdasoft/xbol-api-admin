@@ -5,6 +5,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
 {
     [Route("api/hold-seats")]
     [ApiController]
+    [Obsolete("Use POST /api/seat-management/{externalKey}/hold")]
     public class HoldController(ITicketingClient ticketingClient) : ControllerBase
     {
         /// <summary>

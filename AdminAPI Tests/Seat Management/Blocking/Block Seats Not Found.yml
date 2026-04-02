@@ -1,0 +1,33 @@
+info:
+  name: Block Seats Not Found
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/seat-management/non-existent-key/block"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "seatKeys": ["{{blockSeat1}}"],
+        "reason": "Test",
+        "color": "#000000"
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("returns 404", () => {
+          expect(res.status).to.equal(404);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

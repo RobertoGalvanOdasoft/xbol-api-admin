@@ -125,8 +125,7 @@ namespace Odasoft.XBOL.Data.Repositories
                     ExternalEventKey = x.Schedule.ExternalEventKey,
                     TotalSeats = x.Schedule.Sections.Sum(s => s.TotalSeats),
                     AvailableSeats = x.Schedule.Sections.Sum(s => s.AvailableSeats),
-                    PosterImageUrl = x.Event.PosterImageUrl,
-                    IsSeason = false
+                    PosterImageUrl = x.Event.PosterImageUrl
                 })
                 .ToListAsync();
 
@@ -281,26 +280,29 @@ namespace Odasoft.XBOL.Data.Repositories
             var result = await DbSet
                 .AsNoTracking()
                 .Where(e => e.Id == eventId && e.Status != EventStatus.Cancelled)
-                .Select(e => new
+                .Select(e => new EventInfoDTO
                 {
-                    Event = e,
-                    Schedule = e.Schedules.OrderBy(s => s.StartDateTime).FirstOrDefault()
-                })
-                .Select(temp => new EventInfoDTO
-                {
-                    Id = temp.Event.Id,
-                    ScheduledStartDate = temp.Schedule != null ? temp.Schedule.StartDateTime : DateTimeOffset.MinValue,
-                    ScheduledEndDate = temp.Schedule != null ? temp.Schedule.EndDateTime : null,
-                    Name = temp.Event.Name,
-                    Subtitle = temp.Event.Subtitle,
-                    Category = temp.Event.Category.ToString(),
-                    BannerImageUrl = temp.Event.BannerImageUrl,
-                    VenueMapId = temp.Event.VenueMapId,
-                    VenueName = temp.Event.VenueMap.Venue.Name,
-                    ExternalEventKey = temp.Schedule != null ? temp.Schedule.ExternalEventKey : "",
-                    TotalSeats = temp.Schedule != null ? temp.Schedule.Sections.Sum(s => s.TotalSeats) : 0,
-                    AvailableSeats = temp.Schedule != null ? temp.Schedule.Sections.Sum(s => s.AvailableSeats) : 0,
-                    Prices = prices
+                    Id = e.Id,
+                    Name = e.Name,
+                    Subtitle = e.Subtitle,
+                    Category = e.Category.ToString(),
+                    BannerImageUrl = e.BannerImageUrl,
+                    VenueMapId = e.VenueMapId,
+                    VenueName = e.VenueMap.Venue.Name,
+                    Prices = prices,
+                    Schedules = e.Schedules
+                        .OrderBy(s => s.StartDateTime)
+                        .Select(s => new EventScheduleDTO
+                        {
+                            Id = s.Id,
+                            StartDateTime = s.StartDateTime,
+                            EndDateTime = s.EndDateTime,
+                            ExternalEventKey = s.ExternalEventKey,
+                            TotalSeats = s.Sections.Sum(sec => sec.TotalSeats),
+                            AvailableSeats = s.Sections.Sum(sec => sec.AvailableSeats),
+                            Status = s.Status
+                        })
+                        .ToList()
                 }).FirstOrDefaultAsync();
 
             return result;

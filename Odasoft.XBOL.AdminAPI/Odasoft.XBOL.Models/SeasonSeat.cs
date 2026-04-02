@@ -11,5 +11,6 @@ namespace Odasoft.XBOL.Models
         public decimal? PriceOverride { get; set; }
 
         public string ExternalSeatObjectKey { get; set; } = "";
+        public bool ForSale { get; set; } = true;
     }
 }

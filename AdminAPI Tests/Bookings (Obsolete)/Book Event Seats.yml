@@ -1,0 +1,60 @@
+info:
+  name: Book Event Seats
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/bookings/event/book-seats"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "eventKey": "{{scheduleExternalKey}}",
+        "seats": { "B-9-1": 50.00, "B-9-2": 50.00 },
+        "holdToken": null,
+        "eventScheduleId": 1,
+        "ticketType": "Ticket",
+        "clientContact": {
+          "fullName": "Obsolete Test User",
+          "email": "obsolete-test@example.com"
+        },
+        "paymentInfoRequest": {
+          "cashAmount": 100.00
+        },
+        "localizer": null
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("returns 200", () => {
+          expect(res.status).to.equal(200);
+        });
+        test("bookingId is null (never set by handler)", () => {
+          expect(res.body.bookingId).to.equal(null);
+        });
+        test("reference is null (never set by handler)", () => {
+          expect(res.body.reference).to.equal(null);
+        });
+        test("localizer is set", () => {
+          expect(res.body.localizer).to.be.a("string");
+          expect(res.body.localizer.length).to.be.greaterThan(0);
+        });
+        test("tickets is array of seat keys", () => {
+          expect(res.body.tickets).to.be.an("array");
+          expect(res.body.tickets.length).to.equal(2);
+        });
+        test("message is set", () => {
+          expect(res.body.message).to.equal("Booking created successfully");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

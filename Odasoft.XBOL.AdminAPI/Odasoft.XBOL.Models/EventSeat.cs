@@ -13,6 +13,7 @@ namespace Odasoft.XBOL.Models
 
         public IList<PriceRule> PriceRules { get; set; } = [];
         public IList<Ticket> Tickets { get; set; } = [];
+        public bool ForSale { get; set; } = true;
         public string ExternalSeatObjectKey { get; set; } = "";
     }
 }

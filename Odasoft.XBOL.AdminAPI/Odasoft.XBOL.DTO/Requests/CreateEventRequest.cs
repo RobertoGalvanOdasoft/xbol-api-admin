@@ -1,5 +1,3 @@
-using Odasoft.XBOL.Commons.Enums;
-
 namespace Odasoft.XBOL.DTO.Requests
 {
     public class CreateEventRequest : IEventRequest
@@ -10,6 +8,6 @@ namespace Odasoft.XBOL.DTO.Requests
         public string? ShortDescription { get; set; }
         public string? LongDescription { get; set; }
 
-        public EventCategory? Category { get; set; }
+        public List<long> CategoryIds { get; set; } = [];
     }
 }

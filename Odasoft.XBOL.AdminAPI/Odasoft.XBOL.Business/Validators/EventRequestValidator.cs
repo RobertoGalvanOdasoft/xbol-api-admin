@@ -17,7 +17,7 @@ namespace Odasoft.XBOL.Business.Validators
                 .MaximumLength(200)
                 .WithMessage(string.Format(localizer["The {0} field must not exceed {1} characters."], localizer["Name"], 200));
 
-            RuleFor(x => x.Category)
+            RuleFor(x => x.CategoryIds)
                 .NotEmpty()
                 .WithMessage(string.Format(localizer["The {0} field is required."], localizer["Category"]));
 

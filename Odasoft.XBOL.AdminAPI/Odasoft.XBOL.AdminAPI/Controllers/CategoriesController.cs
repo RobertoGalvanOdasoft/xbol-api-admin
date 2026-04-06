@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Odasoft.XBOL.Business.Services;
+using Odasoft.XBOL.DTO.Results;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
 {
@@ -8,19 +9,15 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
     public class CategoriesController(CategoryService categoryService) : ControllerBase
     {
         /// <summary>
-        /// Retrieves a collection of category names.
+        /// Retrieves the list of active event categories.
         /// </summary>
-        /// <remarks>Use this method to obtain a list of category names for display in user interfaces or
-        /// for reporting purposes. The returned collection does not include additional category details beyond the
-        /// name.</remarks>
-        /// <returns>An list of strings containing the names of all available categories. The collection
-        /// is empty if no categories exist.</returns>
-        [HttpGet("names")]
-        [EndpointName("GetCategoriesNamesAsync")]
-        [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
-        public ActionResult<List<string>> GetCategoriesNamesAsync()
+        /// <returns>A list of event categories with their id, name, and display name.</returns>
+        [HttpGet]
+        [EndpointName("GetCategoriesAsync")]
+        [ProducesResponseType(typeof(List<EventCategoryResult>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<EventCategoryResult>>> GetCategoriesAsync()
         {
-            var result = categoryService.GetCategoryNames();
+            var result = await categoryService.GetCategoriesAsync();
             return Ok(result);
         }
     }

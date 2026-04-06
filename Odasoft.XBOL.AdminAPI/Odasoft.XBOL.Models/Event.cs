@@ -35,7 +35,7 @@ namespace Odasoft.XBOL.Models
         public DateTimeOffset? DeletedAt { get; set; }
         public Guid CreatedBy { get; set; }
         public Guid UpdatedBy { get; set; }
-        public EventCategory? Category { get; set; }
+        public IList<EventCategory> Categories { get; set; } = [];
 
         public long? PerformerId { get; set; }
         public Performer? Performer { get; set; }

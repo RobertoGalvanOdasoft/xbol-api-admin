@@ -25,8 +25,8 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// null, no upper date bound is applied.</param>
         /// <param name="search">A search term used to filter events by their title or description. If null or empty, no search filtering is
         /// applied.</param>
-        /// <param name="sortBy">The property name by which to sort the events. Valid options include 'date', 'name', and others supported by
-        /// the API. If null or empty, a default sort order is applied.</param>
+        /// <param name="sortBy">The property name by which to sort the events. Valid options: 'name', 'category', 'venue', 'createdat'.
+        /// Defaults to schedule start date if null or unrecognized.</param>
         /// <param name="descending">Indicates whether the sorting should be in descending order. If true, results are sorted in descending
         /// order; otherwise, ascending order is used. If null, the default sort direction is applied.</param>
         /// <param name="page">The page number of results to retrieve. Must be a positive integer if specified. If null, the first page is
@@ -77,8 +77,8 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// null, no upper date bound is applied.</param>
         /// <param name="search">A search term used to filter events by their title or description. If null or empty, no search filtering is
         /// applied.</param>
-        /// <param name="sortBy">The property name by which to sort the events. Valid options include 'date', 'name', and others supported by
-        /// the API. If null or empty, a default sort order is applied.</param>
+        /// <param name="sortBy">The property name by which to sort the events. Valid options: 'name', 'category', 'venue'.
+        /// Defaults to schedule start date if null or unrecognized.</param>
         /// <param name="descending">Indicates whether the sorting should be in descending order. If true, results are sorted in descending
         /// order; otherwise, ascending order is used. If null, the default sort direction is applied.</param>
         /// <param name="page">The page number of results to retrieve. Must be a positive integer if specified. If null, the first page is
@@ -89,7 +89,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// the specified filter and sorting criteria. The events are filtered based on the current date and time to include
         /// only those with schedules that are actively on sale.
         /// The results are sorted by scheduled start date in ascending order. If no events are currently on sale, an empty collection is returned.
-        ///The response includes pagination metadata and the filtered event data.</returns>
+        /// The response includes pagination metadata and the filtered event data.</returns>
         [HttpGet("on-sale")]
         [EndpointName("GetEventsOnSaleAsync")]
         [ProducesResponseType(typeof(PagedResponse<EventListItemDTO>), StatusCodes.Status200OK)]

@@ -1,12 +1,24 @@
-using Odasoft.XBOL.Commons.Enums;
+using Microsoft.EntityFrameworkCore;
+using Odasoft.XBOL.Data;
+using Odasoft.XBOL.DTO.Results;
 
 namespace Odasoft.XBOL.Business.Services
 {
-    public class CategoryService
+    public class CategoryService(XBOLDbContext dbContext)
     {
-        public IList<string> GetCategoryNames()
+        public async Task<List<EventCategoryResult>> GetCategoriesAsync()
         {
-            return Enum.GetNames<EventCategory>().ToList();
+            return await dbContext.EventCategories
+                .AsNoTracking()
+                .Where(c => c.IsActive)
+                .Select(c => new EventCategoryResult
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    DisplayName = c.DisplayName,
+                    IsActive = c.IsActive,
+                })
+                .ToListAsync();
         }
     }
 }

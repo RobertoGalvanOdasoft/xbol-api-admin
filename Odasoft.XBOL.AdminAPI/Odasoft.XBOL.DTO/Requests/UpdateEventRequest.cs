@@ -11,7 +11,7 @@ namespace Odasoft.XBOL.DTO.Requests
         public string? ShortDescription { get; set; }
         public string? LongDescription { get; set; }
 
-        public EventCategory? Category { get; set; }
+        public List<long> CategoryIds { get; set; } = [];
         public EventStatus Status { get; set; }
     }
 }

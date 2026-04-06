@@ -10,11 +10,11 @@
         "tags": [
           "Booking"
         ],
-        "summary": "Books event seats based on the specified booking request and returns the keys of the successfully booked\r\nseats.",
-        "description": "This method performs an asynchronous operation to book seats for an event. If the\r\n            booking request is invalid or if the booking process fails due to service issues, an appropriate error\r\n            response is returned.",
+        "summary": "Books event seats based on the specified booking request and returns the keys of the successfully booked\nseats.",
+        "description": "This method performs an asynchronous operation to book seats for an event. If the\n            booking request is invalid or if the booking process fails due to service issues, an appropriate error\n            response is returned.",
         "operationId": "BookEventSeatsAsync",
         "requestBody": {
-          "description": "The booking request containing details of the event seats to be booked. This parameter must not be null and\r\n            should include valid seat identifiers.",
+          "description": "The booking request containing details of the event seats to be booked. This parameter must not be null and\n            should include valid seat identifiers.",
           "content": {
             "application/json-patch+json": {
               "schema": {
@@ -122,11 +122,11 @@
         "tags": [
           "Booking"
         ],
-        "summary": "Books season seats based on the specified booking request and returns the keys of the successfully booked\r\nseats.",
-        "description": "This method performs an asynchronous operation to book seats for a season. If the\r\n            booking request is invalid or if the booking process fails due to service issues, an appropriate error\r\n            response is returned.",
+        "summary": "Books season seats based on the specified booking request and returns the keys of the successfully booked\nseats.",
+        "description": "This method performs an asynchronous operation to book seats for a season. If the\n            booking request is invalid or if the booking process fails due to service issues, an appropriate error\n            response is returned.",
         "operationId": "BookSeasonSeatsAsync",
         "requestBody": {
-          "description": "The booking request containing details of the season seats to be booked. This parameter must not be null and\r\n            should include valid seat identifiers.",
+          "description": "The booking request containing details of the season seats to be booked. This parameter must not be null and\n            should include valid seat identifiers.",
           "content": {
             "application/json-patch+json": {
               "schema": {
@@ -237,7 +237,7 @@
         "summary": "Releases the specified seats for an event or season, making them available for booking.",
         "operationId": "ReleaseBookedSeatsAsync",
         "requestBody": {
-          "description": "The request containing the event or season key and the list of seat identifiers to release. The key cannot\r\n            be null or empty, and the list of seats must contain at least one item.",
+          "description": "The request containing the event or season key and the list of seat identifiers to release. The key cannot\n            be null or empty, and the list of seats must contain at least one item.",
           "content": {
             "application/json-patch+json": {
               "schema": {
@@ -342,46 +342,6 @@
         "deprecated": true
       }
     },
-    "/api/categories/names": {
-      "get": {
-        "tags": [
-          "Categories"
-        ],
-        "summary": "Retrieves a list of category names available in the system.",
-        "operationId": "GetCategoriesNames",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/charts/{chartKey}": {
       "get": {
         "tags": [
@@ -464,193 +424,16 @@
         }
       }
     },
-    "/api/events": {
-      "get": {
-        "tags": [
-          "Events"
-        ],
-        "summary": "Retrieves a paginated list of events filtered by venue, category, date range, and search criteria.",
-        "operationId": "GetEventsAsync",
-        "parameters": [
-          {
-            "name": "venues",
-            "in": "query",
-            "description": "A comma-separated list of venue identifiers used to filter the events. If null or empty, events from all\r\n            venues are included.",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "categories",
-            "in": "query",
-            "description": "A comma-separated list of event category names used to filter the events. If null or empty, events from all\r\n            categories are included.",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "startDate",
-            "in": "query",
-            "description": "The start date and time for filtering events. Only events occurring on or after this date are included. If\r\n            null, no lower date bound is applied.",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "endDate",
-            "in": "query",
-            "description": "The end date and time for filtering events. Only events occurring on or before this date are included. If\r\n            null, no upper date bound is applied.",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "search",
-            "in": "query",
-            "description": "A search term used to filter events by name or description. If null or empty, no search filtering is\r\n            applied.",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sortBy",
-            "in": "query",
-            "description": "The field by which to sort the events. Defaults to \"dateTime\" if not specified.",
-            "schema": {
-              "type": "string",
-              "default": "dateTime"
-            }
-          },
-          {
-            "name": "descending",
-            "in": "query",
-            "description": "Indicates whether the results should be sorted in descending order. Set to true to sort\r\n            descending; otherwise, ascending.",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "description": "The page number of results to retrieve. Must be greater than zero.",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 1
-            }
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "description": "The maximum number of events to include in a single page of results. Must be greater than zero.",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 10
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/EventListItemPagedResponse"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EventListItemPagedResponse"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EventListItemPagedResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/events/{eventId}": {
-      "get": {
-        "tags": [
-          "Events"
-        ],
-        "summary": "Retrieves the details of the event specified by its unique identifier.",
-        "description": "This method performs an asynchronous operation to fetch event details from the event\r\n            service. If the event is not found, a 404 Not Found response is returned.",
-        "operationId": "GetEvenByIdAsync",
-        "parameters": [
-          {
-            "name": "eventId",
-            "in": "path",
-            "description": "The unique identifier of the event to retrieve. Must be a positive long value.",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/EventListItem"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EventListItem"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EventListItem"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/hold-seats": {
       "post": {
         "tags": [
           "Hold"
         ],
         "summary": "Asynchronously holds the specified seats for an event and returns a token representing the hold.",
-        "description": "This method reserves the requested seats for a limited time, allowing further actions\r\n            such as purchase or release. If the event is not found or the seat information is invalid, the operation may\r\n            fail. Exception handling should be implemented to manage such cases appropriately.",
+        "description": "This method reserves the requested seats for a limited time, allowing further actions\n            such as purchase or release. If the event is not found or the seat information is invalid, the operation may\n            fail. Exception handling should be implemented to manage such cases appropriately.",
         "operationId": "HoldSeatsAsync",
         "requestBody": {
-          "description": "The request containing the event identifier and the collection of seat identifiers to be held. The event\r\n            identifier must correspond to an existing event, and the seat identifiers must be valid for that event.",
+          "description": "The request containing the event identifier and the collection of seat identifiers to be held. The event\n            identifier must correspond to an existing event, and the seat identifiers must be valid for that event.",
           "content": {
             "application/json-patch+json": {
               "schema": {
@@ -719,7 +502,7 @@
           "Hold"
         ],
         "summary": "Retrieves the hold token associated with the specified token string.",
-        "description": "This method is asynchronous and may involve network calls to retrieve the hold token.\r\n            Ensure that the hold token is valid before calling this method.",
+        "description": "This method is asynchronous and may involve network calls to retrieve the hold token.\n            Ensure that the hold token is valid before calling this method.",
         "operationId": "GetHoldTokenAsync",
         "parameters": [
           {
@@ -760,7 +543,7 @@
           "Hold"
         ],
         "summary": "Releases the hold on seats associated with the specified hold token.",
-        "description": "This method is asynchronous and should be awaited. It communicates with the seat\r\n            management service to release the hold, and may throw exceptions if the hold token is invalid or if service\r\n            errors occur.",
+        "description": "This method is asynchronous and should be awaited. It communicates with the seat\n            management service to release the hold, and may throw exceptions if the hold token is invalid or if service\n            errors occur.",
         "operationId": "ReleaseHoldSeatsAsync",
         "parameters": [
           {
@@ -1078,7 +861,7 @@
         "tags": [
           "ManageSeats"
         ],
-        "summary": "Updates the extra data (reason, color) for the specified seats in a Seats.io event.\r\nSend an empty object to clear extra data.",
+        "summary": "Updates the extra data (reason, color) for the specified seats in a Seats.io event.\nSend an empty object to clear extra data.",
         "operationId": "UpdateSeatExtraDataAsync",
         "requestBody": {
           "description": "The event key, seat keys, and extra data to set on each seat.",
@@ -2031,7 +1814,7 @@
         "tags": [
           "Reports"
         ],
-        "summary": "Retrieves a summary report of seat availability, grouped by availability reason\r\n(available, booked, reservedByToken, not_for_sale, and any custom statuses).",
+        "summary": "Retrieves a summary report of seat availability, grouped by availability reason\n(available, booked, reservedByToken, not_for_sale, and any custom statuses).",
         "operationId": "GetAvailabilityReasonSummaryAsync",
         "parameters": [
           {
@@ -2623,81 +2406,6 @@
         },
         "additionalProperties": false
       },
-      "EventListItem": {
-        "required": [
-          "availableSeats",
-          "id",
-          "name",
-          "scheduledStartDate",
-          "totalSeats",
-          "venueMapId"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "scheduledStartDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "name": {
-            "type": "string"
-          },
-          "category": {
-            "type": "string"
-          },
-          "venueMapId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "venueName": {
-            "type": "string"
-          },
-          "externalEventKey": {
-            "type": "string"
-          },
-          "availableSeats": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "totalSeats": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
-      "EventListItemPagedResponse": {
-        "required": [
-          "page",
-          "pageSize",
-          "totalCount"
-        ],
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EventListItem"
-            }
-          },
-          "totalCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "page": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "pageSize": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
       "EventObjectInfo": {
         "type": "object",
         "properties": {
@@ -3182,33 +2890,6 @@
         },
         "additionalProperties": false
       },
-      "ProblemDetails": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "nullable": true
-          },
-          "title": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "detail": {
-            "type": "string",
-            "nullable": true
-          },
-          "instance": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": { }
-      },
       "ReleaseBookedSeatsRequest": {
         "type": "object",
         "properties": {
@@ -3544,13 +3225,7 @@
       "name": "Booking"
     },
     {
-      "name": "Categories"
-    },
-    {
       "name": "Charts"
-    },
-    {
-      "name": "Events"
     },
     {
       "name": "Hold"

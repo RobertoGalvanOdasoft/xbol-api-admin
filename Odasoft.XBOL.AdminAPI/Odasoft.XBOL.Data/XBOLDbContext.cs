@@ -22,6 +22,7 @@ namespace Odasoft.XBOL.Data
         public DbSet<VenueMap> VenueMaps => Set<VenueMap>();
         public DbSet<Venue> Venues => Set<Venue>();
         public DbSet<Event> Events => Set<Event>();
+        public DbSet<EventCategory> EventCategories => Set<EventCategory>();
         public DbSet<EventSeat> EventSeats => Set<EventSeat>();
         public DbSet<EventSection> EventSections => Set<EventSection>();
         public DbSet<EventSchedule> EventSchedules => Set<EventSchedule>();
@@ -72,6 +73,7 @@ namespace Odasoft.XBOL.Data
 
             modelBuilder.RemovePluralizingTableNameConvention();
 
+            modelBuilder.ApplyConfiguration(new EventConfiguration());
             modelBuilder.ApplyConfiguration(new ClientConfiguration());
             modelBuilder.ApplyConfiguration(new ClientCreditAccountConfiguration());
             modelBuilder.ApplyConfiguration(new ClientCreditTransactionConfiguration());

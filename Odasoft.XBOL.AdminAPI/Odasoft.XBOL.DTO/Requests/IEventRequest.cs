@@ -1,5 +1,3 @@
-using Odasoft.XBOL.Commons.Enums;
-
 namespace Odasoft.XBOL.DTO.Requests
 {
     public interface IEventRequest
@@ -10,6 +8,6 @@ namespace Odasoft.XBOL.DTO.Requests
         string? ShortDescription { get; set; }
         string? LongDescription { get; set; }
 
-        EventCategory? Category { get; set; }
+        List<long> CategoryIds { get; set; }
     }
 }

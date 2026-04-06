@@ -5,7 +5,7 @@ namespace Odasoft.XBOL.DTO
         public required long Id { get; set; }
         public required DateTimeOffset ScheduledStartDate { get; set; }
         public required string Name { get; set; }
-        public string? Category { get; set; }
+        public List<Results.EventCategoryResult> Categories { get; set; } = [];
         public long? VenueMapId { get; set; }
         public string? VenueName { get; set; }
         public string? ExternalEventKey { get; set; }

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Odasoft.XBOL.Commons.Enums;
+using Odasoft.XBOL.Data;
 using Odasoft.XBOL.Data.Repositories;
 using Odasoft.XBOL.DTO;
 using Odasoft.XBOL.DTO.Requests;
@@ -8,7 +9,7 @@ using Odasoft.XBOL.DTO.Results;
 
 namespace Odasoft.XBOL.Business.Services
 {
-    public class EventService(EventRepository eventRepository)
+    public class EventService(EventRepository eventRepository, XBOLDbContext dbContext)
     {
 
         public async Task<PagedResponse<EventListItemDTO>> GetEventListAsync(
@@ -89,6 +90,10 @@ namespace Odasoft.XBOL.Business.Services
 
         public async Task<EventResult?> CreateEventAsync(CreateEventRequest request)
         {
+            var categories = await dbContext.EventCategories
+                .Where(c => request.CategoryIds.Contains(c.Id))
+                .ToListAsync();
+
             Models.Event newEvent = new()
             {
                 VenueMapId = request.VenueMapId,
@@ -96,7 +101,7 @@ namespace Odasoft.XBOL.Business.Services
                 Subtitle = request.Subtitle,
                 ShortDescription = request.ShortDescription,
                 LongDescription = request.LongDescription,
-                Category = request.Category,
+                Categories = categories,
                 Status = EventStatus.Draft,
                 CreatedAt = DateTimeOffset.UtcNow,
                 CreatedBy = Guid.Empty, // TODO: Replace with actual user ID from context
@@ -121,31 +126,50 @@ namespace Odasoft.XBOL.Business.Services
                 Subtitle = newEvent.Subtitle,
                 ShortDescription = newEvent.ShortDescription,
                 LongDescription = newEvent.LongDescription,
-                Category = newEvent.Category,
+                Categories = [.. newEvent.Categories.Select(c => new EventCategoryResult
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    DisplayName = c.DisplayName,
+                    IsActive = c.IsActive,
+                })],
                 Status = newEvent.Status
             };
         }
 
         public async Task<bool> UpdateEventAsync(long eventId, UpdateEventRequest request)
         {
-            Models.Event? existingEvent = await eventRepository.GetByIdAsync(eventId);
+            var existingEvent = await dbContext.Events
+                .Include(e => e.Categories)
+                .FirstOrDefaultAsync(e => e.Id == eventId);
+
             if (existingEvent == null)
             {
                 Console.WriteLine($"Event with ID {eventId} not found.");
                 return false;
             }
+
             existingEvent.VenueMapId = request.VenueMapId;
             existingEvent.Name = request.Name;
             existingEvent.Subtitle = request.Subtitle;
             existingEvent.ShortDescription = request.ShortDescription;
             existingEvent.LongDescription = request.LongDescription;
-            existingEvent.Category = request.Category;
             existingEvent.UpdatedAt = DateTimeOffset.UtcNow;
             existingEvent.UpdatedBy = Guid.Empty; // TODO: Replace with actual user ID from context
+
+            var newCategories = await dbContext.EventCategories
+                .Where(c => request.CategoryIds.Contains(c.Id))
+                .ToListAsync();
+
+            existingEvent.Categories.Clear();
+            foreach (var cat in newCategories)
+            {
+                existingEvent.Categories.Add(cat);
+            }
+
             try
             {
-                await eventRepository.UpdateAsync(existingEvent);
-                await eventRepository.CommitAsync();
+                await dbContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {

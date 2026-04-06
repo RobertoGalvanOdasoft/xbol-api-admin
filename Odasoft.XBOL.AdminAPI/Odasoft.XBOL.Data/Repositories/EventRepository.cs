@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Odasoft.XBOL.Commons.Enums;
 using Odasoft.XBOL.DTO;
 using Odasoft.XBOL.DTO.Response;
+using Odasoft.XBOL.DTO.Results;
 using Odasoft.XBOL.Models;
 
 namespace Odasoft.XBOL.Data.Repositories
@@ -55,22 +56,22 @@ namespace Odasoft.XBOL.Data.Repositories
             {
                 if (upcoming.Value)
                 {
-                    query = query.Where(x => x.Schedule.EndDateTime >= DateTimeOffset.UtcNow);
+                    query = query.Where(x => x.Schedule!.EndDateTime >= DateTimeOffset.UtcNow);
                 }
                 else
                 {
-                    query = query.Where(x => x.Schedule.EndDateTime <= DateTimeOffset.UtcNow);
+                    query = query.Where(x => x.Schedule!.EndDateTime <= DateTimeOffset.UtcNow);
                 }
             }
 
             if (venueNames.Count > 0)
             {
-                query = query.Where(x => venueNames.Contains(x.Event.VenueMap.Venue.Name));
+                query = query.Where(x => venueNames.Contains(x.Event.VenueMap!.Venue.Name));
             }
 
             if (categoryList.Count > 0)
             {
-                query = query.Where(x => categoryList.Contains(x.Event.Category.ToString()));
+                query = query.Where(x => x.Event.Categories.Any(c => categoryList.Contains(c.Name)));
             }
 
             if (startDate.HasValue)
@@ -98,11 +99,13 @@ namespace Odasoft.XBOL.Data.Repositories
                     ? query.OrderByDescending(x => x.Event.Name).ThenByDescending(x => x.Event.Id)
                     : query.OrderBy(x => x.Event.Name).ThenByDescending(x => x.Event.Id),
                 "category" => descending
-                    ? query.OrderByDescending(x => x.Event.Category).ThenByDescending(x => x.Event.Id)
-                    : query.OrderBy(x => x.Event.Category).ThenByDescending(x => x.Event.Id),
+                    ? query.OrderByDescending(x => x.Event.Categories.OrderBy(c => c.Name).Select(c => c.Name).FirstOrDefault())
+                          .ThenByDescending(x => x.Event.Id)
+                    : query.OrderBy(x => x.Event.Categories.OrderBy(c => c.Name).Select(c => c.Name).FirstOrDefault())
+                          .ThenByDescending(x => x.Event.Id),
                 "venue" => descending
-                    ? query.OrderByDescending(x => x.Event.VenueMap.Venue.Name).ThenByDescending(x => x.Event.Id)
-                    : query.OrderBy(x => x.Event.VenueMap.Venue.Name).ThenByDescending(x => x.Event.Id),
+                    ? query.OrderByDescending(x => x.Event.VenueMap!.Venue.Name).ThenByDescending(x => x.Event.Id)
+                    : query.OrderBy(x => x.Event.VenueMap!.Venue.Name).ThenByDescending(x => x.Event.Id),
                 "createdat" => descending
                     ? query.OrderByDescending(x => x.Event.CreatedAt).ThenByDescending(x => x.Event.Id)
                     : query.OrderBy(x => x.Event.CreatedAt).ThenByDescending(x => x.Event.Id),
@@ -119,12 +122,18 @@ namespace Odasoft.XBOL.Data.Repositories
                     Id = x.Event.Id,
                     ScheduledStartDate = x.Schedule!.StartDateTime,
                     Name = x.Event.Name,
-                    Category = x.Event.Category.ToString(),
+                    Categories = x.Event.Categories.Select(c => new EventCategoryResult
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        DisplayName = c.DisplayName,
+                        IsActive = c.IsActive,
+                    }).ToList(),
                     VenueMapId = x.Event.VenueMapId,
-                    VenueName = x.Event.VenueMap.Venue.Name,
-                    ExternalEventKey = x.Schedule.ExternalEventKey,
-                    TotalSeats = x.Schedule.Sections.Sum(s => s.TotalSeats),
-                    AvailableSeats = x.Schedule.Sections.Sum(s => s.AvailableSeats),
+                    VenueName = x.Event.VenueMap!.Venue.Name,
+                    ExternalEventKey = x.Schedule!.ExternalEventKey,
+                    TotalSeats = x.Schedule!.Sections.Sum(s => s.TotalSeats),
+                    AvailableSeats = x.Schedule!.Sections.Sum(s => s.AvailableSeats),
                     PosterImageUrl = x.Event.PosterImageUrl
                 })
                 .ToListAsync();
@@ -159,9 +168,15 @@ namespace Odasoft.XBOL.Data.Repositories
                     OnSaleDate = e.Schedules.Min(s => s.OnSaleDate),
                     OffSaleDate = e.Schedules.Max(s => s.OffSaleDate),
                     Name = e.Name,
-                    Category = e.Category.ToString(),
+                    Categories = e.Categories.Select(c => new EventCategoryResult
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        DisplayName = c.DisplayName,
+                        IsActive = c.IsActive,
+                    }).ToList(),
                     VenueMapId = e.VenueMapId,
-                    VenueName = e.VenueMap.Venue.Name,
+                    VenueName = e.VenueMap!.Venue.Name,
                     ExternalEventKey = e.Schedules.First(s => s.ExternalEventKey != null).ExternalEventKey,
                     TotalSeats = e.Schedules.Sum(s => s.Sections.Sum(sec => sec.TotalSeats)),
                     AvailableSeats = e.Schedules.Sum(s => s.Sections.Sum(sec => sec.AvailableSeats)),
@@ -180,7 +195,7 @@ namespace Odasoft.XBOL.Data.Repositories
                     OnSaleDate = s.OnSaleDate,
                     OffSaleDate = s.OffSaleDate,
                     Name = s.Name,
-                    Category = "Season",
+                    Categories = new List<EventCategoryResult>(),
                     VenueMapId = 0,
                     VenueName = null,
                     ExternalEventKey = s.ExternalSeasonKey,
@@ -203,8 +218,10 @@ namespace Odasoft.XBOL.Data.Repositories
                     ? query.OrderByDescending(x => x.Name).ThenByDescending(x => x.Id)
                     : query.OrderBy(x => x.Name).ThenByDescending(x => x.Id),
                 "category" => descending
-                    ? query.OrderByDescending(x => x.Category).ThenByDescending(x => x.Id)
-                    : query.OrderBy(x => x.Category).ThenByDescending(x => x.Id),
+                    ? query.OrderByDescending(x => x.Categories.OrderBy(c => c.Name).Select(c => c.Name).FirstOrDefault())
+                          .ThenByDescending(x => x.Id)
+                    : query.OrderBy(x => x.Categories.OrderBy(c => c.Name).Select(c => c.Name).FirstOrDefault())
+                          .ThenByDescending(x => x.Id),
                 "venue" => descending
                     ? query.OrderByDescending(x => x.VenueName).ThenByDescending(x => x.Id)
                     : query.OrderBy(x => x.VenueName).ThenByDescending(x => x.Id),
@@ -221,7 +238,7 @@ namespace Odasoft.XBOL.Data.Repositories
                    Id = x.Id,
                    ScheduledStartDate = x.ScheduledStartDate,
                    Name = x.Name,
-                   Category = x.Category,
+                   Categories = x.Categories,
                    VenueMapId = x.VenueMapId,
                    VenueName = x.VenueName,
                    ExternalEventKey = x.ExternalEventKey,
@@ -285,10 +302,16 @@ namespace Odasoft.XBOL.Data.Repositories
                     Id = e.Id,
                     Name = e.Name,
                     Subtitle = e.Subtitle,
-                    Category = e.Category.ToString(),
+                    Categories = e.Categories.Select(c => new EventCategoryResult
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        DisplayName = c.DisplayName,
+                        IsActive = c.IsActive,
+                    }).ToList(),
                     BannerImageUrl = e.BannerImageUrl,
                     VenueMapId = e.VenueMapId,
-                    VenueName = e.VenueMap.Venue.Name,
+                    VenueName = e.VenueMap!.Venue.Name,
                     Prices = prices,
                     Schedules = e.Schedules
                         .OrderBy(s => s.StartDateTime)

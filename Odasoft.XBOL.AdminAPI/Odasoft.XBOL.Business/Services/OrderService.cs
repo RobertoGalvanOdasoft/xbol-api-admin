@@ -660,7 +660,7 @@ namespace Odasoft.XBOL.Business.Services
 
                 return new OrderItemResponse
                 {
-                    Id = oi.Id,
+                    Id = seasonPass.Id,
                     IsSeasonItem = oi.ItemType == Enums.ItemType.SeasonPass,
                     SeatObjectKey = seasonPass?.TrackingCode ?? "",
                     Zone = seasonPass?.SeasonSeat?.BaseSeat?.BaseRow.BaseSection.BaseZone.Name ?? "",
@@ -720,7 +720,7 @@ namespace Odasoft.XBOL.Business.Services
 
                 return new OrderItemResponse
                 {
-                    Id = oi.Id,
+                    Id = ticket.Id,
                     IsSeasonItem = oi.ItemType == Enums.ItemType.SeasonPass,
                     SeatObjectKey = ticket?.TicketCode ?? "",
                     Zone = ticket?.EventSection.BaseSection.BaseZone.Name ?? "",

@@ -28,13 +28,13 @@ namespace Odasoft.XBOL.Commons.Enums
         ReissueTickets,
 
         [Description("Send individual tickets")]
-        SendIndiviualTickets,
+        SendIndividualTickets,
 
         [Description("Resend courtesy tickets.")]
         ResendCourtesyTickets,
 
         [Description("Convert to digital/physical tickets.")]
-        ConvertToDigitalPyshical,
+        ConvertToDigitalPhysical,
 
         [Description("Cancel tickets.")]
         CancelTickets

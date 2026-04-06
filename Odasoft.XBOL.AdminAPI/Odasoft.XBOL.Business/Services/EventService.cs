@@ -54,7 +54,7 @@ namespace Odasoft.XBOL.Business.Services
             int? page,
             int? pageSize)
         {
-            var events = await eventRepository.GetEventListAsync(
+            var events = await eventRepository.GetEventsOnSaleAsync(
                 venues,
                 categories,
                 startDate,
@@ -63,8 +63,7 @@ namespace Odasoft.XBOL.Business.Services
                 sortBy,
                 descending ?? false,
                 page ?? 1,
-                pageSize ?? 10,
-                upcoming: true);
+                pageSize ?? 10);
             return events;
         }
 

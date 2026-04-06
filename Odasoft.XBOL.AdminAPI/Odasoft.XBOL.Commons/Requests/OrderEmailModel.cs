@@ -2,6 +2,8 @@ using Odasoft.XBOL.Commons.Email;
 
 namespace Odasoft.XBOL.Commons.Requests;
 
+// TODO: Move this to a proper namespace like Odasoft.XBOL.Commons.Email.Models
+
 public class OrderEmailModel : EmailModelBase
 {
     public required string EventTitle { get; set; }

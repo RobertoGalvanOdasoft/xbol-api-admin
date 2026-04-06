@@ -20,6 +20,7 @@ namespace Odasoft.XBOL.Business.Extensions
             services.AddScoped<LegalRepresentativeService>();
             services.AddScoped<PhoneRegionCodesService>();
             services.AddScoped<OrderActionService>();
+            services.AddScoped<ReportService>();
             services.AddScoped<OrderService>();
             services.AddScoped<SeatManagementService>();
             services.AddScoped<SeasonPassService>();

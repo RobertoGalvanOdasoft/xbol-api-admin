@@ -12,6 +12,8 @@
     <PackageReference Include="Hangfire.NetCore" Version="1.8.23" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.3" />
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.3" />
+    <PackageReference Include="PuppeteerSharp" Version="24.40.0" />
+    <PackageReference Include="QRCoder" Version="1.8.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -135,48 +135,51 @@ namespace Odasoft.XBOL.Business.Services
                 await repository.UpdateAsync(existingClient);
                 await repository.CommitAsync();
 
-                ClientCreditAccount? clientCreditAccount = await clientCreditRepository.GetByIdAsync(request.Credit.Id ?? 0);
-
-                if (clientCreditAccount is null)
+                if (request.Credit != null)
                 {
-                    if (request.HasCredit)
+                    ClientCreditAccount? clientCreditAccount = await clientCreditRepository.GetByIdAsync(request.Credit.Id ?? 0);
+
+                    if (clientCreditAccount is null)
                     {
-                        clientCreditAccount = new()
+                        if (request.HasCredit)
                         {
-                            ClientId = existingClient.Id,
-                            CreditStatus = CreditStatus.Pending,
-                            CurrentBalance = 0,
-                            // TODO: Update data from logged user identity
-                            UpdatedAt = DateTimeOffset.UtcNow,
-                            UpdatedBy = Guid.Empty,
-                            IsActive = true,
-                            EndDate = null,
-                            CreditLimit = request.Credit.AuthorizedAmount ?? 0,
-                            StartDate = (request.Credit.StartDate ?? DateTimeOffset.UnixEpoch).ToUniversalTime(),
-                            PaymentFrequency = request.Credit.PaymentCycleTypeId ?? PaymentFrequency.Monthly,
-                            AppliesInterestRate = request.Credit.InterestApply ?? false
-                        };
+                            clientCreditAccount = new()
+                            {
+                                ClientId = existingClient.Id,
+                                CreditStatus = CreditStatus.Pending,
+                                CurrentBalance = 0,
+                                // TODO: Update data from logged user identity
+                                UpdatedAt = DateTimeOffset.UtcNow,
+                                UpdatedBy = Guid.Empty,
+                                IsActive = true,
+                                EndDate = null,
+                                CreditLimit = request.Credit.AuthorizedAmount ?? 0,
+                                StartDate = (request.Credit.StartDate ?? DateTimeOffset.UnixEpoch).ToUniversalTime(),
+                                PaymentFrequency = request.Credit.PaymentCycleTypeId ?? PaymentFrequency.Monthly,
+                                AppliesInterestRate = request.Credit.InterestApply ?? false
+                            };
 
-                        await clientCreditRepository.InsertAsync(clientCreditAccount);
-                        await clientCreditRepository.CommitAsync();
-                    }
-                }
-                else
-                {
-                    if (request.HasCredit)
-                    {
-                        clientCreditAccount.CreditLimit = request.Credit.AuthorizedAmount ?? 0;
-                        clientCreditAccount.StartDate = (request.Credit.StartDate ?? DateTimeOffset.UnixEpoch).ToUniversalTime();
-                        clientCreditAccount.PaymentFrequency = request.Credit.PaymentCycleTypeId ?? PaymentFrequency.Monthly;
-                        clientCreditAccount.AppliesInterestRate = request.Credit.InterestApply ?? false;
+                            await clientCreditRepository.InsertAsync(clientCreditAccount);
+                            await clientCreditRepository.CommitAsync();
+                        }
                     }
                     else
                     {
-                        clientCreditAccount.IsActive = false;
-                    }
+                        if (request.HasCredit)
+                        {
+                            clientCreditAccount.CreditLimit = request.Credit.AuthorizedAmount ?? 0;
+                            clientCreditAccount.StartDate = (request.Credit.StartDate ?? DateTimeOffset.UnixEpoch).ToUniversalTime();
+                            clientCreditAccount.PaymentFrequency = request.Credit.PaymentCycleTypeId ?? PaymentFrequency.Monthly;
+                            clientCreditAccount.AppliesInterestRate = request.Credit.InterestApply ?? false;
+                        }
+                        else
+                        {
+                            clientCreditAccount.IsActive = false;
+                        }
 
-                    await clientCreditRepository.UpdateAsync(clientCreditAccount);
-                    await clientCreditRepository.CommitAsync();
+                        await clientCreditRepository.UpdateAsync(clientCreditAccount);
+                        await clientCreditRepository.CommitAsync();
+                    }
                 }
 
                 if (request.LegalRep != null)
@@ -408,8 +411,9 @@ namespace Odasoft.XBOL.Business.Services
                 .AsNoTracking()
                 .Where(c => c.IsActive
                     && ((phoneRegionCodeId.HasValue
-                            ? (c.PhoneNumber == phoneNumber && c.PhoneRegionCodeId == phoneRegionCodeId.Value)
-                            : c.PhoneNumber == phoneNumber)
+                            ? ((c.PhoneNumber != null && c.PhoneNumber == phoneNumber) && c.PhoneRegionCodeId == phoneRegionCodeId.Value)
+                            : (c.PhoneNumber != null && c.PhoneNumber == phoneNumber)
+                            )
                         || (email != null && c.Email == email))
                         )
                 .Select(c => new ClientContactResponse

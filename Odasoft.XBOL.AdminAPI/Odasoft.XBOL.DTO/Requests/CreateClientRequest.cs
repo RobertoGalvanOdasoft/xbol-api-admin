@@ -27,8 +27,8 @@ namespace Odasoft.XBOL.DTO.Requests
 
         public bool HasCredit { get; set; }
 
-        public LegalRepForm LegalRep { get; set; } = new();
-        public CreditForm Credit { get; set; } = new();
+        public LegalRepForm? LegalRep { get; set; }
+        public CreditForm? Credit { get; set; }
     }
 
     public class LegalRepForm

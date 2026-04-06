@@ -10,11 +10,11 @@
         "tags": [
           "Booking"
         ],
-        "summary": "Books event seats based on the specified booking request and returns the keys of the successfully booked\nseats.",
-        "description": "This method performs an asynchronous operation to book seats for an event. If the\n            booking request is invalid or if the booking process fails due to service issues, an appropriate error\n            response is returned.",
+        "summary": "Books event seats based on the specified booking request and returns the keys of the successfully booked\r\nseats.",
+        "description": "This method performs an asynchronous operation to book seats for an event. If the\r\n            booking request is invalid or if the booking process fails due to service issues, an appropriate error\r\n            response is returned.",
         "operationId": "BookEventSeatsAsync",
         "requestBody": {
-          "description": "The booking request containing details of the event seats to be booked. This parameter must not be null and\n            should include valid seat identifiers.",
+          "description": "The booking request containing details of the event seats to be booked. This parameter must not be null and\r\n            should include valid seat identifiers.",
           "content": {
             "application/json-patch+json": {
               "schema": {
@@ -122,11 +122,11 @@
         "tags": [
           "Booking"
         ],
-        "summary": "Books season seats based on the specified booking request and returns the keys of the successfully booked\nseats.",
-        "description": "This method performs an asynchronous operation to book seats for a season. If the\n            booking request is invalid or if the booking process fails due to service issues, an appropriate error\n            response is returned.",
+        "summary": "Books season seats based on the specified booking request and returns the keys of the successfully booked\r\nseats.",
+        "description": "This method performs an asynchronous operation to book seats for a season. If the\r\n            booking request is invalid or if the booking process fails due to service issues, an appropriate error\r\n            response is returned.",
         "operationId": "BookSeasonSeatsAsync",
         "requestBody": {
-          "description": "The booking request containing details of the season seats to be booked. This parameter must not be null and\n            should include valid seat identifiers.",
+          "description": "The booking request containing details of the season seats to be booked. This parameter must not be null and\r\n            should include valid seat identifiers.",
           "content": {
             "application/json-patch+json": {
               "schema": {
@@ -237,7 +237,7 @@
         "summary": "Releases the specified seats for an event or season, making them available for booking.",
         "operationId": "ReleaseBookedSeatsAsync",
         "requestBody": {
-          "description": "The request containing the event or season key and the list of seat identifiers to release. The key cannot\n            be null or empty, and the list of seats must contain at least one item.",
+          "description": "The request containing the event or season key and the list of seat identifiers to release. The key cannot\r\n            be null or empty, and the list of seats must contain at least one item.",
           "content": {
             "application/json-patch+json": {
               "schema": {
@@ -475,7 +475,7 @@
           {
             "name": "venues",
             "in": "query",
-            "description": "A comma-separated list of venue identifiers used to filter the events. If null or empty, events from all\n            venues are included.",
+            "description": "A comma-separated list of venue identifiers used to filter the events. If null or empty, events from all\r\n            venues are included.",
             "schema": {
               "type": "string"
             }
@@ -483,7 +483,7 @@
           {
             "name": "categories",
             "in": "query",
-            "description": "A comma-separated list of event category names used to filter the events. If null or empty, events from all\n            categories are included.",
+            "description": "A comma-separated list of event category names used to filter the events. If null or empty, events from all\r\n            categories are included.",
             "schema": {
               "type": "string"
             }
@@ -491,7 +491,7 @@
           {
             "name": "startDate",
             "in": "query",
-            "description": "The start date and time for filtering events. Only events occurring on or after this date are included. If\n            null, no lower date bound is applied.",
+            "description": "The start date and time for filtering events. Only events occurring on or after this date are included. If\r\n            null, no lower date bound is applied.",
             "schema": {
               "type": "string",
               "format": "date-time"
@@ -500,7 +500,7 @@
           {
             "name": "endDate",
             "in": "query",
-            "description": "The end date and time for filtering events. Only events occurring on or before this date are included. If\n            null, no upper date bound is applied.",
+            "description": "The end date and time for filtering events. Only events occurring on or before this date are included. If\r\n            null, no upper date bound is applied.",
             "schema": {
               "type": "string",
               "format": "date-time"
@@ -509,7 +509,7 @@
           {
             "name": "search",
             "in": "query",
-            "description": "A search term used to filter events by name or description. If null or empty, no search filtering is\n            applied.",
+            "description": "A search term used to filter events by name or description. If null or empty, no search filtering is\r\n            applied.",
             "schema": {
               "type": "string"
             }
@@ -526,7 +526,7 @@
           {
             "name": "descending",
             "in": "query",
-            "description": "Indicates whether the results should be sorted in descending order. Set to true to sort\n            descending; otherwise, ascending.",
+            "description": "Indicates whether the results should be sorted in descending order. Set to true to sort\r\n            descending; otherwise, ascending.",
             "schema": {
               "type": "boolean",
               "default": false
@@ -583,7 +583,7 @@
           "Events"
         ],
         "summary": "Retrieves the details of the event specified by its unique identifier.",
-        "description": "This method performs an asynchronous operation to fetch event details from the event\n            service. If the event is not found, a 404 Not Found response is returned.",
+        "description": "This method performs an asynchronous operation to fetch event details from the event\r\n            service. If the event is not found, a 404 Not Found response is returned.",
         "operationId": "GetEvenByIdAsync",
         "parameters": [
           {
@@ -647,10 +647,10 @@
           "Hold"
         ],
         "summary": "Asynchronously holds the specified seats for an event and returns a token representing the hold.",
-        "description": "This method reserves the requested seats for a limited time, allowing further actions\n            such as purchase or release. If the event is not found or the seat information is invalid, the operation may\n            fail. Exception handling should be implemented to manage such cases appropriately.",
+        "description": "This method reserves the requested seats for a limited time, allowing further actions\r\n            such as purchase or release. If the event is not found or the seat information is invalid, the operation may\r\n            fail. Exception handling should be implemented to manage such cases appropriately.",
         "operationId": "HoldSeatsAsync",
         "requestBody": {
-          "description": "The request containing the event identifier and the collection of seat identifiers to be held. The event\n            identifier must correspond to an existing event, and the seat identifiers must be valid for that event.",
+          "description": "The request containing the event identifier and the collection of seat identifiers to be held. The event\r\n            identifier must correspond to an existing event, and the seat identifiers must be valid for that event.",
           "content": {
             "application/json-patch+json": {
               "schema": {
@@ -719,7 +719,7 @@
           "Hold"
         ],
         "summary": "Retrieves the hold token associated with the specified token string.",
-        "description": "This method is asynchronous and may involve network calls to retrieve the hold token.\n            Ensure that the hold token is valid before calling this method.",
+        "description": "This method is asynchronous and may involve network calls to retrieve the hold token.\r\n            Ensure that the hold token is valid before calling this method.",
         "operationId": "GetHoldTokenAsync",
         "parameters": [
           {
@@ -760,7 +760,7 @@
           "Hold"
         ],
         "summary": "Releases the hold on seats associated with the specified hold token.",
-        "description": "This method is asynchronous and should be awaited. It communicates with the seat\n            management service to release the hold, and may throw exceptions if the hold token is invalid or if service\n            errors occur.",
+        "description": "This method is asynchronous and should be awaited. It communicates with the seat\r\n            management service to release the hold, and may throw exceptions if the hold token is invalid or if service\r\n            errors occur.",
         "operationId": "ReleaseHoldSeatsAsync",
         "parameters": [
           {
@@ -1078,7 +1078,7 @@
         "tags": [
           "ManageSeats"
         ],
-        "summary": "Updates the extra data (reason, color) for the specified seats in a Seats.io event.\nSend an empty object to clear extra data.",
+        "summary": "Updates the extra data (reason, color) for the specified seats in a Seats.io event.\r\nSend an empty object to clear extra data.",
         "operationId": "UpdateSeatExtraDataAsync",
         "requestBody": {
           "description": "The event key, seat keys, and extra data to set on each seat.",
@@ -1924,6 +1924,142 @@
         }
       }
     },
+    "/api/reports/{key}/summary/by-section": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Retrieves a summary report of seat availability, grouped by section.",
+        "operationId": "GetSectionSummaryAsync",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/SectionSummaryDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reports/{key}/summary/by-zone": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Retrieves a summary report of seat availability, grouped by zone.",
+        "operationId": "GetZoneSummaryAsync",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/ZoneSummaryDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reports/{key}/summary/by-availability": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Retrieves a summary report of seat availability, grouped by availability (available vs not_available).",
+        "operationId": "GetAvailabilitySummaryAsync",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/AvailabilitySummaryDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reports/{key}/summary/by-availability-reason": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Retrieves a summary report of seat availability, grouped by availability reason\r\n(available, booked, reservedByToken, not_for_sale, and any custom statuses).",
+        "operationId": "GetAvailabilityReasonSummaryAsync",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/AvailabilityReasonSummaryDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/tests": {
       "get": {
         "tags": [
@@ -1983,6 +2119,96 @@
   },
   "components": {
     "schemas": {
+      "AvailabilityReasonSummaryDto": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "byStatus": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "byAvailability": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "byCategoryLabel": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "byCategoryKey": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "byChannel": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "AvailabilitySummaryDto": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "byStatus": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "byAvailability": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "byCategoryLabel": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "byCategoryKey": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "byChannel": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "BookSeatsActionRequest": {
         "required": [
           "clientContact",
@@ -3130,6 +3356,51 @@
         },
         "additionalProperties": false
       },
+      "SectionSummaryDto": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "byStatus": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "byAvailability": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "byCategoryLabel": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "byCategoryKey": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "byChannel": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "SetForSaleRequest": {
         "required": [
           "eventKey",
@@ -3220,6 +3491,51 @@
           }
         },
         "additionalProperties": false
+      },
+      "ZoneSummaryDto": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "byStatus": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "byAvailability": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "byCategoryLabel": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "byCategoryKey": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "byChannel": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        },
+        "additionalProperties": false
       }
     }
   },
@@ -3241,6 +3557,9 @@
     },
     {
       "name": "ManageSeats"
+    },
+    {
+      "name": "Reports"
     },
     {
       "name": "Test"

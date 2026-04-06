@@ -58,9 +58,9 @@ namespace Odasoft.XBOL.Business.Services
                     OrderAction.ResendReceipt => await EmailResendReceiptAsync(orderId, request),
                     OrderAction.UpdateOrderHolder => true,
                     OrderAction.ReissueTickets => await EmailReIssueTicketsAsync(orderId, request),
-                    OrderAction.SendIndiviualTickets => await EmailSendTicketsAsync(orderId, request),
+                    OrderAction.SendIndividualTickets => await EmailSendTicketsAsync(orderId, request),
                     OrderAction.ResendCourtesyTickets => await EmailSendCourtesiesAsync(orderId, request),
-                    OrderAction.ConvertToDigitalPyshical => await ConvertToDigitalPhysicalAsync(orderId, request),
+                    OrderAction.ConvertToDigitalPhysical => await ConvertToDigitalPhysicalAsync(orderId, request),
                     OrderAction.CancelTickets => await CancelItemsAsync(orderId, request),
                     _ => false
                 };
@@ -106,6 +106,8 @@ namespace Odasoft.XBOL.Business.Services
             {
                 Order? order = await _orderRepository
                                         .Get()
+                                        .AsNoTracking()
+                                        .Include(o => o.Items)
                                         .Where(o => o.Id == orderId)
                                         .SingleOrDefaultAsync();
 
@@ -130,12 +132,15 @@ namespace Odasoft.XBOL.Business.Services
                 {
                     var seasonPasses = await _seasonPassRepository
                                             .Get()
+                                            .AsNoTracking()
                                             .Where(sp => order.Items.Select(i => i.ItemReferenceId).Contains(sp.Id))
                                             .ToListAsync();
 
                     foreach (var sp in seasonPasses)
                     {
                         sp.Status = SeasonPassStatus.Cancelled;
+                        sp.UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime();
+                        await _seasonPassRepository.UpdateAsync(sp);
                     }
 
                     await _seasonPassRepository.CommitAsync();
@@ -144,19 +149,24 @@ namespace Odasoft.XBOL.Business.Services
                 {
                     var tickets = await _ticketRepository
                                             .Get()
+                                            .AsNoTracking()
                                             .Where(t => order.Items.Select(i => i.ItemReferenceId).Contains(t.Id))
                                             .ToListAsync();
 
                     foreach (var ticket in tickets)
                     {
                         ticket.Status = TicketStatus.Cancelled;
+                        ticket.UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime();
+                        await _ticketRepository.UpdateAsync(ticket);
                     }
 
                     await _ticketRepository.CommitAsync();
                 }
 
                 order.Status = OrderStatus.Cancelled;
+                order.UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime();
 
+                await _orderRepository.UpdateAsync(order);
                 await _orderRepository.CommitAsync();
                 await EmailCancelOrderAsync(orderId, request);
 
@@ -225,10 +235,19 @@ namespace Odasoft.XBOL.Business.Services
 
             var tickets = await _ticketRepository
                                         .Get()
+                                        .Include(t => t.EventSchedule)
                                         .AsNoTracking()
-                                        .Where(t => seatIds.Contains(t.Id)
-                                            && t.Status != TicketStatus.Cancelled)
+                                        .Where(t => seatIds.Contains(t.Id))
                                         .ToListAsync();
+
+            if (tickets.Count == 0)
+            {
+                return null;
+            }
+
+            key = tickets.First().EventSchedule.ExternalEventKey;
+
+            seatKeys.AddRange(tickets.Select(t => t.TicketCode));
 
             return new ReleaseBookedSeatsRequest
             {
@@ -244,9 +263,9 @@ namespace Odasoft.XBOL.Business.Services
 
             var seasonPasses = await _seasonPassRepository
                                         .Get()
+                                        .Include(sp => sp.Season)
                                         .AsNoTracking()
-                                        .Where(sp => seatIds.Contains(sp.Id)
-                                            && sp.Status != SeasonPassStatus.Cancelled)
+                                        .Where(sp => seatIds.Contains(sp.Id))
                                         .ToListAsync();
 
             if (seasonPasses.Count == 0)
@@ -278,6 +297,7 @@ namespace Odasoft.XBOL.Business.Services
 
                 Order? order = await _orderRepository
                                         .Get()
+                                        .Include(o => o.Items)
                                         .AsNoTracking()
                                         .Where(o => o.Id == orderId)
                                         .SingleOrDefaultAsync();
@@ -335,6 +355,7 @@ namespace Odasoft.XBOL.Business.Services
         {
             var tickets = await _ticketRepository
                                 .Get()
+                                .AsNoTracking()
                                 .Where(t => ticketIds.Contains(t.Id)
                                     && t.Status != TicketStatus.Cancelled)
                                 .ToListAsync();
@@ -342,6 +363,8 @@ namespace Odasoft.XBOL.Business.Services
             foreach (var ticket in tickets)
             {
                 ticket.Status = TicketStatus.Cancelled;
+                ticket.UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime();
+                await _ticketRepository.UpdateAsync(ticket);
             }
 
             await _ticketRepository.CommitAsync();
@@ -351,6 +374,7 @@ namespace Odasoft.XBOL.Business.Services
         {
             var seasonPasses = await _seasonPassRepository
                                         .Get()
+                                        .AsNoTracking()
                                         .Where(sp => seasonPassIds.Contains(sp.Id)
                                             && sp.Status != SeasonPassStatus.Cancelled)
                                         .ToListAsync();
@@ -358,6 +382,8 @@ namespace Odasoft.XBOL.Business.Services
             foreach (var sp in seasonPasses)
             {
                 sp.Status = SeasonPassStatus.Cancelled;
+                sp.UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime();
+                await _seasonPassRepository.UpdateAsync(sp);
             }
 
             await _seasonPassRepository.CommitAsync();
@@ -389,14 +415,15 @@ namespace Odasoft.XBOL.Business.Services
                 {
                     List<SeasonPass> seasonPasses = await _seasonPassRepository
                                             .Get()
-                                            .Where(sp => seatIds.Contains(sp.Id)
-                                                && sp.Status != SeasonPassStatus.Cancelled
-                                                && sp.IsDigital == !request.ChangeToDigital)
+                                            .AsNoTracking()
+                                            .Where(sp => seatIds.Contains(sp.Id))
                                             .ToListAsync();
 
                     foreach (var sp in seasonPasses)
                     {
                         sp.IsDigital = request.ChangeToDigital;
+                        sp.UpdatedAt = DateTime.UtcNow;
+                        await _seasonPassRepository.UpdateAsync(sp);
                     }
 
                     await _seasonPassRepository.CommitAsync();
@@ -405,14 +432,15 @@ namespace Odasoft.XBOL.Business.Services
                 {
                     List<Ticket> tickets = await _ticketRepository
                                             .Get()
-                                            .Where(t => seatIds.Contains(t.Id)
-                                                && t.Status != TicketStatus.Cancelled
-                                                && t.IsDigital == !request.ChangeToDigital)
+                                            .AsNoTracking()
+                                            .Where(t => seatIds.Contains(t.Id))
                                             .ToListAsync();
 
                     foreach (var ticket in tickets)
                     {
                         ticket.IsDigital = request.ChangeToDigital;
+                        ticket.UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime();
+                        await _ticketRepository.UpdateAsync(ticket);
                     }
 
                     await _ticketRepository.CommitAsync();
@@ -447,7 +475,7 @@ namespace Odasoft.XBOL.Business.Services
 
                 model.Subject = request.ActionName;
 
-                _backgroundJobClient.Enqueue<IEmailJob>(x => x.SendOrderEmailAsync(model, EmailTemplateConstants.ORDER_CONFIRMATION));
+                _backgroundJobClient.Enqueue<IEmailJob>(x => x.SendOrderEmailAsync(model, EmailTemplateConstants.ORDER_CONFIRMATION, true));
 
                 return true;
             }
@@ -478,7 +506,7 @@ namespace Odasoft.XBOL.Business.Services
                 model.Subject = request.ActionName;
                 model.Seats.RemoveAll(s => !request.Seats.Values.Contains(s.SeatKey));
 
-                _backgroundJobClient.Enqueue<IEmailJob>(x => x.SendOrderEmailAsync(model, EmailTemplateConstants.ORDER_REIISUE_TICKETS));
+                _backgroundJobClient.Enqueue<IEmailJob>(x => x.SendOrderEmailAsync(model, EmailTemplateConstants.ORDER_REISSUE_TICKETS, true));
 
                 return true;
             }
@@ -509,7 +537,7 @@ namespace Odasoft.XBOL.Business.Services
                 model.Subject = request.ActionName;
                 model.Seats.RemoveAll(s => !request.Seats.Values.Contains(s.SeatKey));
 
-                _backgroundJobClient.Enqueue<IEmailJob>(x => x.SendOrderEmailAsync(model, EmailTemplateConstants.ORDER_SEND_TICKETS));
+                _backgroundJobClient.Enqueue<IEmailJob>(x => x.SendOrderEmailAsync(model, EmailTemplateConstants.ORDER_SEND_TICKETS, true));
 
                 return true;
             }
@@ -540,7 +568,7 @@ namespace Odasoft.XBOL.Business.Services
                 model.Subject = request.ActionName;
                 model.Seats.RemoveAll(s => !request.Seats.Values.Contains(s.SeatKey));
 
-                _backgroundJobClient.Enqueue<IEmailJob>(x => x.SendOrderEmailAsync(model, EmailTemplateConstants.ORDER_CANCELLED));
+                _backgroundJobClient.Enqueue<IEmailJob>(x => x.SendOrderEmailAsync(model, EmailTemplateConstants.ORDER_CANCELLED, true));
 
                 return true;
             }
@@ -570,7 +598,7 @@ namespace Odasoft.XBOL.Business.Services
                 OrderEmailModel model = await _orderService.BuildOrderEmailModelAsync(orderId, request.NewEmail, "", DEFAULT_CULTURE);
                 model.Subject = request.ActionName;
 
-                _backgroundJobClient.Enqueue<IEmailJob>(x => x.SendOrderEmailAsync(model, EmailTemplateConstants.ORDER_CANCELLED));
+                _backgroundJobClient.Enqueue<IEmailJob>(x => x.SendOrderEmailAsync(model, EmailTemplateConstants.ORDER_CANCELLED, false));
 
                 return true;
             }
@@ -601,7 +629,7 @@ namespace Odasoft.XBOL.Business.Services
                 model.Subject = request.ActionName;
                 model.Seats.RemoveAll(s => !request.Seats.Values.Contains(s.SeatKey));
 
-                _backgroundJobClient.Enqueue<IEmailJob>(x => x.SendOrderEmailAsync(model, EmailTemplateConstants.ORDER_CANCELLED));
+                _backgroundJobClient.Enqueue<IEmailJob>(x => x.SendOrderEmailAsync(model, EmailTemplateConstants.ORDER_CANCELLED, false));
 
                 return true;
             }

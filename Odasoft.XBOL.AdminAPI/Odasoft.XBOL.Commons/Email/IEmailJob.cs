@@ -8,5 +8,5 @@ public interface IEmailJob
 
     Task SendOrderConfirmationAsync(OrderEmailModel model);
 
-    Task SendOrderEmailAsync(OrderEmailModel model, string template);
+    Task SendOrderEmailAsync(OrderEmailModel model, string template, bool generateTickets);
 }

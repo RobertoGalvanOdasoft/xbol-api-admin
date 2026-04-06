@@ -27,7 +27,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         [EndpointName("PerformOrderActionAsync")]
         [ProducesResponseType(typeof(long), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
-        public async Task<ActionResult> PerformOrderActionAsync([FromRoute] long orderId, OrderActionRequest request)
+        public async Task<ActionResult> PerformOrderActionAsync([FromRoute] long orderId, [FromBody] OrderActionRequest request)
         {
             bool? result = await _orderActionService.PerformOrderActionAsync(orderId, request);
 

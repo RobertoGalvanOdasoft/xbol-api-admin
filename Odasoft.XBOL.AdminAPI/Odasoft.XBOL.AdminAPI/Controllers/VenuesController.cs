@@ -70,7 +70,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// </summary>
         /// <returns>An ActionResult containing the list of venue cites name.
         /// Returns an empty collection if no venues are available.</returns>
-        [HttpGet("/cities")]
+        [HttpGet("cities-catalog")]
         [EndpointName("GetVenueCitiesCatalogAsync")]
         [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<string>>> GetVenueCitiesCatalogAsync()

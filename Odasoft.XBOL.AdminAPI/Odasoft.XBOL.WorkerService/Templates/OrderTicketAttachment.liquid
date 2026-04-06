@@ -1,0 +1,26 @@
+
+    <!DOCTYPE html>
+    <html lang='es'>
+    <head>
+        <meta charset='UTF-8'>
+        <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; padding: 20px; display: flex; justify-content: center; }
+            .ticket { background-color: #fff; border: 2px dashed #333; border-radius: 10px; width: 400px; padding: 30px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+            h1 { color: #2c3e50; margin-bottom: 5px; }
+            p { color: #7f8c8d; font-size: 16px; margin-bottom: 20px; }
+            .qr-container { margin: 20px 0; }
+            .qr-container img { width: 200px; height: 200px; }
+            .footer { margin-top: 20px; font-size: 12px; color: #aaa; }
+        </style>
+    </head>
+    <body>
+        <div class='ticket'>
+            <h1>{{ event }}</h1>
+            <p>{{ orderReference }}</p>
+            <div class='qr-container'>
+                <img src='data:image/png;base64,{{ qrBase64 }}' alt='Código QR' />
+            </div>
+            <div class='footer'>{{ seatKey }}</div>
+        </div>
+    </body>
+    </html>

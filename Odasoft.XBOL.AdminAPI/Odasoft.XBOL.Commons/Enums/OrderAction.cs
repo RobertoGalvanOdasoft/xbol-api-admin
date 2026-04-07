@@ -12,8 +12,8 @@ namespace Odasoft.XBOL.Commons.Enums
         [Description("Order renewed.")]
         OrderRenewed,
 
-        [Description("Cancel order.")]
-        CancelOrder,
+        [Description("Cancel with refund.")]
+        CancelWithRefund,
 
         [Description("Cancel without refund.")]
         CancelWithoutRefund,

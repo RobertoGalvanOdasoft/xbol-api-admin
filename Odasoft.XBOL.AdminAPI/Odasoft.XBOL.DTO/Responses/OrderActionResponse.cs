@@ -15,5 +15,7 @@ namespace Odasoft.XBOL.DTO.Responses
         public required string Comments { get; set; }
 
         public required DateTimeOffset CreatedAt { get; set; }
+
+        public required string CreatedBy { get; set; }
     }
 }

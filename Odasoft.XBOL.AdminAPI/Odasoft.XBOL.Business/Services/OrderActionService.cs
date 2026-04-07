@@ -53,7 +53,7 @@ namespace Odasoft.XBOL.Business.Services
                 {
                     OrderAction.OrderCreated => true,
                     OrderAction.OrderRenewed => true,
-                    OrderAction.CancelOrder => await CancelOrderAsync(orderId, request),
+                    OrderAction.CancelWithRefund => await CancelOrderAsync(orderId, request),
                     OrderAction.CancelWithoutRefund => await CancelOrderAsync(orderId, request),
                     OrderAction.ResendReceipt => await EmailResendReceiptAsync(orderId, request),
                     OrderAction.UpdateOrderHolder => true,
@@ -95,7 +95,8 @@ namespace Odasoft.XBOL.Business.Services
                                 Action = x.Action,
                                 ActionName = x.ActionName,
                                 Comments = x.Comments,
-                                CreatedAt = x.CreatedAt
+                                CreatedAt = x.CreatedAt,
+                                CreatedBy = "John Doe"
                             }).ToListAsync();
         }
 
@@ -140,6 +141,7 @@ namespace Odasoft.XBOL.Business.Services
                     {
                         sp.Status = SeasonPassStatus.Cancelled;
                         sp.UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime();
+                        sp.UpdatedBy = Guid.Empty;
                         await _seasonPassRepository.UpdateAsync(sp);
                     }
 
@@ -157,6 +159,7 @@ namespace Odasoft.XBOL.Business.Services
                     {
                         ticket.Status = TicketStatus.Cancelled;
                         ticket.UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime();
+                        ticket.UpdatedBy = Guid.Empty;
                         await _ticketRepository.UpdateAsync(ticket);
                     }
 
@@ -165,6 +168,7 @@ namespace Odasoft.XBOL.Business.Services
 
                 order.Status = OrderStatus.Cancelled;
                 order.UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime();
+                order.UpdatedBy = Guid.Empty;
 
                 await _orderRepository.UpdateAsync(order);
                 await _orderRepository.CommitAsync();
@@ -222,7 +226,7 @@ namespace Odasoft.XBOL.Business.Services
                 Comments = request.Comments,
                 Seats = string.Join(",", request.Seats.Values),
                 CreatedAt = DateTimeOffset.Now.ToUniversalTime(),
-                CreatedBy = Guid.NewGuid() // This should ideally come from the authenticated user context
+                CreatedBy = Guid.Empty
             });
 
             await _orderActionLogRepository.CommitAsync();
@@ -364,6 +368,8 @@ namespace Odasoft.XBOL.Business.Services
             {
                 ticket.Status = TicketStatus.Cancelled;
                 ticket.UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime();
+                ticket.UpdatedBy = Guid.Empty;
+
                 await _ticketRepository.UpdateAsync(ticket);
             }
 
@@ -383,6 +389,8 @@ namespace Odasoft.XBOL.Business.Services
             {
                 sp.Status = SeasonPassStatus.Cancelled;
                 sp.UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime();
+                sp.UpdatedBy = Guid.Empty;
+
                 await _seasonPassRepository.UpdateAsync(sp);
             }
 
@@ -423,6 +431,8 @@ namespace Odasoft.XBOL.Business.Services
                     {
                         sp.IsDigital = request.ChangeToDigital;
                         sp.UpdatedAt = DateTime.UtcNow;
+                        sp.UpdatedBy = Guid.Empty;
+
                         await _seasonPassRepository.UpdateAsync(sp);
                     }
 
@@ -440,6 +450,8 @@ namespace Odasoft.XBOL.Business.Services
                     {
                         ticket.IsDigital = request.ChangeToDigital;
                         ticket.UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime();
+                        ticket.UpdatedBy = Guid.Empty;
+
                         await _ticketRepository.UpdateAsync(ticket);
                     }
 

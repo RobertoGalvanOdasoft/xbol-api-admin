@@ -106,7 +106,7 @@ public class TestsController(
 
         string html = action switch
         {
-            OrderAction.CancelOrder => await templateService.RenderAsync(EmailTemplateConstants.ORDER_CANCELLED, model),
+            OrderAction.CancelWithRefund => await templateService.RenderAsync(EmailTemplateConstants.ORDER_CANCELLED, model),
             OrderAction.CancelWithoutRefund => await templateService.RenderAsync(EmailTemplateConstants.ORDER_CANCELLED, model),
             OrderAction.ReissueTickets => await templateService.RenderAsync(EmailTemplateConstants.ORDER_REISSUE_TICKETS, model),
             OrderAction.SendIndividualTickets => await templateService.RenderAsync(EmailTemplateConstants.ORDER_SEND_TICKETS, model),

@@ -168,13 +168,7 @@ namespace Odasoft.XBOL.Data.Repositories
                     OnSaleDate = e.Schedules.Min(s => s.OnSaleDate),
                     OffSaleDate = e.Schedules.Max(s => s.OffSaleDate),
                     Name = e.Name,
-                    Categories = e.Categories.Select(c => new EventCategoryResult
-                    {
-                        Id = c.Id,
-                        Name = c.Name,
-                        DisplayName = c.DisplayName,
-                        IsActive = c.IsActive,
-                    }).ToList(),
+                    Categories = new List<EventCategoryResult>(),
                     VenueMapId = e.VenueMapId,
                     VenueName = e.VenueMap!.Venue.Name,
                     ExternalEventKey = e.Schedules.First(s => s.ExternalEventKey != null).ExternalEventKey,
@@ -218,9 +212,13 @@ namespace Odasoft.XBOL.Data.Repositories
                     ? query.OrderByDescending(x => x.Name).ThenByDescending(x => x.Id)
                     : query.OrderBy(x => x.Name).ThenByDescending(x => x.Id),
                 "category" => descending
-                    ? query.OrderByDescending(x => x.Categories.OrderBy(c => c.Name).Select(c => c.Name).FirstOrDefault())
+                    ? query.OrderByDescending(x => DbContext.Set<Models.EventCategory>()
+                          .Where(c => c.Events.Any(e => e.Id == x.Id))
+                          .OrderBy(c => c.Name).Select(c => c.Name).FirstOrDefault())
                           .ThenByDescending(x => x.Id)
-                    : query.OrderBy(x => x.Categories.OrderBy(c => c.Name).Select(c => c.Name).FirstOrDefault())
+                    : query.OrderBy(x => DbContext.Set<Models.EventCategory>()
+                          .Where(c => c.Events.Any(e => e.Id == x.Id))
+                          .OrderBy(c => c.Name).Select(c => c.Name).FirstOrDefault())
                           .ThenByDescending(x => x.Id),
                 "venue" => descending
                     ? query.OrderByDescending(x => x.VenueName).ThenByDescending(x => x.Id)
@@ -248,6 +246,32 @@ namespace Odasoft.XBOL.Data.Repositories
                    IsSeason = x.IsSeason
                })
                .ToListAsync();
+
+            var eventIds = items.Where(x => !x.IsSeason).Select(x => x.Id).ToList();
+            if (eventIds.Count > 0)
+            {
+                var categoriesByEvent = await DbContext.Set<Models.Event>()
+                    .AsNoTracking()
+                    .Where(e => eventIds.Contains(e.Id))
+                    .Select(e => new
+                    {
+                        e.Id,
+                        Categories = e.Categories.Select(c => new EventCategoryResult
+                        {
+                            Id = c.Id,
+                            Name = c.Name,
+                            DisplayName = c.DisplayName,
+                            IsActive = c.IsActive,
+                        }).ToList()
+                    })
+                    .ToDictionaryAsync(x => x.Id, x => x.Categories);
+
+                foreach (var item in items.Where(x => !x.IsSeason))
+                {
+                    if (categoriesByEvent.TryGetValue(item.Id, out var cats))
+                        item.Categories = cats;
+                }
+            }
 
             return new PagedResponse<EventListItemDTO>
             {

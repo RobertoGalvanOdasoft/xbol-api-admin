@@ -20,6 +20,7 @@ namespace Odasoft.XBOL.Data.Extensions
 
             services.AddScoped<SeasonPassRepository>();
 
+            services.AddScoped<AmenityRepository>();
             services.AddScoped<ClientCreditAccountRepository>();
             services.AddScoped<ClientCreditTransactionRepository>();
             services.AddScoped<EventRepository>();
@@ -38,6 +39,7 @@ namespace Odasoft.XBOL.Data.Extensions
             services.AddScoped<SuiteRepository>();
             services.AddScoped<TicketRepository>();
             services.AddScoped<UserRepository>();
+            services.AddScoped<VenueAmenityRepository>();
             services.AddScoped<VenueImageRepository>();
             services.AddScoped<VenueMapRepository>();
             services.AddScoped<VenueRepository>();

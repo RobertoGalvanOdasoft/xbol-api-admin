@@ -20,7 +20,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         }
 
         /// <summary>
-        /// Retrieves a list of all available test suites.
+        /// Retrieves a list of all available suites.
         /// </summary>
         /// <returns>An ActionResult containing a list of test suite results. Returns an empty
         /// list if no suites are available.</returns>

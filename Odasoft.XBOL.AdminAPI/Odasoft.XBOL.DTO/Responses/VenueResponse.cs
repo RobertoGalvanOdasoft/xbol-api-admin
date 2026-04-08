@@ -22,6 +22,8 @@ namespace Odasoft.XBOL.DTO
         public long? PhoneRegionCodeId { get; set; }
         public string DialCode { get; set; } = "";
         public string ContactPhoneNumber { get; set; } = "";
+        public string Policies { get; set; } = "";
+        public string AdditionalComments { get; set; } = "";
 
         public VenueCategory Category { get; set; }
         public VenueStatus Status { get; set; }

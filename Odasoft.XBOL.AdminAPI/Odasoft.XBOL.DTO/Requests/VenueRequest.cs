@@ -23,5 +23,7 @@ namespace Odasoft.XBOL.DTO.Requests
         public long? PhoneRegionCodeId { get; set; }
         public string DialCode { get; set; } = "";
         public string ContactPhoneNumber { get; set; } = "";
+        public string Policies { get; set; } = "";
+        public string AdditionalComments { get; set; } = "";
     }
 }

@@ -24,7 +24,10 @@ public class SeatManagementService(
     public async Task<SeatManagementDetailDTO?> GetDetailAsync(string externalKey)
     {
         var scheduleResult = await GetScheduleDetailAsync(externalKey);
-        if (scheduleResult is not null) return scheduleResult;
+        if (scheduleResult is not null)
+        {
+            return scheduleResult;
+        }
 
         return await GetSeasonDetailAsync(externalKey);
     }
@@ -36,7 +39,10 @@ public class SeatManagementService(
     public async Task<bool> BlockSeatsAsync(string externalKey, BlockSeatsRequest request)
     {
         var resolved = await ResolveExternalKeyAsync(externalKey);
-        if (resolved is null) return false;
+        if (resolved is null)
+        {
+            return false;
+        }
 
         // Set extraData first so the renderer has color context before the seat appears blocked
         await ticketingClient.UpdateSeatExtraDataAsync(new UpdateSeatExtraDataRequest
@@ -70,7 +76,10 @@ public class SeatManagementService(
     public async Task<bool> UnblockSeatsAsync(string externalKey, UnblockSeatsRequest request)
     {
         var resolved = await ResolveExternalKeyAsync(externalKey);
-        if (resolved is null) return false;
+        if (resolved is null)
+        {
+            return false;
+        }
 
         // Overwrite extraData with unblock reason (replaces block reason + color)
         await ticketingClient.UpdateSeatExtraDataAsync(new UpdateSeatExtraDataRequest
@@ -101,7 +110,10 @@ public class SeatManagementService(
     public async Task<bool> EditBlockedSeatsAsync(string externalKey, BlockSeatsRequest request)
     {
         var resolved = await ResolveExternalKeyAsync(externalKey);
-        if (resolved is null) return false;
+        if (resolved is null)
+        {
+            return false;
+        }
 
         await ticketingClient.UpdateSeatExtraDataAsync(new UpdateSeatExtraDataRequest
         {
@@ -130,7 +142,9 @@ public class SeatManagementService(
             .FirstOrDefaultAsync();
 
         if (scheduleId is not null)
+        {
             return new ResolvedKey(BookableUnitType.Schedule, scheduleId.Value);
+        }
 
         var seasonId = await dbContext.Seasons
             .AsNoTracking()
@@ -139,7 +153,9 @@ public class SeatManagementService(
             .FirstOrDefaultAsync();
 
         if (seasonId is not null)
+        {
             return new ResolvedKey(BookableUnitType.Season, seasonId.Value);
+        }
 
         return null;
     }
@@ -164,7 +180,9 @@ public class SeatManagementService(
                 LogMismatch(seats.Count, seatKeys.Count, resolved);
 
                 foreach (var seat in seats)
+                {
                     seat.ForSale = forSale;
+                }
             }
             else
             {
@@ -176,7 +194,9 @@ public class SeatManagementService(
                 LogMismatch(seats.Count, seatKeys.Count, resolved);
 
                 foreach (var seat in seats)
+                {
                     seat.ForSale = forSale;
+                }
             }
 
             await dbContext.SaveChangesAsync();
@@ -214,7 +234,10 @@ public class SeatManagementService(
             .Select(s => (long?)s.Id)
             .FirstOrDefaultAsync();
 
-        if (scheduleId is null) return null;
+        if (scheduleId is null)
+        {
+            return null;
+        }
 
         // Seat-level: individual seats with PriceOverride, grouped by price value
         var seatsPrice = await dbContext.EventSeats
@@ -283,7 +306,10 @@ public class SeatManagementService(
             .Select(s => (long?)s.Id)
             .FirstOrDefaultAsync();
 
-        if (seasonId is null) return null;
+        if (seasonId is null)
+        {
+            return null;
+        }
 
         var seatsPrice = await dbContext.SeasonSeats
             .AsNoTracking()

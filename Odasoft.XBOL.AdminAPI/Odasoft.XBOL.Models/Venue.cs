@@ -26,11 +26,14 @@ namespace Odasoft.XBOL.Models
         public string ContactPhoneNumber { get; set; } = "";
         public VenueStatus Status { get; set; }
         public bool IsDeleted { get; set; }
+        public string Policies { get; set; } = "";
+        public string AdditionalComments { get; set; } = "";
         public DateTimeOffset CreatedAt { get; set; }
         public Guid CreatedBy { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
         public Guid UpdatedBy { get; set; }
         public IList<VenueMap> VenueMaps { get; set; } = [];
         public IList<VenueImage> VenueImages { get; set; } = [];
+        public IList<VenueAmenity> VenueAmenities { get; set; } = [];
     }
 }

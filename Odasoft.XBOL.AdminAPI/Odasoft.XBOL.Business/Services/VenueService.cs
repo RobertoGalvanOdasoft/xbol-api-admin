@@ -6,6 +6,7 @@ using Odasoft.XBOL.DTO;
 using Odasoft.XBOL.DTO.QueryParams;
 using Odasoft.XBOL.DTO.Requests;
 using Odasoft.XBOL.DTO.Response;
+using Odasoft.XBOL.DTO.Responses;
 using Odasoft.XBOL.Models;
 
 namespace Odasoft.XBOL.Business.Services
@@ -47,7 +48,9 @@ namespace Odasoft.XBOL.Business.Services
                                 DialCode = v.PhoneRegionCode == null ? "" : v.PhoneRegionCode.DialCode,
                                 ContactPhoneNumber = v.ContactPhoneNumber,
                                 Category = v.Category,
-                                Status = v.Status
+                                Status = v.Status,
+                                Policies = v.Policies,
+                                AdditionalComments = v.AdditionalComments
                             });
 
             SetCitiesFilter(ref query, queryParams.Cities);
@@ -86,7 +89,9 @@ namespace Odasoft.XBOL.Business.Services
                                 DialCode = v.PhoneRegionCode == null ? "" : v.PhoneRegionCode.DialCode,
                                 ContactPhoneNumber = v.ContactPhoneNumber,
                                 Category = v.Category,
-                                Status = v.Status
+                                Status = v.Status,
+                                Policies = v.Policies,
+                                AdditionalComments = v.AdditionalComments
                             }).FirstOrDefaultAsync();
         }
 
@@ -172,6 +177,8 @@ namespace Odasoft.XBOL.Business.Services
                 venue.ContactEmail = request.ContactEmail;
                 venue.PhoneRegionCodeId = request.PhoneRegionCodeId;
                 venue.ContactPhoneNumber = request.ContactPhoneNumber;
+                venue.Policies = request.Policies;
+                venue.AdditionalComments = request.AdditionalComments;
                 venue.UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime();
                 venue.UpdatedBy = Guid.Empty;
 
@@ -211,6 +218,8 @@ namespace Odasoft.XBOL.Business.Services
                     ContactEmail = request.ContactEmail,
                     PhoneRegionCodeId = request.PhoneRegionCodeId,
                     ContactPhoneNumber = request.ContactPhoneNumber,
+                    Policies = request.Policies,
+                    AdditionalComments = request.AdditionalComments,
                     CreatedAt = DateTimeOffset.UtcNow.ToUniversalTime(),
                     CreatedBy = Guid.Empty,
                     UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime(),
@@ -253,6 +262,30 @@ namespace Odasoft.XBOL.Business.Services
                 Console.WriteLine($"An error occurred while trying to update the status of the Venue. {ex.Message}");
                 return false;
             }
+        }
+
+        public async Task<List<AmenityResponse>> GetAmenityByVenueAsync(long id)
+        {
+            Venue? venue = await _venueRepository
+                           .Get()
+                           .Include(v => v.VenueAmenities)
+                           .ThenInclude(va => va.Amenity)
+                           .AsNoTracking()
+                           .Where(v => v.Id == id)
+                           .FirstOrDefaultAsync();
+
+            if (venue == null)
+            {
+                return null;
+            }
+
+            return venue.VenueAmenities
+                    .Select(va => new AmenityResponse
+                    {
+                        Id = va.Amenity.Id,
+                        Name = va.Amenity.Name,
+                        IconIdentifier = va.Amenity.IconIdentifier
+                    }).ToList();
         }
 
         private void SetCitiesFilter(ref IQueryable<VenueResponse> query, List<string> cities)

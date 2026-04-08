@@ -21,6 +21,10 @@ namespace Odasoft.XBOL.Data.Configurations
             builder.HasMany(x => x.VenueImages)
                 .WithOne(x => x.Venue)
                 .HasForeignKey(x => x.VenueId);
+
+            builder.HasMany(x => x.VenueAmenities)
+                .WithOne(x => x.Venue)
+                .HasForeignKey(x => x.VenueId);
         }
     }
 }

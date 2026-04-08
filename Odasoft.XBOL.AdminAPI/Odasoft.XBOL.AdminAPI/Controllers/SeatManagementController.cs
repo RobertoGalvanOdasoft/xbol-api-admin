@@ -190,7 +190,10 @@ public class SeatManagementController(
         [FromBody] BookSeatsBody request)
     {
         var resolved = await seatManagementService.ResolveExternalKeyAsync(externalKey);
-        if (resolved is null) return NotFound();
+        if (resolved is null)
+        {
+            return NotFound();
+        }
 
         BookingResult? result;
 

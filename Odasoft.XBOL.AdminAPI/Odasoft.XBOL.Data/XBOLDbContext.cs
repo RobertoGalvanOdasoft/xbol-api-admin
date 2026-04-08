@@ -41,6 +41,8 @@ namespace Odasoft.XBOL.Data
         public DbSet<PhoneRegionCode> PhoneRegionCodes => Set<PhoneRegionCode>();
         public DbSet<VenueImage> VenueImages => Set<VenueImage>();
         public DbSet<OrderActionLog> OrderActionLogs => Set<OrderActionLog>();
+        public DbSet<Amenity> Amenities => Set<Amenity>();
+        public DbSet<VenueAmenity> VenueAmenities => Set<VenueAmenity>();
 
         public XBOLDbContext(DbContextOptions<XBOLDbContext> options)
            : base(options)
@@ -73,6 +75,7 @@ namespace Odasoft.XBOL.Data
 
             modelBuilder.RemovePluralizingTableNameConvention();
 
+            modelBuilder.ApplyConfiguration(new AmenityConfiguration());
             modelBuilder.ApplyConfiguration(new EventConfiguration());
             modelBuilder.ApplyConfiguration(new ClientConfiguration());
             modelBuilder.ApplyConfiguration(new ClientCreditAccountConfiguration());
@@ -84,6 +87,7 @@ namespace Odasoft.XBOL.Data
             modelBuilder.ApplyConfiguration(new SuiteConfiguration());
             modelBuilder.ApplyConfiguration(new TicketConfiguration());
             modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new VenueAmenityConfiguration());
             modelBuilder.ApplyConfiguration(new VenueConfiguration());
         }
     }

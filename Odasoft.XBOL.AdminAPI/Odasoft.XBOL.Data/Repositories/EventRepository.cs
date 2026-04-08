@@ -269,7 +269,9 @@ namespace Odasoft.XBOL.Data.Repositories
                 foreach (var item in items.Where(x => !x.IsSeason))
                 {
                     if (categoriesByEvent.TryGetValue(item.Id, out var cats))
+                    {
                         item.Categories = cats;
+                    }
                 }
             }
 

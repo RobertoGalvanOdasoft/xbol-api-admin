@@ -5,6 +5,7 @@ using Odasoft.XBOL.DTO;
 using Odasoft.XBOL.DTO.QueryParams;
 using Odasoft.XBOL.DTO.Requests;
 using Odasoft.XBOL.DTO.Response;
+using Odasoft.XBOL.Models;
 
 namespace Odasoft.XBOL.AdminAPI.Controllers
 {
@@ -146,7 +147,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         }
 
         /// <summary>
-        /// Updaes the venue status.
+        /// Updates the venue status.
         /// </summary>
         /// <param name="venueId">The unique Id of the Venue.</param>
         /// <param name="venueStatus">The new venue status.</param>

@@ -8,6 +8,7 @@ namespace Odasoft.XBOL.Business.Extensions
     {
         public static IServiceCollection ConfigureServices(this IServiceCollection services)
         {
+            services.AddScoped<AmenityService>();
             services.AddScoped<CategoryService>();
             services.AddScoped<ClientCreditAccountService>();
             services.AddScoped<ClientCreditTransactionService>();
@@ -31,6 +32,7 @@ namespace Odasoft.XBOL.Business.Extensions
             services.AddScoped<SuiteAgreementService>();
             services.AddScoped<SuiteLevelService>();
             services.AddScoped<SuiteService>();
+            services.AddScoped<VenueAmenityService>();
             services.AddScoped<VenueImageService>();
             services.AddScoped<VenueMapService>();
             services.AddScoped<VenueService>();

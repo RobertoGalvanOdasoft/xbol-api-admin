@@ -36,6 +36,10 @@ RUN dotnet publish "Odasoft.XBOL.WorkerService.csproj" -c $BUILD_CONFIGURATION -
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
+
+ARG DOCKER_IMAGE_VERSION="0.0.0.0.1"
+ENV DOCKER_IMAGE_VERSION=$DOCKER_IMAGE_VERSION
+
 COPY --from=publish /app/publish .
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \

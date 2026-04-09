@@ -92,5 +92,22 @@ app.UseRequestLocalization();
 
 app.MapControllers();
 
-app.MapHealthChecks("/healthz");
+app.MapHealthChecks("/healthz", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        var appName = app.Environment.ApplicationName ?? "unknown";
+        var environment = app.Environment.EnvironmentName ?? "unknown";
+        var dockerImageVersion = Environment.GetEnvironmentVariable("DOCKER_IMAGE_VERSION") ?? "unknown";
+        var response = new
+        {
+            appName,
+            environment,
+            status = report.Status.ToString(),
+            dockerImageVersion
+        };
+        await context.Response.WriteAsJsonAsync(response);
+    }
+});
 app.Run();

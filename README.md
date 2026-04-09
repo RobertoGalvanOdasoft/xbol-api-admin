@@ -85,6 +85,35 @@ make run      # Run the Docker Compose environment
 - **API Base URL**: <http://localhost:8080>
 - **API Health Check**: <http://localhost:8080/healthz>
 
+#### GCP Secrets
+
+Runtime configuration is stored in GCP Secret Manager. Each environment has a dedicated secret:
+
+| Secret                      | Contents                                                                       |
+| --------------------------- | ------------------------------------------------------------------------------ |
+| `dev-xbol-db-secret`        | PostgreSQL credentials (`DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`, `DB_NAME`) |
+| `dev-xbol-api-admin-secret` | App configuration (connection strings, service URLs)                           |
+
+The app secret stores environment variables using ASP.NET's `__` (double underscore) convention for nested config:
+
+```json
+{
+    "ConnectionStrings__Database": "Host=<DB_HOST>;Port=<DB_PORT>;Database=<DB_NAME>;Username=<DB_USER>;Password=<DB_PASS>",
+    "BackgroundJobs__ConnectionString": "Host=<DB_HOST>;Port=<DB_PORT>;Database=<DB_NAME>;Username=<DB_USER>;Password=<DB_PASS>",
+    "TicketingClient__BaseAddress": "https://dev-api.ticketing.pwrticket.mx"
+}
+```
+
+Connection strings are assembled from the values in `dev-xbol-db-secret`. To update:
+
+```bash
+gcloud secrets versions add dev-xbol-api-admin-secret --data-file=- <<'EOF'
+{ ... }
+EOF
+```
+
+QA secrets follow the same pattern with a `qa-` prefix.
+
 #### Email
 
 Configure SendGrid SMTP relay via environment variables:

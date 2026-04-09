@@ -9,6 +9,8 @@ namespace Odasoft.XBOL.Commons.Enums
         Gallery,
         Logo,
         GeneralView,
-        Facade
+        Facade,
+        VerticalPoster,
+        HorizontalPoster
     }
 }

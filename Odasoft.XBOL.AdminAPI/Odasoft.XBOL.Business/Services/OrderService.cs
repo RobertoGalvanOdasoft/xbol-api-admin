@@ -395,11 +395,16 @@ namespace Odasoft.XBOL.Business.Services
                 PhoneNumber = PhoneNumberHelper.NormalizePhoneNumber(clientInfo.PhoneNumber ?? ""),
                 FullName = clientInfo.FullName,
                 BusinessName = clientInfo.FullName,
+                City = clientInfo.City,
+                Neighborhood = clientInfo.Neighborhood,
+                Gender = (Enums.Gender?)clientInfo.Gender,
+                DateOfBirth = clientInfo.Birthday,
                 ClientType = Enums.ClientType.Individual,
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = Guid.Empty,
                 UpdatedAt = DateTime.UtcNow,
-                UpdatedBy = Guid.Empty
+                UpdatedBy = Guid.Empty,
+                IsActive = true
             };
 
             await _clientRepository.InsertAsync(client);
@@ -584,6 +589,8 @@ namespace Odasoft.XBOL.Business.Services
                 Email = order.Client?.Email ?? "",
                 Neighbourhood = order.Client?.Neighborhood ?? "",
                 City = order.Client?.City ?? "",
+                Gender = order.Client?.Gender,
+                DOB = order.Client?.DateOfBirth,
                 Reference = order.Reference,
             };
         }
@@ -634,6 +641,9 @@ namespace Odasoft.XBOL.Business.Services
                 PhoneNumber = order.Client?.PhoneNumber ?? "",
                 Email = order.Client?.Email ?? "",
                 Neighbourhood = order.Client?.Neighborhood ?? "",
+                City = order.Client?.City ?? "",
+                Gender = order.Client?.Gender,
+                DOB = order.Client?.DateOfBirth,
                 Reference = order.Reference
             };
         }

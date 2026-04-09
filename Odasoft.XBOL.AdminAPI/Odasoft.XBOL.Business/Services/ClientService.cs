@@ -422,7 +422,11 @@ namespace Odasoft.XBOL.Business.Services
                     Name = c.FullName ?? "",
                     Email = c.Email ?? "",
                     PhoneRegionCodeId = c.PhoneRegionCodeId,
-                    PhoneNumber = c.PhoneNumber ?? ""
+                    PhoneNumber = c.PhoneNumber ?? "",
+                    City = c.City,
+                    Neighbourhood = c.Neighborhood,
+                    Gender = c.Gender,
+                    DOB = c.DateOfBirth
                 }).SingleOrDefaultAsync();
 
             return result;

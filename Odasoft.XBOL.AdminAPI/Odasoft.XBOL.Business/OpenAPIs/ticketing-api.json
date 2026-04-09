@@ -2503,6 +2503,13 @@
         },
         "additionalProperties": false
       },
+      "ClientGender": {
+        "enum": [
+          "Female",
+          "Male"
+        ],
+        "type": "string"
+      },
       "ClientInfoRequest": {
         "type": "object",
         "properties": {
@@ -2530,6 +2537,27 @@
           },
           "lastName": {
             "type": "string"
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "neighborhood": {
+            "type": "string",
+            "nullable": true
+          },
+          "gender": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientGender"
+              }
+            ],
+            "nullable": true
+          },
+          "birthday": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           }
         },
         "additionalProperties": false

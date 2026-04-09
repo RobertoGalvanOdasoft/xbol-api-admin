@@ -1,3 +1,5 @@
+using Odasoft.XBOL.Commons.Enums;
+
 namespace Odasoft.XBOL.DTO
 {
     public class ClientContactDTO
@@ -8,5 +10,9 @@ namespace Odasoft.XBOL.DTO
         public string Email { get; set; } = "";
         public string Name { get; set; } = "";
         public string LastName { get; set; } = "";
+        public string? City { get; set; }
+        public string? Neighbourhood { get; set; }
+        public Gender? Gender { get; set; }
+        public DateTimeOffset? DOB { get; set; }
     }
 }

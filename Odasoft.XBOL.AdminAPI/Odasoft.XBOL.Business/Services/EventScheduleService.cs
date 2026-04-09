@@ -30,8 +30,8 @@ namespace Odasoft.XBOL.Business.Services
                 GateOpenDate = request.GateOpenDate.ToUniversalTime(),
                 StartDateTime = request.StartDateTime.ToUniversalTime(),
                 EndDateTime = request.EndDateTime.ToUniversalTime(),
-                Status = ScheduleStatus.Draft,
-                ExternalEventKey = string.Empty,
+                Status = ScheduleStatus.OnSale, // TODO: Replace for draft when a publishing mechanism is available
+                ExternalEventKey = request.ExternalEventKey,
                 CreatedAt = DateTimeOffset.UtcNow,
                 CreatedBy = Guid.Empty,
                 UpdatedAt = DateTimeOffset.UtcNow,
@@ -72,11 +72,10 @@ namespace Odasoft.XBOL.Business.Services
             existingSchedule.GateOpenDate = request.GateOpenDate;
             existingSchedule.StartDateTime = request.StartDateTime;
             existingSchedule.EndDateTime = request.EndDateTime;
+            existingSchedule.ExternalEventKey = request.ExternalEventKey;
 
             existingSchedule.UpdatedAt = DateTimeOffset.UtcNow;
             existingSchedule.UpdatedBy = Guid.Empty;
-
-            // TODO: Add updated At and By columns to schedule or update event instead
 
             try
             {
@@ -96,6 +95,8 @@ namespace Odasoft.XBOL.Business.Services
         public async Task<bool> DeleteScheduleAsync(long id)
         {
             EventSchedule? existingSchedule = await repository.GetByIdAsync(id);
+
+            // TODO: Check if theres tickets, orders, bookings, etc for this event
 
             if (existingSchedule == null)
             {

@@ -15,6 +15,7 @@ namespace Odasoft.XBOL.DTO.Requests
         public DateTimeOffset OffSaleDate { get; set; }
         public DateTimeOffset GateOpenDate { get; set; }
         public AgeRestriction? AgeRestriction { get; set; }
+        public string ExternalEventKey { get; set; } = null!;
         public string? SecurityPolicies { get; set; }
         public string? AdditionalComments { get; set; }
     }

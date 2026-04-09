@@ -154,7 +154,11 @@ namespace Odasoft.XBOL.Data.Repositories.Order
                             : (string.IsNullOrWhiteSpace(o.Client.BusinessName)
                                     ? (o.Client.FullName ?? "")
                                     : o.Client.BusinessName),
-                        LastName = ""
+                        LastName = "",
+                        City = o.Client == null ? null : o.Client.City,
+                        Neighbourhood = o.Client == null ? null : o.Client.Neighborhood,
+                        Gender = o.Client == null ? null : o.Client.Gender,
+                        DOB = o.Client == null ? null : o.Client.DateOfBirth
                     },
                     Seats = o.Tickets
                         .GroupBy(t => t.EventSeat.ExternalSeatObjectKey)

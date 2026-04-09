@@ -1,3 +1,5 @@
+using Odasoft.XBOL.Commons.Enums;
+
 namespace Odasoft.XBOL.DTO.Responses
 {
     public class OrderRenewalInfoResponse
@@ -18,7 +20,7 @@ namespace Odasoft.XBOL.DTO.Responses
         public string Email { get; set; } = "";
         public string City { get; set; } = "";
         public string Neighbourhood { get; set; } = "";
-        public string Gender { get; set; } = "";
+        public Gender? Gender { get; set; }
         public DateTimeOffset? DOB { get; set; }
         public string Reference { get; set; } = "";
 

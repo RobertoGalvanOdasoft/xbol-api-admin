@@ -102,7 +102,10 @@ namespace Odasoft.XBOL.Business.Services
                 ShortDescription = request.ShortDescription,
                 LongDescription = request.LongDescription,
                 Categories = categories,
-                Status = EventStatus.Draft,
+                SecurityPolicies = request.SecurityPolicies,
+                AdditionalComments = request.AdditionalComments,
+                AgeRestriction = request.AgeRestriction,
+                Status = EventStatus.Published, // TODO: Change to draft when publish mechanism is available
                 CreatedAt = DateTimeOffset.UtcNow,
                 CreatedBy = Guid.Empty, // TODO: Replace with actual user ID from context
                 UpdatedAt = DateTimeOffset.UtcNow,
@@ -154,6 +157,9 @@ namespace Odasoft.XBOL.Business.Services
             existingEvent.Subtitle = request.Subtitle;
             existingEvent.ShortDescription = request.ShortDescription;
             existingEvent.LongDescription = request.LongDescription;
+            existingEvent.SecurityPolicies = request.SecurityPolicies;
+            existingEvent.AdditionalComments = request.AdditionalComments;
+            existingEvent.AgeRestriction = request.AgeRestriction;
             existingEvent.UpdatedAt = DateTimeOffset.UtcNow;
             existingEvent.UpdatedBy = Guid.Empty; // TODO: Replace with actual user ID from context
 
@@ -181,7 +187,11 @@ namespace Odasoft.XBOL.Business.Services
 
         public async Task<bool> DeleteEventAsync(long eventId)
         {
-            Models.Event? existingEvent = await eventRepository.GetByIdAsync(eventId);
+            Models.Event? existingEvent = await eventRepository.Get()
+                                        .AsNoTracking()
+                                        .Include(o => o.Schedules)
+                                        .Where(o => o.Id == eventId)
+                                        .SingleOrDefaultAsync();
             if (existingEvent == null)
             {
                 Console.WriteLine($"Event with ID {eventId} not found.");

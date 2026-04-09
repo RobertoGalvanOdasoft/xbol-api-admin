@@ -328,6 +328,8 @@ namespace Odasoft.XBOL.Data.Repositories
                     Id = e.Id,
                     Name = e.Name,
                     Subtitle = e.Subtitle,
+                    ShortDescription = e.ShortDescription,
+                    LongDescription = e.LongDescription,
                     Categories = e.Categories.Select(c => new EventCategoryResult
                     {
                         Id = c.Id,
@@ -336,8 +338,12 @@ namespace Odasoft.XBOL.Data.Repositories
                         IsActive = c.IsActive,
                     }).ToList(),
                     BannerImageUrl = e.BannerImageUrl,
-                    VenueMapId = e.VenueMapId,
+                    VenueId = e.VenueMap!.VenueId,
                     VenueName = e.VenueMap!.Venue.Name,
+                    VenueMapId = e.VenueMapId,
+                    SecurityPolicies = e.SecurityPolicies,
+                    AdditionalComments = e.AdditionalComments,
+                    AgeRestriction = e.AgeRestriction,
                     Prices = prices,
                     Schedules = e.Schedules
                         .OrderBy(s => s.StartDateTime)
@@ -346,12 +352,19 @@ namespace Odasoft.XBOL.Data.Repositories
                             Id = s.Id,
                             StartDateTime = s.StartDateTime,
                             EndDateTime = s.EndDateTime,
+                            OnSaleDate = s.OnSaleDate,
+                            OffSaleDate = s.OffSaleDate,
+                            PreSaleStartDate = s.PreSaleStartDate,
+                            PreSaleEndDate = s.PreSaleEndDate,
+                            GateOpenDate = s.GateOpenDate,
+                            PublishedDate = s.PublishedDate,
                             ExternalEventKey = s.ExternalEventKey,
                             TotalSeats = s.Sections.Sum(sec => sec.TotalSeats),
                             AvailableSeats = s.Sections.Sum(sec => sec.AvailableSeats),
                             Status = s.Status
                         })
-                        .ToList()
+                        .ToList(),
+                    Status = e.Status
                 }).FirstOrDefaultAsync();
 
             return result;

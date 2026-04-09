@@ -185,7 +185,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// <returns>An IActionResult that indicates the result of the update operation. Returns NoContent if the update is
         /// successful; otherwise, returns BadRequest if the input is invalid or UnprocessableEntity if the update
         /// fails.</returns>
-        [HttpPut]
+        [HttpPut("{id:long}")]
         [EndpointName("UpdateEventAsync")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

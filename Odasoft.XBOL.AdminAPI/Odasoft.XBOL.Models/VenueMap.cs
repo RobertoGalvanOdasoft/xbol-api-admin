@@ -7,6 +7,7 @@ namespace Odasoft.XBOL.Models
         public string Name { get; set; } = null!;
         public string ExternalMapKey { get; set; } = null!;
         public int Capacity { get; set; }
+        public string ThumbnailUrl { get; set; } = null!;
         public bool IsDeleted { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public Guid CreatedBy { get; set; }

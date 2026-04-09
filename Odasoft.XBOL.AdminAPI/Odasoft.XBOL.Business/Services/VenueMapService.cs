@@ -27,7 +27,26 @@ namespace Odasoft.XBOL.Business.Services
                                 VenueId = vm.VenueId,
                                 Name = vm.Name,
                                 Capacity = vm.Capacity,
-                                ExternalMapKey = vm.ExternalMapKey
+                                ExternalMapKey = vm.ExternalMapKey,
+                                ThumbnailUrl = vm.ThumbnailUrl
+                            }).ToListAsync();
+        }
+
+        public async Task<IList<VenueMapResponse>> GetVenueMapsByVenueAsync(long venueId)
+        {
+            return await _venueMapRepository
+                            .Get()
+                            .AsNoTracking()
+                            .Where(vm => vm.IsDeleted == false
+                                && vm.VenueId == venueId)
+                            .Select(vm => new VenueMapResponse
+                            {
+                                Id = vm.Id,
+                                VenueId = vm.VenueId,
+                                Name = vm.Name,
+                                Capacity = vm.Capacity,
+                                ExternalMapKey = vm.ExternalMapKey,
+                                ThumbnailUrl = vm.ThumbnailUrl
                             }).ToListAsync();
         }
 
@@ -44,7 +63,8 @@ namespace Odasoft.XBOL.Business.Services
                                 VenueId = vm.VenueId,
                                 Name = vm.Name,
                                 Capacity = vm.Capacity,
-                                ExternalMapKey = vm.ExternalMapKey
+                                ExternalMapKey = vm.ExternalMapKey,
+                                ThumbnailUrl = vm.ThumbnailUrl
                             }).FirstOrDefaultAsync();
         }
 
@@ -91,6 +111,7 @@ namespace Odasoft.XBOL.Business.Services
                 venueMap.Capacity = request.Capacity;
                 venueMap.Name = request.Name;
                 venueMap.ExternalMapKey = request.ExternalMapKey;
+                venueMap.ThumbnailUrl = request.ThumbnailUrl;
                 venueMap.UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime();
                 venueMap.UpdatedBy = Guid.Empty;
 
@@ -104,49 +125,51 @@ namespace Odasoft.XBOL.Business.Services
             }
         }
 
-        public async Task<bool> CreateVenueMapAsync(List<VenueMapRequest> requests)
+        public async Task<long> CreateVenueMapAsync(VenueMapRequest request)
         {
             try
             {
-                foreach (var request in requests)
+                VenueMap venueMap = new VenueMap()
                 {
-                    VenueMap venueMap = new VenueMap()
-                    {
-                        VenueId = request.VenueId,
-                        Capacity = request.Capacity,
-                        Name = request.Name,
-                        ExternalMapKey = request.ExternalMapKey,
-                        CreatedAt = DateTimeOffset.UtcNow.ToUniversalTime(),
-                        CreatedBy = Guid.Empty,
-                        UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime(),
-                        UpdatedBy = Guid.Empty
-                    };
+                    VenueId = request.VenueId,
+                    Capacity = request.Capacity,
+                    Name = request.Name,
+                    ExternalMapKey = request.ExternalMapKey,
+                    ThumbnailUrl = request.ThumbnailUrl,
+                    CreatedAt = DateTimeOffset.UtcNow.ToUniversalTime(),
+                    CreatedBy = Guid.Empty,
+                    UpdatedAt = DateTimeOffset.UtcNow.ToUniversalTime(),
+                    UpdatedBy = Guid.Empty
+                };
 
-                    await _venueMapRepository.InsertAsync(venueMap);
-                }
+                await _venueMapRepository.InsertAsync(venueMap);
 
                 await _venueMapRepository.CommitAsync();
 
-                return true;
+                return venueMap.Id;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred while trying to create a Venue Map. {ex.Message}");
-                return false;
+                return 0;
             }
         }
 
-        public async Task<List<ListItem>> GetVenueMapCatalogByVenueIdAsync(long? venueId)
+        public async Task<List<VenueMapResponse>> GetVenueMapCatalogByVenueIdAsync(long? venueId)
         {
             return await _venueMapRepository
                             .Get()
                             .AsNoTracking()
                             .Where(vm => vm.IsDeleted == false)
                             .Where(vm => venueId == null || vm.VenueId == venueId)
-                            .Select(vm => new ListItem
+                            .Select(vm => new VenueMapResponse
                             {
                                 Id = vm.Id,
-                                Name = vm.Name
+                                VenueId = vm.VenueId,
+                                Name = vm.Name,
+                                Capacity = vm.Capacity,
+                                ExternalMapKey = vm.ExternalMapKey,
+                                ThumbnailUrl = vm.ThumbnailUrl
                             }).ToListAsync();
         }
     }

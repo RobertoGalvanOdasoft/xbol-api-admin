@@ -95,16 +95,36 @@ namespace Odasoft.XBOL.Business.Services
                             }).FirstOrDefaultAsync();
         }
 
-        public async Task<List<ListItem>> GetVenueCatalogAsync()
+        public async Task<List<VenueResponse>> GetVenueCatalogAsync()
         {
             return await _venueRepository.Get()
                             .AsNoTracking()
                             .Where(v => v.IsDeleted == false
                                 && v.Status == VenueStatus.Active)
-                            .Select(v => new ListItem
+                            .Select(v => new VenueResponse
                             {
                                 Id = v.Id,
-                                Name = v.Name
+                                Name = v.Name,
+                                Country = v.Country,
+                                State = v.State,
+                                City = v.City,
+                                Neighborhood = v.Neighborhood,
+                                StreetAddress = v.StreetAddress,
+                                ExtNum = v.ExtNum,
+                                IntNum = v.IntNum,
+                                ZipCode = v.ZipCode,
+                                Latitude = v.Latitude,
+                                Longitude = v.Longitude,
+                                LandingUrl = v.LandingUrl,
+                                ContactName = v.ContactName,
+                                ContactEmail = v.ContactEmail,
+                                PhoneRegionCodeId = v.PhoneRegionCodeId,
+                                DialCode = v.PhoneRegionCode == null ? "" : v.PhoneRegionCode.DialCode,
+                                ContactPhoneNumber = v.ContactPhoneNumber,
+                                Category = v.Category,
+                                Status = v.Status,
+                                Policies = v.Policies,
+                                AdditionalComments = v.AdditionalComments
                             }).ToListAsync();
         }
 

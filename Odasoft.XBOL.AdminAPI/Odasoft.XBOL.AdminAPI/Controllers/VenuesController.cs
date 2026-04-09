@@ -59,8 +59,8 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// Returns an empty collection if no venues are available.</returns>
         [HttpGet("catalog")]
         [EndpointName("GetVenueCatalogAsync")]
-        [ProducesResponseType(typeof(List<ListItem>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<ListItem>>> GetVenueCatalogAsync()
+        [ProducesResponseType(typeof(List<VenueResponse>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<VenueResponse>>> GetVenueCatalogAsync()
         {
             var result = await venueService.GetVenueCatalogAsync();
             return Ok(result);

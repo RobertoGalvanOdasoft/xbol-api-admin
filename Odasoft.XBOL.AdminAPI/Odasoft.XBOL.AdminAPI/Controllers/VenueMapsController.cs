@@ -13,9 +13,6 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// <summary>
         /// Retrieves a collection of venue maps.
         /// </summary>
-        /// <remarks>This method calls the underlying venue map service to obtain the data. Ensure that
-        /// the service is properly configured to return the expected results. The response is returned with an HTTP 200
-        /// status code on success.</remarks>
         /// <returns>An ActionResult containing a list of objects that represent the available venue maps.
         /// The list will be empty if no venue maps are found.</returns>
         [HttpGet]
@@ -28,6 +25,21 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         }
 
         /// <summary>
+        /// Retrieves a collection of venue maps from the venue provided.
+        /// </summary>
+        /// <param name="venueId">Unique venue identifier.</param>
+        /// <returns>An ActionResult containing a list of objects that represent the available venue maps for the venue.
+        /// The list will be empty if no venue maps are found.</returns>
+        [HttpGet("/venue/{venueId:long}")]
+        [EndpointName("GetVenueMapsByVenueAsync")]
+        [ProducesResponseType(typeof(List<VenueMapResponse>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<VenueMapResponse>>> GetVenueMapsAsync([FromRoute] long venueId)
+        {
+            var result = await venueMapService.GetVenueMapsByVenueAsync(venueId);
+            return Ok(result);
+        }
+
+        /// <summary>
         /// Retrieves the venue map details for the specified identifier.
         /// </summary>
         /// <remarks>This method performs an asynchronous lookup for the venue map. If no venue map is
@@ -36,7 +48,7 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// <returns>An ActionResult containing a VenueMapListItemDTO if a venue map with the specified identifier exists;
         /// otherwise, a 404 Not Found response.</returns>
         [HttpGet("{venueMapId:long}")]
-        [EndpointName("GetVenueMapsByIdAsync")]
+        [EndpointName("GetVenueMapsById")]
         [ProducesResponseType(typeof(VenueMapResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<VenueMapResponse>> GetVenueMapsByIdAsync([FromRoute] long venueMapId)
@@ -61,27 +73,27 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
         /// Returns an empty collection if no venue maps are available.</returns>
         [HttpGet("catalog/{venueId:long}")]
         [EndpointName("GetVenueMapCatalogByVenueIdAsync")]
-        [ProducesResponseType(typeof(List<ListItem>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<ListItem>>> GetVenueMapCatalogByVenueIdAsync(long? venueId)
+        [ProducesResponseType(typeof(List<VenueMapResponse>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<VenueMapResponse>>> GetVenueMapCatalogByVenueIdAsync(long? venueId)
         {
             var result = await venueMapService.GetVenueMapCatalogByVenueIdAsync(venueId);
             return Ok(result);
         }
 
         /// <summary>
-        /// Creates a new Venue Map or Maps using the specified request data.
+        /// Creates a new Venue Map using the specified request data.
         /// </summary>
-        /// <param name="requests">The list of details of the Venue Map or Maps to create.</param>
-        /// <returns>An ActionResult to confirm it the Venue Map or Maps were created.</returns>
+        /// <param name="request">The details of the Venue Map to create.</param>
+        /// <returns>An ActionResult to confirm it the Venue Map was created.</returns>
         [HttpPost]
         [EndpointName("CreateVenueMapAsync")]
         [ProducesResponseType(typeof(long), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
-        public async Task<ActionResult<long>> CreateVenueAsync(List<VenueMapRequest> requests)
+        public async Task<ActionResult<long>> CreateVenueAsync(VenueMapRequest request)
         {
-            var result = await venueMapService.CreateVenueMapAsync(requests);
+            var result = await venueMapService.CreateVenueMapAsync(request);
 
-            if (result)
+            if (result > 0)
             {
                 return CreatedAtAction("GetVenueMapsById", new { venueMapId = result }, result);
             }
@@ -132,19 +144,38 @@ namespace Odasoft.XBOL.AdminAPI.Controllers
             return UnprocessableEntity("Unable to delete venue map.");
         }
 
+        /// <summary>
+        /// Retrieves venue map chart data using the unique chart key provided.
+        /// </summary>
+        /// <param name="chartKey">The unique chart key</param>
+        /// <returns>Returns a Chart object containing the venue map data.</returns>
         [HttpGet("{chartKey}/validate")]
         [EndpointName("GetVenueMapChartByKeyAsync")]
-        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<ActionResult<bool>> GetVenueMapChartByKeyAsync([FromRoute] string chartKey)
+        [ProducesResponseType(typeof(Chart), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Chart), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<Chart>> GetVenueMapChartByKeyAsync([FromRoute] string chartKey)
         {
-            Chart? chart = await ticketingClient.GetChartByKeyAsync(chartKey);
-
-            if (chart == null)
+            if (string.IsNullOrWhiteSpace(chartKey))
             {
-                return Ok(false);
+                return BadRequest("Chart key must be provided.");
             }
 
-            return Ok(true);
+            try
+            {
+                Chart chart = await ticketingClient.GetChartByKeyAsync(chartKey);
+
+                return Ok(chart);
+            }
+            catch (ApiException ex)
+            {
+                if (ex.StatusCode == StatusCodes.Status404NotFound)
+                {
+                    return NotFound();
+                }
+
+                throw;
+            }
         }
     }
 }

@@ -7,5 +7,6 @@ namespace Odasoft.XBOL.DTO
         public string? Name { get; set; }
         public string? ExternalMapKey { get; set; }
         public int Capacity { get; set; }
+        public string? ThumbnailUrl { get; set; }
     }
 }

@@ -22,7 +22,7 @@ COPY ["Odasoft.XBOL.DTO/Odasoft.XBOL.DTO.csproj", "Odasoft.XBOL.DTO/"]
 COPY ["Odasoft.XBOL.Commons/Odasoft.XBOL.Commons.csproj", "Odasoft.XBOL.Commons/"]
 
 # Restore dependencies
-RUN dotnet restore "Odasoft.XBOL.AdminAPI/Odasoft.XBOL.AdminAPI.csproj"
+RUN dotnet restore "Odasoft.XBOL.AdminAPI/Odasoft.XBOL.AdminAPI.csproj" --verbosity detailed
 
 # Copy entire source tree
 COPY . .
@@ -44,12 +44,6 @@ ARG DOCKER_IMAGE_VERSION="0.0.0.0.1"
 
 ENV DOCKER_IMAGE_VERSION=$DOCKER_IMAGE_VERSION
 
-ARG ASPNETCORE_HTTP_PORTS="8080"
-ARG ASPNETCORE_ENVIRONMENT="Production"
-
-ENV ASPNETCORE_HTTP_PORTS=$ASPNETCORE_HTTP_PORTS
-ENV ASPNETCORE_ENVIRONMENT=$ASPNETCORE_ENVIRONMENT
-
 # Install curl for health checks (run as root)
 USER root
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
@@ -59,8 +53,5 @@ USER $APP_UID
 
 # Copy published output from publish stage
 COPY --from=publish /app/publish .
-
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD curl --fail http://localhost:8080/healthz || exit 1
 
 ENTRYPOINT ["dotnet", "Odasoft.XBOL.AdminAPI.dll"]
